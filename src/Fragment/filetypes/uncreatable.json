@@ -1,0 +1,6 @@
+{
+  "fragment": ".fragment",
+  "mesh": ".fmesh",
+  "script": ".py",
+  "audio": ".wav"
+}

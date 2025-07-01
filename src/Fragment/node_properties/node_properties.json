@@ -1,0 +1,73 @@
+{
+  "Node": {
+    "position": [[0, 0, 0], "coordinates"],
+    "rotation": [[0, 0, 0], "coordinates"],
+    "scale": [[1, 1, 1], "coordinates"],
+    "visible": [true, "bool"]
+  },
+  "Camera": {
+    "fov": [90, "float"]
+  },
+  "Canvas": {},
+  "Mesh": {},
+  "Text": {
+    "text": ["Write Something ...", "string"],
+    "color": [[1, 1, 1], "color"]
+  },
+  "Light": {
+    "color": [[1, 1, 1], "color"],
+    "strength": [1.0, "float"],
+    "light_source_radius": [0.1, "float"],
+    "light_travel_radius": [10.0, "float"]
+  },
+  "SpotLight": {},
+  "Input": {
+    "input_map": [{}, "input_map"]
+  },
+  "StaticBody": {
+    "friction": [0.5, "float"],
+    "elasticity": [0, "float"]
+  },
+  "RigidBody": {
+    "mass": [1.0, "float"]
+  },
+  "KinematicBody": {},
+  "Ghost": {},
+  "BoxShape": {
+    "dimension": [[1, 1, 1], "coordinates"]
+  },
+  "SphereShape": {
+    "radius": [1, "float"]
+  },
+  "CapsuleShape": {
+    "height": [1, "float"],
+    "radius": [0.5, "float"]
+  },
+  "CustomShape": {
+    "mesh": ["", "path"]
+  },
+  "Bone": {
+    "bone_name": ["", "hidden"],
+    "controlled": [false, "bool"]
+  },
+  "Audio": {
+    "sound": ["", "path"],
+    "speed": [1.0, "float"],
+    "volume": [1.0, "float"]
+  },
+  "Timeline": {
+    "timeline": [[[], []], "timeline"]
+  },
+  "Model": {
+    "model": ["", "path"]
+  },
+  "ModelRoot": {
+    "node_path": ["", "hidden"]
+  },
+  "Skeleton": {},
+  "AnimationBundle": {},
+  "Character": {
+    "animations": [{}, "path_dict"],
+    "model": ["", "path"]
+  }
+}
