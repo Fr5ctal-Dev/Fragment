@@ -3,15 +3,14 @@ sys.path.insert(0, 'fragment/render_pipeline/')
 
 from .window import Window
 from .nodes.node import Node
-import builtins
 import os
 import importlib
+import builtins
 
 
-class Game:
+class GameManager:
     def __init__(self, scene, project_path):
         builtins.game = self
-
         self.project_path = project_path
 
         self.window = Window()
@@ -23,8 +22,8 @@ class Game:
 
         self.scene = content
         self.nodes = {}
-        self.base_node = Node(None, '/')
-        base.render = self.base_node._node
+        self.base_node = Node(None, '/', _game_manager=self)
+        self.window.render = self.base_node._node
 
         self.window.setup()
 
@@ -76,7 +75,7 @@ class Game:
             for key in list(properties.keys()):
                 properties[key] = properties[key][0]
 
-            self.nodes[node] = node_(parent, node, **properties)
+            self.nodes[node] = node_(parent, node, _game_manager=self, **properties)
 
         for node in self.scene.keys():
             self.nodes[node].on_start()
@@ -119,7 +118,7 @@ class Game:
 
         for node in self.scene.keys():
             if self.scene[node]['parent'] == '':
-                parent = game.base_node
+                parent = self.base_node
             else:
                 parent = self.nodes[self.scene[node]['parent']]
 
@@ -139,7 +138,7 @@ class Game:
             for key in list(properties.keys()):
                 properties[key] = properties[key][0]
 
-            self.nodes[node] = node_(parent, node, **properties)
+            self.nodes[node] = node_(parent, node, _game_manager=self, **properties)
 
         for node in self.scene.keys():
             self.nodes[node].on_start()
@@ -153,5 +152,5 @@ class Game:
 
 
 def setup(scene, project_path):
-    game = Game(scene, project_path)
+    game = GameManager(scene, project_path)
     game.run()

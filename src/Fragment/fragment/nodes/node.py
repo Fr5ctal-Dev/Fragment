@@ -1,28 +1,34 @@
 from panda3d.core import NodePath, CardMaker, CompassEffect
 from ..vector import Vec3
 import os
-import builtins
 
 
 class Node:
-    def __init__(self, parent, path, **kwargs):
+    def __init__(self, parent, path, _game_manager=None, _window=None, **kwargs):
+        self._game_manager = _game_manager
+        if self._game_manager:
+            self._window = self._game_manager.window
+        else:
+            self._window = _window
+
         self._properties = kwargs
         self._properties['parent'] = parent
         self._node = self._get_node()
         self._node_path = path
         self._property_init()
         self._node.set_python_tag('owner', self)
+
         try:
-            self._update_task = taskMgr.add(self._update)
+            self._update_task = self._window.taskMgr.add(self._update)
         except NameError:
             pass
-        if not hasattr(builtins, 'game'):
+        if not self._game_manager:
             cm = CardMaker('card')
             cm.set_frame(-0.3, 0.3, -0.3, 0.3)
             card = cm.generate()
             card = self._node.attach_new_node(card)
             card.set_billboard_point_world()
-            card.set_texture(loader.load_texture(kwargs['viewport_card_texture']))
+            card.set_texture(self._window.loader.load_texture(kwargs['viewport_card_texture']))
 
             effect = CompassEffect.make(NodePath('compass'), CompassEffect.P_scale)
             card.set_effect(effect)
@@ -44,7 +50,7 @@ class Node:
 
     def destroy(self):
         self.on_destroy()
-        taskMgr.remove(self._update_task)
+        self._window.taskMgr.remove(self._update_task)
         self._node.remove_node()
 
     def _property_init(self):
@@ -66,7 +72,7 @@ class Node:
 
     def get_node(self, path):
         if path.startswith('/'):
-            return game.get_node(path)
+            return self._game_manager.get_node(path)
         else:
             amount = 0
             for ch in path:
@@ -81,7 +87,7 @@ class Node:
                 if self_node_path == '/':
                     self_node_path = ''
                     break
-            return game.get_node(self_node_path + '/' + path)
+            return self._game_manager.get_node(self_node_path + '/' + path)
 
     def on_start(self):
         pass

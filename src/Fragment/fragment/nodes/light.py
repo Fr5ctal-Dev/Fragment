@@ -6,14 +6,14 @@ from ..vector import Vec3
 class Light(Node):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.light_update_task = taskMgr.add(self._update_light, 'update_light')
+        self.light_update_task = self._window.taskMgr.add(self._update_light, 'update_light')
 
     def _get_node(self):
         self.light = PointLight()
         self.light.casts_shadows = True
         try:
-            game.window.render_pipeline.add_light(self.light)
-        except NameError:
+            self._game_manager.window.render_pipeline.add_light(self.light)
+        except:
             pass
         node = super()._get_node()
         return node
@@ -24,15 +24,15 @@ class Light(Node):
 
     def _update_light(self, task):
         try:
-            self.light.pos = self._node.get_pos(game.base_node._node)
+            self.light.pos = self._node.get_pos(self._game_manager.base_node._node)
         except:
             self.light.pos = self._node.get_pos(self._node.get_top())
         return task.cont
 
     def destroy(self):
-        taskMgr.remove(self.light_update_task)
+        self._window.taskMgr.remove(self.light_update_task)
         try:
-            game.window.render_pipeline.remove_light(self.light)
+            self._game_manager.window.render_pipeline.remove_light(self.light)
         except:
             self._node.get_top().get_python_tag('render_pipeline').remove_light(self.light)
         super().destroy()

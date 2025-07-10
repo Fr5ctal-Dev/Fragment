@@ -28,7 +28,6 @@ class Viewport(QtWidgets.QWidget):
         self.showbase.disable_mouse()
 
         self.render_pipeline.create(self.showbase)
-        self.render_pipeline.daytime_mgr.time = 0.0
 
         self.engine = self.showbase.graphics_engine
         self.buffer = self.showbase.win
@@ -62,7 +61,7 @@ class Viewport(QtWidgets.QWidget):
 
         self.timer = QtCore.QTimer(self)
         self.timer.timeout.connect(self.update)
-        self.timer.start(25)
+        self.timer.start(1)
 
         self.update_physics_timer = QtCore.QTimer(self)
         self.update_physics_timer.timeout.connect(lambda: self.physics_world.do_physics(0.01))
@@ -237,7 +236,7 @@ class Viewport(QtWidgets.QWidget):
     def add_entity(self, type, parent, properties, node_path):
         node_file = importlib.import_module(f'fragment.nodes.{type.lower()}')
         node_class = getattr(node_file, type)
-        node = node_class.to_viewport(parent, node_path, viewport_card_texture=f'assets/node_icons/{type.lower()}.png', **properties)
+        node = node_class.to_viewport(parent, node_path, _window=self.showbase, viewport_card_texture=f'assets/node_icons/{type.lower()}.png', **properties)
         if type in ['Light', 'SpotLight']:
             self.render_pipeline.add_light(node.light)
 

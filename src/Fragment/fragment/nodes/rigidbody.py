@@ -7,7 +7,7 @@ class RigidBody(StaticBody):
         self.body = BulletRigidBodyNode('Body')
         self.mass = self._properties['mass']
         node = self._properties['parent']._node.attach_new_node(self.body)
-        game.window.physics_world.attach_rigid_body(self.body)
+        self._game_manager.window.physics_world.attach_rigid_body(self.body)
         return node
 
     @property

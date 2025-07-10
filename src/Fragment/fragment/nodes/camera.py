@@ -11,10 +11,10 @@ class Camera(Node):
     def _get_node(self):
         camera = PandaNode('camera')
         node = self._properties['parent']._node.attach_new_node(camera)
-        game.window.camera.reparent_to(node)
-        lens = game.window.cam.node().get_lens()
+        self._game_manager.window.camera.reparent_to(node)
+        lens = self._game_manager.window.cam.node().get_lens()
         lens.set_fov(self._properties['fov'])
-        game.window.cam.node().set_lens(lens)
+        self._game_manager.window.cam.node().set_lens(lens)
         return node
 
     @classmethod
@@ -45,6 +45,6 @@ class Camera(Node):
     @fov.setter
     def fov(self, fov):
         self._properties['fov'] = fov
-        lens = game.window.cam.node().get_lens()
+        lens = self._game_manager.window.cam.node().get_lens()
         lens.set_fov(fov)
-        game.window.cam.node().set_lens(lens)
+        self._game_manager.window.cam.node().set_lens(lens)

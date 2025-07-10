@@ -28,7 +28,6 @@ class Window(ShowBase):
 
     def setup(self):
         self.render_pipeline.create(self)
-        self.render_pipeline.daytime_mgr.time = 0.0
 
         self.taskMgr.add(self.update, 'update')
         self.disable_mouse()

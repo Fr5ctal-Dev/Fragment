@@ -15,10 +15,10 @@ class KinematicBody(Node):
         self._node.set_hpr((0, 0, 0))
         self._node = nodepath
         self._property_init()
-        game.window.physics_world.attach_character(self.body)
+        self._game_manager.window.physics_world.attach_character(self.body)
 
     def destroy(self):
-        game.window.physics_world.remove_character(self.body)
+        self._game_manager.window.physics_world.remove_character(self.body)
         super().destroy()
 
     @classmethod

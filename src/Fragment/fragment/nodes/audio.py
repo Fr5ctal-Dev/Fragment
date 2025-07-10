@@ -4,7 +4,7 @@ from .node import Node
 class Audio(Node):
     def _get_node(self):
         node = super()._get_node()
-        self.audio = loader.load_sfx(self._properties['sound'])
+        self.audio = self._window.loader.load_sfx(self._properties['sound'])
         return node
 
     def play(self):

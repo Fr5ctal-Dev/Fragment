@@ -9,7 +9,7 @@ enabled:
     - color_correction
     - forward_shading
     - motion_blur
-    # - pssm
+    - pssm
     - scattering
     - skin_shading
     - sky_ao
@@ -20,7 +20,7 @@ enabled:
     # - env_probes
     - fxaa
     # - volumetrics
-    - vxgi
+    # - vxgi
 
 
 overrides:

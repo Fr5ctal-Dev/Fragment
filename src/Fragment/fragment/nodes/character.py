@@ -41,11 +41,11 @@ class Character(Node):
 
     def handle_animation_change(self, animation):
         if self.current_blend_task is not None:
-            taskMgr.remove(self.current_blend_task)
+            self._window.taskMgr.remove(self.current_blend_task)
             self._node.set_control_effect(self.current_animation, 0)
             self._node.set_control_effect(self.future_animation, 0)
         self.future_animation = animation
-        self.current_blend_task = taskMgr.add(self.blend_update, 'blend_update')
+        self.current_blend_task = self._window.taskMgr.add(self.blend_update, 'blend_update')
 
     def blend_update(self, task):
         if self.current_animation is None:
@@ -80,7 +80,7 @@ class Character(Node):
         self.current_animation = None
         self.future_animation = None
         if self.current_blend_task is not None:
-            taskMgr.remove(self.current_blend_task)
+            self._window.taskMgr.remove(self.current_blend_task)
             self.current_blend_task = None
         self._node.set_control_effect(self.current_animation, 0)
         self._node.set_control_effect(self.future_animation, 0)

@@ -10,15 +10,15 @@ class SpotLight(Light):
         self.light = _SpotLight()
         self.light.casts_shadows = True
         try:
-            game.window.render_pipeline.add_light(self.light)
-        except NameError:
+            self._game_manager.window.render_pipeline.add_light(self.light)
+        except:
             pass
         node = Node._get_node(self)
         return node
 
     def _update_light(self, task):
         try:
-            self.light.direction = game.base_node._node.get_relative_vector(self._node, (0, 1, 0))
+            self.light.direction = self._game_manager.base_node._node.get_relative_vector(self._node, (0, 1, 0))
         except:
             try:
                 self.light.direction = self._node.get_top().get_relative_vector(self._node, (0, 1, 0))

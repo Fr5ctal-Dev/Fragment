@@ -10,7 +10,7 @@ class Ghost(Node):
         node = self._properties['parent']._node.attach_new_node(self.body)
         node.set_collide_mask(BitMask32(0x0f))
         try:
-            game.window.physics_world.attach_ghost(self.body)
+            self._game_manager.window.physics_world.attach_ghost(self.body)
         except:
             node.get_top().get_python_tag('physics_world').attach_ghost(self.body)
         return node
@@ -23,7 +23,7 @@ class Ghost(Node):
 
     def destroy(self):
         try:
-            game.window.physics_world.remove_ghost(self.body)
+            self._game_manager.window.physics_world.remove_ghost(self.body)
         except:
             self._node.get_top().get_python_tag('physics_world').remove_ghost(self.body)
         super().destroy()

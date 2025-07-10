@@ -7,7 +7,7 @@ class Timeline(Node):
         self.timeline = self._properties['timeline'][0]
         self.is_playing = [False, None, None]
         self.prev_time = 0
-        taskMgr.add(self._update_timeline, 'update_timeline')
+        self._window.taskMgr.add(self._update_timeline, 'update_timeline')
 
     def _update_timeline(self, task):
         if self.is_playing[0]:
