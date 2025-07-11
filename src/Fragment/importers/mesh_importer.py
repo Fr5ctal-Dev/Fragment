@@ -43,17 +43,17 @@ class MeshImporter(BaseImporter):
 
         if is_character:
             properties = copy.deepcopy(node_properties['Character'])
-            properties['Character']['model'][0] = file_path
-            properties['Node']['position'][0] = list(model.get_pos())
-            properties['Node']['rotation'][0] = list(model.get_hpr())
-            properties['Node']['scale'][0] = list(model.get_scale())
+            properties['Character']['model'] = file_path
+            properties['Node']['position'] = list(model.get_pos())
+            properties['Node']['rotation'] = list(model.get_hpr())
+            properties['Node']['scale'] = list(model.get_scale())
             scene_data = {tuple(node_path_to_string(model)): get_node_string_data(model.get_name(), generate_uuid(), None, 'Character', properties)}
         else:
             properties = copy.deepcopy(node_properties['Model'])
-            properties['Model']['model'][0] = file_path
-            properties['Node']['position'][0] = list(model.get_pos())
-            properties['Node']['rotation'][0] = list(model.get_hpr())
-            properties['Node']['scale'][0] = list(model.get_scale())
+            properties['Model']['model'] = file_path
+            properties['Node']['position'] = list(model.get_pos())
+            properties['Node']['rotation'] = list(model.get_hpr())
+            properties['Node']['scale'] = list(model.get_scale())
             scene_data = {tuple(node_path_to_string(model)): get_node_string_data(model.get_name(), generate_uuid(), None, 'Model', properties)}
 
         for node in nodes:
@@ -76,10 +76,10 @@ class MeshImporter(BaseImporter):
             if node_type is not None:
                 properties = copy.deepcopy(node_properties[node_type])
                 if properties.get('ModelRoot') is not None:
-                    properties['ModelRoot']['node_path'][0] = node_path
-                properties['Node']['position'][0] = list(node.get_pos())
-                properties['Node']['rotation'][0] = list(node.get_hpr())
-                properties['Node']['scale'][0] = list(node.get_scale())
+                    properties['ModelRoot']['node_path'] = node_path
+                properties['Node']['position'] = list(node.get_pos())
+                properties['Node']['rotation'] = list(node.get_hpr())
+                properties['Node']['scale'] = list(node.get_scale())
 
                 string_path = tuple(node_path_to_string(node))
 
@@ -106,11 +106,11 @@ class MeshImporter(BaseImporter):
             node_path = parent + (np.name,)
 
             properties = copy.deepcopy(node_properties['Bone'])
-            properties['Bone']['bone_name'][0] = part.get_name()
-            properties['Bone']['controlled'][0] = False
-            properties['Node']['position'][0] = list(np.get_pos())
-            properties['Node']['rotation'][0] = list(np.get_hpr())
-            properties['Node']['scale'][0] = list(np.get_scale())
+            properties['Bone']['bone_name'] = part.get_name()
+            properties['Bone']['controlled'] = False
+            properties['Node']['position'] = list(np.get_pos())
+            properties['Node']['rotation'] = list(np.get_hpr())
+            properties['Node']['scale'] = list(np.get_scale())
 
             scene_data[tuple(node_path)] = get_node_string_data(np.name, generate_uuid(), tuple(parent), 'Bone', properties)
 

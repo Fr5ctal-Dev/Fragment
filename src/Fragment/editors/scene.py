@@ -4,6 +4,7 @@ from widgets.viewport import Viewport
 from dialogs.new_node_selection import NewNodeSelectionDialog
 from dialogs.text_selection import TextSelectionDialog
 from node_properties.loader import tree as node_properties
+from node_properties.loader import node_types
 from .editor import Editor
 from utils import get_node_data, string_to_node_data, node_data_to_string, generate_uuid
 from PySide6 import QtWidgets, QtGui, QtCore
@@ -161,8 +162,6 @@ class SceneEditor(Editor):
         for value in list(copy.deepcopy(self.nodes[node]['properties']).values()):
             properties = {**properties, **value}
 
-        for key in list(properties.keys()):
-            properties[key] = properties[key][0]
         if self.nodes[node].get('viewport_entity') is None:
             if node.parent:
                 self.nodes[node]['viewport_entity'] = self.viewport.add_entity(type, self.nodes[node.parent]['viewport_entity'], properties, node)
@@ -183,9 +182,6 @@ class SceneEditor(Editor):
 
         for value in list(copy.deepcopy(self.nodes[node]['properties']).values()):
             properties = {**properties, **value}
-
-        for key in list(properties.keys()):
-            properties[key] = properties[key][0]
 
         self.nodes[node]['viewport_entity']._properties = properties
         self.nodes[node]['viewport_entity']._property_init()
@@ -210,7 +206,7 @@ class SceneEditor(Editor):
             child = self.property_list.topLevelItem(0).child(i)
             for j in range(child.childCount()):
                 prop_child = child.child(j)
-                self.nodes[self.current_node]['properties'][child.text(0)][prop_child.text(0)] = [self.property_list.itemWidget(prop_child, 1).get(), self.property_list.itemWidget(prop_child, 1).type]
+                self.nodes[self.current_node]['properties'][child.text(0)][prop_child.text(0)] = self.property_list.itemWidget(prop_child, 1).get()
                 try:
                     eval(self.nodes[self.current_node]['properties'][child.text(0)][prop_child.text(0)])
                     self.nodes[self.current_node]['properties'][child.text(0)][prop_child.text(0)] = eval(self.nodes[self.current_node]['properties'][child.text(0)][prop_child.text(0)])
@@ -280,17 +276,18 @@ class SceneEditor(Editor):
             type = self.nodes[node]['type']
 
             properties = {}
+            property_types = {}
 
             for value in list(copy.deepcopy(self.nodes[node]['properties']).values()):
                 properties = {**properties, **value}
+                property_types[list(value.keys())[0]] = node_types[list(value.keys())[0]]
 
             for key in list(properties.keys()):
-                if properties[key][1] == 'path':
-                    properties[key][0] = self.path + '/' + properties[key][0]
-                elif properties[key][1] == 'path_dict':
-                    for name in list(properties[key][0].keys()):
-                        properties[key][0][name] = self.path + '/' + properties[key][0][name]
-                properties[key] = properties[key][0]
+                if property_types[key] == 'path':
+                    properties[key] = self.path + '/' + properties[key]
+                elif property_types[key] == 'path_dict':
+                    for name in list(properties[key].keys()):
+                        properties[key][name] = self.path + '/' + properties[key][name]
 
             if node.parent:
                 self.nodes[node]['viewport_entity'] = self.viewport.add_entity(type, self.nodes[node.parent]['viewport_entity'], properties, node)

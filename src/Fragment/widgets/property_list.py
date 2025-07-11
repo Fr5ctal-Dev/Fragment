@@ -9,6 +9,7 @@ from property_editor_widgets.path_dict import PathDict
 from property_editor_widgets.input_map import InputMap
 from property_editor_widgets.hidden import Hidden
 from utils import node_path_to_string
+from node_properties.loader import node_types
 from PySide6 import QtWidgets, QtGui
 import os
 
@@ -70,14 +71,14 @@ class PropertyList(QtWidgets.QTreeWidget):
                         nodes = eval(fp.read())
                         fp.close()
 
-                        self.nodes[node]['properties'][type][prop] = nodes[tuple(node_path_to_string(node)[len(node_path_to_string(self.nodes[node]['scene_root_node'].parent)):])]['properties'][type][prop]
+                        self.nodes[node]['properties'][type][prop] = nodes[tuple(node_path_to_string(node)[len(node_path_to_string(self.nodes[node]['scene_root_node'].parent)):])]['properties'][type][prop] # TODO: Please check what is happening here
 
                 chunk.addChild(p)
 
-                data = self.nodes[node]['properties'][type][prop], self.path
+                data = (self.nodes[node]['properties'][type][prop], node_types[type][prop]), self.path
 
-                if EDITOR_TYPE_CLASS_MAP.get(self.nodes[node]['properties'][type][prop][1]) is not None:
-                    editor = EDITOR_TYPE_CLASS_MAP[self.nodes[node]['properties'][type][prop][1]](*data)
+                if EDITOR_TYPE_CLASS_MAP.get(node_types[type][prop]) is not None:
+                    editor = EDITOR_TYPE_CLASS_MAP[node_types[type][prop]](*data)
                 else:
                     editor = String(*data)
 

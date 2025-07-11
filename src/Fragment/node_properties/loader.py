@@ -19,6 +19,12 @@ fp.close()
 
 node_properties = json.loads(content)
 
+fp = open('node_properties/node_types.json')
+content = fp.read()
+fp.close()
+
+node_types = json.loads(content)
+
 fp = open('node_properties/tree.vtree')
 content = fp.read()
 fp.close()

@@ -1,6 +1,5 @@
 from panda3d.core import NodePath, CardMaker, CompassEffect
 from ..vector import Vec3
-import os
 
 
 class Node:
@@ -71,23 +70,23 @@ class Node:
         self.rotation = self._node.get_hpr()
 
     def get_node(self, path):
-        if path.startswith('/'):
-            return self._game_manager.get_node(path)
+        path = path.split('/')
+        if not len(path):
+            return
+        if path[0] == '':
+            current_node_path = ()
         else:
-            amount = 0
-            for ch in path:
-                if ch == '.':
-                    amount += 1
-                else:
-                    break
-            path = path[amount:]
-            self_node_path = self._node_path
-            for i in range(amount + 1):
-                self_node_path = os.path.dirname(self_node_path)
-                if self_node_path == '/':
-                    self_node_path = ''
-                    break
-            return self._game_manager.get_node(self_node_path + '/' + path)
+            current_node_path = self._node_path
+
+        for step in path:
+            if step == '.': # Go back by one
+                current_node_path = current_node_path[:-1]
+            elif step == '':
+                pass
+            else:
+                current_node_path = current_node_path + (step,)
+
+        return self._game_manager.get_node(current_node_path)
 
     def on_start(self):
         pass

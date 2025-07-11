@@ -72,9 +72,6 @@ class GameManager:
             for value in self.scene[node]['properties'].values():
                 properties = {**properties, **value}
 
-            for key in list(properties.keys()):
-                properties[key] = properties[key][0]
-
             self.nodes[node] = node_(parent, node, _game_manager=self, **properties)
 
         for node in self.scene.keys():
@@ -134,9 +131,6 @@ class GameManager:
 
             for value in self.scene[node]['properties'].values():
                 properties = {**properties, **value}
-
-            for key in list(properties.keys()):
-                properties[key] = properties[key][0]
 
             self.nodes[node] = node_(parent, node, _game_manager=self, **properties)
 

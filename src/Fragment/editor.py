@@ -12,7 +12,7 @@ from splash_screen import SplashScreen
 
 from qdarktheme import setup_theme
 
-from PySide6 import QtWidgets, QtGui
+from PySide6 import QtWidgets, QtGui, QtCore
 from PySide6.QtCore import Qt
 
 import os
@@ -41,8 +41,7 @@ def launch_editor():
     else:
         app.setWindowIcon(QtGui.QIcon('fragment/icon/icon.png'))
 
-    window = QtWidgets.QWidget()
-    window.setWindowTitle('Fragment Library')
+    window = EditorWindow()
     window_layout = QtWidgets.QStackedLayout(window)
 
     splash = SplashScreen()
@@ -55,16 +54,28 @@ def launch_editor():
     window_layout.addWidget(editor)
     window_layout.setCurrentWidget(editor)
 
+    window.closed.connect(editor.save_settings)
+
     sys.exit(app.exec())
+
+
+class EditorWindow(QtWidgets.QWidget):
+    closed = QtCore.Signal()
+    def __init__(self):
+        super().__init__()
+        self.resize(2200, 1300)
+        self.setGeometry(0, 0, 2200, 1300)
+        self.setWindowTitle('Fragment Editor')
+
+    def closeEvent(self, event):
+        self.closed.emit()
+        super().closeEvent(event)
 
 
 class Editor(QtWidgets.QMainWindow):
     def __init__(self, path):
         super().__init__()
         self.path = path
-        self.resize(2200, 1300)
-        self.setGeometry(0, 0, 2200, 1300)
-        self.setWindowTitle('Fragment Editor')
 
         self.tab_view = QtWidgets.QTabWidget()
         self.setCentralWidget(self.tab_view)
@@ -103,7 +114,7 @@ class Editor(QtWidgets.QMainWindow):
 
         self.reopen_last()
 
-    def closeEvent(self, event):
+    def save_settings(self):
         fp = open(self.path + '/main.fragment')
         content = eval(fp.read())
         fp.close()
@@ -117,7 +128,6 @@ class Editor(QtWidgets.QMainWindow):
 
         for i in range(self.tab_view.count()):
             self.delete_tab(0)
-        return super().closeEvent(event)
 
     def reopen_last(self):
         fp = open(self.path + '/main.fragment')
