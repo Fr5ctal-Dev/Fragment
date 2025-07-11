@@ -8,6 +8,8 @@ from widgets.filesystem import FileSystem
 from widgets.task_manager import TaskManager
 from widgets.notifications import Notifications
 
+from splash_screen import SplashScreen
+
 from qdarktheme import setup_theme
 
 from PySide6 import QtWidgets, QtGui
@@ -32,27 +34,31 @@ def get_filetype(path):
 
 
 def launch_editor():
-    app = App()
+    app = QtWidgets.QApplication([])
+    setup_theme()
     if platform.system() == 'Windows':
         app.setWindowIcon(QtGui.QIcon('fragment/icon/icon_win.ico'))
     else:
         app.setWindowIcon(QtGui.QIcon('fragment/icon/icon.png'))
-    window = EditorWindow(sys.argv[1])
+
+    window = QtWidgets.QWidget()
+    window.setWindowTitle('Fragment Library')
+    window_layout = QtWidgets.QStackedLayout(window)
+
+    splash = SplashScreen()
+    window_layout.addWidget(splash)
+
+    window_layout.setCurrentWidget(splash)
     window.showMaximized()
 
-    app.run()
+    editor = Editor(sys.argv[1])
+    window_layout.addWidget(editor)
+    window_layout.setCurrentWidget(editor)
+
+    sys.exit(app.exec())
 
 
-class App(QtWidgets.QApplication):
-    def __init__(self):
-        super().__init__([])
-        setup_theme()
-
-    def run(self):
-        sys.exit(self.exec())
-
-
-class EditorWindow(QtWidgets.QMainWindow):
+class Editor(QtWidgets.QMainWindow):
     def __init__(self, path):
         super().__init__()
         self.path = path

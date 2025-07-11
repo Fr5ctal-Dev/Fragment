@@ -1,4 +1,9 @@
 from PySide6 import QtWidgets, QtCore
+from PySide6.QtWidgets import QApplication, QWidget, QStackedLayout
+from PySide6 import QtGui
+from splash_screen import SplashScreen
+from qdarktheme import setup_theme
+import platform
 import sys
 import subprocess
 import shutil
@@ -119,3 +124,33 @@ class Library(QtWidgets.QWidget):
             if not os.path.exists(project):
                 self.load_project_list()
                 return
+
+
+
+def launch_library():
+    app = QApplication([])
+    setup_theme()
+    if platform.system() == 'Windows':
+        app.setWindowIcon(QtGui.QIcon('fragment/icon/icon_win.ico'))
+    else:
+        app.setWindowIcon(QtGui.QIcon('fragment/icon/icon.png'))
+
+    window = QWidget()
+    window.setWindowTitle('Fragment Library')
+    window_layout = QStackedLayout(window)
+
+    library = Library()
+    window_layout.addWidget(library)
+
+    splash = SplashScreen()
+    window_layout.addWidget(splash)
+
+    window_layout.setCurrentWidget(splash)
+    window.showMaximized()
+
+    timer = QtCore.QTimer()
+    timer.setSingleShot(True)
+    timer.timeout.connect(lambda: window_layout.setCurrentWidget(library))
+    timer.start(1000)
+
+    sys.exit(app.exec())
