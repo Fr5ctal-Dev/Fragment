@@ -11,6 +11,7 @@ from PySide6 import QtWidgets, QtGui, QtCore
 from PySide6.QtCore import Qt
 import os
 import copy
+import pyperclip
 
 
 class SceneEditor(Editor):
@@ -51,6 +52,7 @@ class SceneEditor(Editor):
         self.node_tree.delete_node_action.triggered.connect(lambda: self.delete_node(self.current_node))
         self.node_tree.set_root_action.triggered.connect(lambda: self.gui_add_new_node(True))
         self.node_tree.rename_node_action.triggered.connect(self.gui_rename_node)
+        self.node_tree.copy_id_action.triggered.connect(lambda: self.copy_node_uuid(self.current_node))
         self.node_tree.node_dragged_signal.connect(lambda sources, dest: self.reparent_nodes([item.node_path for item in sources], dest.node_path))
         self.node_tree_dock.setWidget(self.node_tree)
         self.addDockWidget(Qt.DockWidgetArea.LeftDockWidgetArea, self.node_tree_dock)
@@ -287,6 +289,9 @@ class SceneEditor(Editor):
                 self.nodes[node]['viewport_entity'] = self.viewport.add_entity(type, self.nodes[node.parent]['viewport_entity'], properties, node)
             else:
                 self.nodes[node]['viewport_entity'] = self.viewport.add_entity(type, self.viewport.scene, properties, node)
+
+    def copy_node_uuid(self, node):
+        pyperclip.copy(self.nodes[node]['uid'])
 
     def run(self):
         self.editor.task_manager.new_task('execute_scene', [self])

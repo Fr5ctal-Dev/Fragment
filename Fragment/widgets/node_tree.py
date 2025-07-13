@@ -18,6 +18,7 @@ class NodeTree(QtWidgets.QTreeWidget):
         self.new_nested_scene_action = QtGui.QAction('New Scene', self)
         self.delete_node_action = QtGui.QAction('Delete', self)
         self.rename_node_action = QtGui.QAction('Rename', self)
+        self.copy_id_action = QtGui.QAction('Copy ID', self)
 
         self.with_root = True
 
@@ -38,9 +39,11 @@ class NodeTree(QtWidgets.QTreeWidget):
         if self.currentItem() is not None:
             self.delete_node_action.setEnabled(True)
             self.rename_node_action.setEnabled(True)
+            self.copy_id_action.setEnabled(True)
         else:
             self.delete_node_action.setEnabled(False)
             self.rename_node_action.setEnabled(False)
+            self.copy_id_action.setEnabled(False)
 
         new_menu = context_menu.addMenu('New')
         new_menu.addAction(self.new_node_action)
@@ -49,6 +52,7 @@ class NodeTree(QtWidgets.QTreeWidget):
         context_menu.addAction(self.delete_node_action)
         context_menu.addAction(self.rename_node_action)
         context_menu.addAction(self.set_root_action)
+        context_menu.addAction(self.copy_id_action)
 
         context_menu.exec(self.mapToGlobal(event.pos()))
 
