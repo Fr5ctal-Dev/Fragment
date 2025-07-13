@@ -39,11 +39,9 @@ class Console(QtWidgets.QWidget):
         super().__init__()
         self.main_layout = QtWidgets.QVBoxLayout(self)
         self.console = QtWidgets.QTextEdit()
-        self.console.setReadOnly(True)
         self.main_layout.addWidget(self.console)
 
         self.error_console = QtWidgets.QTextEdit()
-        self.error_console.setReadOnly(True)
         self.main_layout.addWidget(self.error_console)
 
 
@@ -86,15 +84,11 @@ class TaskManager(QtWidgets.QWidget):
         self.tasks[task_list_widget] = console
 
         def new_text(chunk):
-            console.console.setReadOnly(False)
             console.console.insertPlainText(chunk)
-            console.console.setReadOnly(True)
             console.console.verticalScrollBar().setValue(console.console.verticalScrollBar().maximum())
 
         def new_error(chunk):
-            console.error_console.setReadOnly(False)
             console.error_console.insertPlainText(chunk)
-            console.error_console.setReadOnly(True)
             console.error_console.verticalScrollBar().setValue(console.error_console.verticalScrollBar().maximum())
 
         task.new_text_chunk.connect(new_text)

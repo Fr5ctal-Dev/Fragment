@@ -1,6 +1,7 @@
 from panda3d.core import NodePath
 import copy
 import uuid
+import re
 
 
 def get_code(scene, project_path):
@@ -15,15 +16,15 @@ def generate_uuid():
     return uuid.uuid4().hex
 
 
-def get_node_string_data(name, uid, parent, type, properties, script=None):
-    return {'name': name, 'uid': uid, 'parent': parent, 'type': type, 'properties': properties, 'script': script}
+def get_node_string_data(name, uid, parent, type, properties):
+    return {'name': name, 'uid': uid, 'parent': parent, 'type': type, 'properties': properties}
 
-def get_node_data(name, uid, parent, type, properties, script=None):
+def get_node_data(name, uid, parent, type, properties):
     node_path = NodePath(name)
     node_path.set_python_tag('uid', uid)
     if parent:
         node_path.reparent_to(parent)
-    return {node_path: {'uid': uid, 'type': type, 'properties': properties, 'script': script}}
+    return {node_path: {'uid': uid, 'type': type, 'properties': properties}}
 
 def node_path_to_string(node_path):
     string_path = []
@@ -67,3 +68,17 @@ def string_to_node_data(data):
         if result[node_path].get('scene_root_node') is not None:
             result[node_path]['scene_root_node'] = tuple_node_path_map[tuple(result[node_path]['scene_root_node'])]
     return result
+
+def extract_extensions_from_filter(filter_string):
+    match = re.search(r'\((.*?)\)', filter_string)
+    if not match:
+        return []
+    pattern = match.group(1)
+    extensions = []
+    for ext in pattern.split():
+        ext = ext.strip()
+        if ext.startswith('*.'):
+            extensions.append(ext[1:])
+        elif ext == '*':
+            extensions.append('*')
+    return extensions

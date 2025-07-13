@@ -10,7 +10,6 @@ from utils import get_node_data, string_to_node_data, node_data_to_string, gener
 from PySide6 import QtWidgets, QtGui, QtCore
 from PySide6.QtCore import Qt
 import os
-import shutil
 import copy
 
 
@@ -47,7 +46,6 @@ class SceneEditor(Editor):
         self.node_tree = NodeTree()
         self.node_tree.setExpandsOnDoubleClick(False)
         self.node_tree.itemClicked.connect(lambda item, column: self.set_current_node(item.node_path))
-        self.node_tree.itemDoubleClicked.connect(lambda item, column: self.open_script(column, item.node_path))
         self.node_tree.new_node_action.triggered.connect(self.gui_add_new_node)
         self.node_tree.new_nested_scene_action.triggered.connect(self.gui_add_nested_scene)
         self.node_tree.delete_node_action.triggered.connect(lambda: self.delete_node(self.current_node))
@@ -61,7 +59,7 @@ class SceneEditor(Editor):
         self.property_list_dock.setWindowTitle('Property List')
         self.property_list_dock.setAllowedAreas(Qt.DockWidgetArea.AllDockWidgetAreas)
         self.property_list_dock.setFeatures(QtWidgets.QDockWidget.DockWidgetFeature.DockWidgetMovable | QtWidgets.QDockWidget.DockWidgetFeature.DockWidgetFloatable | QtWidgets.QDockWidget.DockWidgetFeature.DockWidgetClosable)
-        self.property_list = PropertyList(self.nodes, self.scene_property_changed, self.path)
+        self.property_list = PropertyList(self, self.nodes, self.scene_property_changed, self.path)
         self.property_list_dock.setWidget(self.property_list)
         self.addDockWidget(Qt.DockWidgetArea.RightDockWidgetArea, self.property_list_dock)
 
@@ -143,10 +141,6 @@ class SceneEditor(Editor):
     def add_node_to_tree(self, node):
         self.nodes[node]['element'] = QtWidgets.QTreeWidgetItem([node.get_name(), ''])
         self.nodes[node]['element'].setIcon(0, QtGui.QIcon('assets/node_icons/' + self.nodes[node]['type'] + '.png'))
-        if self.nodes[node]['script']:
-            self.nodes[node]['element'].setIcon(1, QtGui.QIcon('assets/ui_icons/script.png'))
-        else:
-            self.nodes[node]['element'].setIcon(1, QtGui.QIcon('assets/ui_icons/add.png'))
 
         self.nodes[node]['element'].node_path = node
         parent = node.parent
@@ -293,28 +287,6 @@ class SceneEditor(Editor):
                 self.nodes[node]['viewport_entity'] = self.viewport.add_entity(type, self.nodes[node.parent]['viewport_entity'], properties, node)
             else:
                 self.nodes[node]['viewport_entity'] = self.viewport.add_entity(type, self.viewport.scene, properties, node)
-
-    def open_script(self, column, node):
-        if column != 1:
-            return
-        if self.nodes[node]['type'] == 'Scene':
-            return
-        if not self.nodes[node]['script']:
-            path = QtWidgets.QFileDialog.getSaveFileName(self, 'New Script', self.path)[0]
-            if not path:
-                return
-            path += '.py'
-            shutil.copy('python_file/main.py', path)
-            fp = open(path, 'w')
-            fp.write(f'# Node Script\nimport fragment.nodes.{self.nodes[node]["type"].lower()}\n\n\nclass Node(fragment.nodes.{self.nodes[node]["type"].lower()}.{self.nodes[node]["type"]}):\n    pass\n')
-            fp.close()
-            self.nodes[node]['script'] = path
-            self.nodes[node]['element'].setIcon(1, QtGui.QIcon('assets/ui_icons/script.png'))
-
-        self.open_script_(self.nodes[node]['script'])
-
-    def open_script_(self, script):
-        self.editor.open(script)
 
     def run(self):
         self.editor.task_manager.new_task('execute_scene', [self])

@@ -21,7 +21,6 @@ class ExecuteSceneTask(BaseTask):
         code = get_code(self.scene_editor.scene, self.scene_editor.path)
         shutil.copytree(self.scene_editor.path, os.path.dirname(self.file))
         shutil.copytree('fragment', os.path.dirname(self.file) + '/fragment')
-        shutil.copy('python_file/main.py', self.file)
 
         fp = open(self.file, 'w')
         fp.write(code)

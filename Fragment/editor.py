@@ -164,6 +164,7 @@ class Editor(QtWidgets.QMainWindow):
 
         for i in range(self.tab_view.count()):
             if self.tab_view.tabText(i) == os.path.basename(path):
+                self.tab_view.setCurrentIndex(i)
                 return
 
         filetype = get_filetype(path).lower()

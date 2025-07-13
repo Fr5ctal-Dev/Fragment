@@ -136,7 +136,7 @@ class ScriptEditor(QtWidgets.QTextEdit):
         column = cursor.columnNumber()
         block = cursor.block()
         line_number = block.blockNumber()
-        if self.lint_output and line_number in self.lint_output and self.hasFocus() and column in range(*self.lint_output[line_number][2]):
+        if self.lint_output and line_number in self.lint_output and self.hasFocus() and column in range(*self.lint_output[line_number][2]) and self.rect().contains(self.mapFromGlobal(self.cursor().pos())):
             lint_info = self.lint_output[line_number]
             tooltip_text = lint_info[1]
             self.lint_tooltip.setFont(QtGui.QFont('Consolas', 11))
@@ -148,7 +148,10 @@ class ScriptEditor(QtWidgets.QTextEdit):
 
     def get_completions(self, source_code, position):
         line, column = self.get_line_and_column(source_code, position)
-        if (source_code[position - 1] == ' ') or (self.textCursor().atBlockStart()):
+        try:
+            if (source_code[position - 1] == ' ') or (self.textCursor().atBlockStart()):
+                return []
+        except:
             return []
         script = jedi.Script(path=self.script, project=jedi.Project(self.path))
         completions = script.complete(line=line, column=column)

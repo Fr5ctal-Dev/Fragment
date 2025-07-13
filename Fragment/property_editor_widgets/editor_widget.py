@@ -4,8 +4,10 @@ from PySide6.QtCore import Signal
 
 class EditorWidget(QWidget):
     value_changed = Signal(QWidget)
-    def __init__(self, data, path):
+    def __init__(self, data, path, node_type, scene_editor):
         super().__init__()
+        self.scene_editor = scene_editor
+        self.node_type = node_type
         self.type = data[1]
         self.value = data[0]
         self.path = path

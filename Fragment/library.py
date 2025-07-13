@@ -6,7 +6,6 @@ from qdarktheme import setup_theme
 import platform
 import sys
 import subprocess
-import shutil
 import os
 import json
 
@@ -63,7 +62,16 @@ class Library(QtWidgets.QWidget):
         path = QtWidgets.QFileDialog.getSaveFileName(self, 'New Project', '/')[0]
         if not path:
             return
-        shutil.copytree('save', path)
+
+        try:
+            os.mkdir(path)
+        except:
+            return
+
+        fp = open(path + '/main.fragment', 'w')
+        fp.write("{'reopen': {'tabs': [], 'last_tab': None}}")
+        fp.close()
+
         fp = open('library_config/projects.json')
         projects = json.loads(fp.read())
         fp.close()

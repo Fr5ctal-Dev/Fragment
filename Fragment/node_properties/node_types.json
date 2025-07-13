@@ -3,7 +3,8 @@
     "position": "coordinates",
     "rotation": "coordinates",
     "scale": "coordinates",
-    "visible": "bool"
+    "visible": "bool",
+    "script": "path_node_script"
   },
   "Camera": {
     "fov": "float"

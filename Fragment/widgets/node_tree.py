@@ -5,8 +5,8 @@ class NodeTree(QtWidgets.QTreeWidget):
     node_dragged_signal = QtCore.Signal(list, QtWidgets.QTreeWidgetItem) # Sources, Dest
     def __init__(self):
         super().__init__()
-        self.setColumnCount(2)
-        self.setHeaderLabels(['Name', 'Script'])
+        self.setColumnCount(1)
+        self.setHeaderLabels(['Name'])
 
         self.setDragEnabled(True)
         self.setAcceptDrops(True)

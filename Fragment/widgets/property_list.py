@@ -8,6 +8,7 @@ from property_editor_widgets.timeline import Timeline
 from property_editor_widgets.path_dict import PathDict
 from property_editor_widgets.input_map import InputMap
 from property_editor_widgets.hidden import Hidden
+from property_editor_widgets.path_node_script import PathNodeScript
 from utils import node_path_to_string
 from node_properties.loader import node_types
 from PySide6 import QtWidgets, QtGui
@@ -23,13 +24,15 @@ EDITOR_TYPE_CLASS_MAP = {
     'timeline': Timeline,
     'path_dict': PathDict,
     'input_map': InputMap,
-    'hidden': Hidden
+    'hidden': Hidden,
+    'path_node_script': PathNodeScript
 }
 
 
 class PropertyList(QtWidgets.QTreeWidget):
-    def __init__(self, nodes, set_changed_prop_action, path):
+    def __init__(self, editor, nodes, set_changed_prop_action, path):
         super().__init__()
+        self.scene_editor = editor
         self.nodes = nodes
         self.set_changed_prop_action = set_changed_prop_action
         self.path = path
@@ -75,7 +78,7 @@ class PropertyList(QtWidgets.QTreeWidget):
 
                 chunk.addChild(p)
 
-                data = (self.nodes[node]['properties'][type][prop], node_types[type][prop]), self.path
+                data = (self.nodes[node]['properties'][type][prop], node_types[type][prop]), self.path, self.nodes[node]['type'], self.scene_editor
 
                 if EDITOR_TYPE_CLASS_MAP.get(node_types[type][prop]) is not None:
                     editor = EDITOR_TYPE_CLASS_MAP[node_types[type][prop]](*data)

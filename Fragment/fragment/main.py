@@ -60,17 +60,17 @@ class GameManager:
             else:
                 parent = self.base_node
 
-            node_file = importlib.import_module(f'fragment.nodes.{self.scene[node]["type"].lower()}')
-            if self.scene[node]['script']:
-                node_ = importlib.import_module(self.scene[node]['script'].replace('/', '.')[len(self.project_path) + 1: -3]).Node
-
-            else:
-                node_ = getattr(node_file, self.scene[node]['type'])
-
             properties = {}
 
             for value in self.scene[node]['properties'].values():
                 properties = {**properties, **value}
+
+            node_file = importlib.import_module(f'fragment.nodes.{self.scene[node]["type"].lower()}')
+            if properties['script']:
+                node_ = importlib.import_module(properties['script'].replace('/', '.')[len(self.project_path) + 1: -3]).Node
+
+            else:
+                node_ = getattr(node_file, self.scene[node]['type'])
 
             self.nodes[node] = node_(parent, node, _game_manager=self, **properties)
 
@@ -119,18 +119,18 @@ class GameManager:
             else:
                 parent = self.nodes[self.scene[node]['parent']]
 
-            node_file = importlib.import_module(f'fragment.nodes.{self.scene[node]["type"].lower()}')
-            if self.scene[node]['script']:
-                node_ = importlib.import_module(self.scene[node]['script'].replace('/', '.')[len(os.path.dirname(
-                    os.path.dirname(os.path.dirname(__file__)))) + 1: -3]).Node
-
-            else:
-                node_ = getattr(node_file, self.scene[node]['type'])
-
             properties = {}
 
             for value in self.scene[node]['properties'].values():
                 properties = {**properties, **value}
+
+            node_file = importlib.import_module(f'fragment.nodes.{self.scene[node]["type"].lower()}')
+            if properties['script']:
+                node_ = importlib.import_module(properties['script'].replace('/', '.')[len(os.path.dirname(
+                    os.path.dirname(os.path.dirname(__file__)))) + 1: -3]).Node
+
+            else:
+                node_ = getattr(node_file, self.scene[node]['type'])
 
             self.nodes[node] = node_(parent, node, _game_manager=self, **properties)
 
