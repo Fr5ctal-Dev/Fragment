@@ -1,5 +1,4 @@
 import sys
-sys.path.insert(0, 'fragment/render_pipeline/')
 
 from editors.scene import SceneEditor
 from editors.script import ScriptEditor

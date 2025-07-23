@@ -1,6 +1,6 @@
 from widgets.node_tree import NodeTree
 from widgets.property_list import PropertyList
-from widgets.viewport import Viewport
+#from widgets.viewport import Viewport
 from dialogs.new_node_selection import NewNodeSelectionDialog
 from dialogs.text_selection import TextSelectionDialog
 from node_properties.loader import tree as node_properties
@@ -68,8 +68,8 @@ class SceneEditor(Editor):
         if not self.nodes:
             self.node_tree.with_root = False
 
-        self.viewport = Viewport(self)
-        self.central_widget_layout.addWidget(self.viewport)
+        #self.viewport = Viewport(self)
+        #self.central_widget_layout.addWidget(self.viewport)
 
         self.setCentralWidget(self.central_widget)
 
@@ -160,15 +160,15 @@ class SceneEditor(Editor):
 
         if self.nodes[node].get('viewport_entity') is None:
             if node.parent:
-                self.nodes[node]['viewport_entity'] = self.viewport.add_entity(type, self.nodes[node.parent]['viewport_entity'], properties, node)
+                self.nodes[node]['viewport_entity'] = None#self.viewport.add_entity(type, self.nodes[node.parent]['viewport_entity'], properties, node)
             else:
-                self.nodes[node]['viewport_entity'] = self.viewport.add_entity(type, self.viewport.scene, properties, node)
+                self.nodes[node]['viewport_entity'] = None#self.viewport.add_entity(type, self.viewport.scene, properties, node)
 
     def set_current_node(self, node):
         self.save_current_node_properties()
         self.current_node = node
         self.property_list.set_current_node(node)
-        self.viewport.selected_entity = self.nodes[node]['viewport_entity']
+        #self.viewport.selected_entity = self.nodes[node]['viewport_entity']
 
     def scene_property_changed(self, node, p):
         self.save_current_node_properties()
@@ -179,8 +179,8 @@ class SceneEditor(Editor):
         for value in list(copy.deepcopy(self.nodes[node]['properties']).values()):
             properties = {**properties, **value}
 
-        self.nodes[node]['viewport_entity']._properties = properties
-        self.nodes[node]['viewport_entity']._property_init()
+        #self.nodes[node]['viewport_entity']._properties = properties
+        #self.nodes[node]['viewport_entity']._property_init()
 
         if self.nodes[node].get('changed_props') is None:
             return
@@ -221,8 +221,8 @@ class SceneEditor(Editor):
             if self.nodes.get(node.parent) is not None:
                 self.nodes[node.parent]['element'].removeChild(self.nodes[node]['element'])
 
-        self.nodes[node]['viewport_entity'].destroy()
-        self.viewport.entities.remove(self.nodes[node]['viewport_entity'])
+        #self.nodes[node]['viewport_entity'].destroy()
+        #self.viewport.entities.remove(self.nodes[node]['viewport_entity'])
 
         for path in list(self.nodes.keys()):
             if node.is_ancestor_of(path) or path == node:
@@ -266,8 +266,8 @@ class SceneEditor(Editor):
         self.nodes = sorted_nodes
 
     def reload_viewport_entities(self):
-        list(self.nodes.values())[0]['viewport_entity'].destroy()
-        self.viewport.entities = []
+        #list(self.nodes.values())[0]['viewport_entity'].destroy()
+        #self.viewport.entities = []
         for node in list(self.nodes.keys()):
             type = self.nodes[node]['type']
 
@@ -286,9 +286,9 @@ class SceneEditor(Editor):
                         properties[key][name] = self.path + '/' + properties[key][name]
 
             if node.parent:
-                self.nodes[node]['viewport_entity'] = self.viewport.add_entity(type, self.nodes[node.parent]['viewport_entity'], properties, node)
+                self.nodes[node]['viewport_entity'] = None#self.viewport.add_entity(type, self.nodes[node.parent]['viewport_entity'], properties, node)
             else:
-                self.nodes[node]['viewport_entity'] = self.viewport.add_entity(type, self.viewport.scene, properties, node)
+                self.nodes[node]['viewport_entity'] = None#self.viewport.add_entity(type, self.viewport.scene, properties, node)
 
     def copy_node_uuid(self, node):
         pyperclip.copy(self.nodes[node]['uid'])
@@ -358,4 +358,5 @@ class SceneEditor(Editor):
             self.new_nested_scene(*data, old_data=old_data)
 
     def _destroy(self):
-        self.viewport.on_destroy()
+        #self.viewport.on_destroy()
+        pass
