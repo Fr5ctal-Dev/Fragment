@@ -1,23 +1,31 @@
 from .manager import Manager
+from .renderer import Renderer
+from ..types.vector import Vector2
 import pygame
 
 
 class WindowManager(Manager):
-    def __init__(self, game_manager, window_size = (0, 0), window_title = 'Made with Fragment'):
+    def __init__(self, game_manager, window_size = Vector2(0, 0), window_title = 'Made with Fragment'):
         super().__init__(game_manager)
+        pygame.init()
+
+        if window_size[0] == 0: window_size[0] = pygame.display.Info().current_w
+        if window_size[1] == 0: window_size[1] = pygame.display.Info().current_h
+
+        self.renderer = Renderer(self.game_manager)
 
         self.window_size = window_size
         self.window_title = window_title
 
-        pygame.init()
         self.window = pygame.display.set_mode(self.window_size)
 
     @property
     def window_size(self):
-        return pygame.display.get_window_size()
+        return Vector2(pygame.display.get_window_size())
 
     @window_size.setter
     def window_size(self, size):
+        self.renderer.size = size
         self.window = pygame.display.set_mode(size)
 
     @property
@@ -33,4 +41,7 @@ class WindowManager(Manager):
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 self.game_manager.destroy()
+        self.window.fill((0, 0, 0))
+        self.renderer.update(dt)
+        self.window.blit(self.renderer.surface, (0, 0))
         pygame.display.update()

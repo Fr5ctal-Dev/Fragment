@@ -1,9 +1,5 @@
 {
   "Node": {
-    "position": "coordinates",
-    "rotation": "coordinates",
-    "scale": "coordinates",
-    "visible": "bool",
     "script": "path_node_script"
   }
 }

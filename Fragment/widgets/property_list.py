@@ -74,7 +74,7 @@ class PropertyList(QtWidgets.QTreeWidget):
                         nodes = eval(fp.read())
                         fp.close()
 
-                        self.nodes[node]['properties'][type][prop] = nodes[tuple(node_path_to_string(node)[len(node_path_to_string(self.nodes[node]['scene_root_node'].parent)):])]['properties'][type][prop] # TODO: Please check what is happening here
+                        self.nodes[node]['properties'][type][prop] = nodes[tuple(node_path_to_string(node)[len(node_path_to_string(self.nodes[node]['scene_root_node'].parent)):])]['properties'][type][prop]
 
                 chunk.addChild(p)
 
