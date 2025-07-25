@@ -43,7 +43,7 @@ class Highlighter(QtGui.QSyntaxHighlighter):
             self.setFormat(index, length, fmt)
             index += length
 
-class ScriptEditor(QtWidgets.QTextEdit):
+class ScriptEditor(QtWidgets.QPlainTextEdit):
     def __init__(self, script, path):
         super().__init__()
         self.script = script
@@ -105,13 +105,13 @@ class ScriptEditor(QtWidgets.QTextEdit):
         cursor = self.textCursor()
         extra_selections = []
         if cursor.block().blockNumber() not in self.lint_output.keys():
-            extra_selection = self.ExtraSelection()
+            extra_selection = QtWidgets.QTextEdit.ExtraSelection()
             extra_selection.cursor = cursor
             extra_selection.format.setBackground(QtGui.QColor(50, 50, 50))
             extra_selection.format.setProperty(QtGui.QTextFormat.Property.FullWidthSelection, True)
             extra_selections.append(extra_selection)
         for line_number in self.lint_output.keys():
-            lint_selection = self.ExtraSelection()
+            lint_selection = QtWidgets.QTextEdit.ExtraSelection()
             lint_selection.cursor = self.textCursor()
             lint_selection.cursor.setPosition(self.document().findBlockByLineNumber(line_number).position() + self.lint_output[line_number][2][0])
             if self.lint_output[line_number][2][1] == -1:

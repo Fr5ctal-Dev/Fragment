@@ -1,6 +1,5 @@
 import json
 
-
 def load_tree(tree, properties):
     indentation = {}
     data = {}
@@ -13,17 +12,15 @@ def load_tree(tree, properties):
 
     return data
 
-fp = open('node_properties/node_properties.json')
-content = fp.read()
-fp.close()
+def load_json(file):
+    fp = open(file)
+    content = json.loads(fp.read())
+    fp.close()
+    return content
 
-node_properties = json.loads(content)
+node_properties = load_json('node_properties/node_properties.json')
 
-fp = open('node_properties/node_types.json')
-content = fp.read()
-fp.close()
-
-node_types = json.loads(content)
+node_types = load_json('node_properties/node_types.json')
 
 fp = open('node_properties/tree.vtree')
 content = fp.read()
