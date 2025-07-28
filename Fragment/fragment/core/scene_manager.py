@@ -71,7 +71,8 @@ class Scene(Manager):
 
     def destroy(self):
         super().destroy()
-        self.root_node.destroy()
+        if self.root_node is not None: # Happens when scene is empty
+            self.root_node.destroy()
 
 
 class SceneManager(Manager):

@@ -30,8 +30,13 @@ class TaskListWidget(QtWidgets.QWidget):
         self.delete_button.setEnabled(False)
         self.main_layout.addWidget(self.delete_button)
 
-        self.task.finished.connect(self.progress_bar.hide)
-        self.task.finished.connect(lambda: self.delete_button.setEnabled(True))
+        self.task.finished.connect(self.finish)
+
+    def finish(self):
+        self.thread.quit()
+        self.thread.wait()
+        self.progress_bar.hide()
+        self.delete_button.setEnabled(True)
 
 
 class Console(QtWidgets.QWidget):

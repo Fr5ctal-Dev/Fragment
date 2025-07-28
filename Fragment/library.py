@@ -1,3 +1,4 @@
+from editor import launch_editor
 from PySide6 import QtWidgets, QtCore
 from PySide6.QtWidgets import QApplication, QWidget, QStackedLayout
 from PySide6 import QtGui
@@ -5,7 +6,6 @@ from splash_screen import SplashScreen
 from qdarktheme import setup_theme
 import platform
 import sys
-import subprocess
 import os
 import json
 
@@ -13,7 +13,7 @@ import json
 class Library(QtWidgets.QWidget):
     def __init__(self):
         super().__init__()
-        self.processes = []
+        self.editor_instances = []
 
         self.check_projects_timer = QtCore.QTimer()
         self.check_projects_timer.timeout.connect(self.check_for_missing_projects)
@@ -38,7 +38,7 @@ class Library(QtWidgets.QWidget):
         self.project_list_frame = QtWidgets.QFrame()
         self.project_list_layout = QtWidgets.QGridLayout(self.project_list_frame)
         self.project_list = QtWidgets.QTreeWidget()
-        self.project_list.itemDoubleClicked.connect(lambda item, column: self.processes.append(subprocess.Popen([sys.executable, 'editor.py', item.text(1)])))
+        self.project_list.itemDoubleClicked.connect(lambda item, column: self.open_in_editor(item.text(1)))
         self.project_list.setColumnCount(2)
         self.project_list.setHeaderLabels(['Name', 'Path'])
         self.project_list_layout.addWidget(self.project_list, 0, 0)
@@ -58,6 +58,19 @@ class Library(QtWidgets.QWidget):
         self.project_layout.addWidget(self.button_frame, 0, 1)
         self.main_stacked_layout.addWidget(self.project_frame)
 
+    def open_in_editor(self, path):
+        self.editor_instances.append(launch_editor(path))
+
+    def add_to_project_list(self, path):
+        fp = open('library_config/projects.json')
+        projects = json.loads(fp.read())
+        fp.close()
+        projects[os.path.basename(path)] = path
+        fp = open('library_config/projects.json', 'w')
+        fp.write(json.dumps(projects))
+        fp.close()
+        self.load_project_list()
+
     def new_project(self):
         path = QtWidgets.QFileDialog.getSaveFileName(self, 'New Project', '/')[0]
         if not path:
@@ -72,35 +85,17 @@ class Library(QtWidgets.QWidget):
         fp.write("{'reopen': {'tabs': [], 'last_tab': None}}")
         fp.close()
 
-        fp = open('library_config/projects.json')
-        projects = json.loads(fp.read())
-        fp.close()
-        projects[os.path.basename(path)] = path
-        fp = open('library_config/projects.json', 'w')
-        fp.write(json.dumps(projects))
-        fp.close()
-        self.load_project_list()
-        self.processes.append(subprocess.Popen([sys.executable, 'editor.py', path]))
+        self.add_to_project_list(path)
+        self.open_in_editor(path)
 
     def open_project(self):
         path = QtWidgets.QFileDialog.getOpenFileName(self, 'Open Project', '/', 'Fragment Projects (*.fragment)')[0]
         if not path:
             return
         path = os.path.dirname(path)
-        fp = open('library_config/projects.json')
-        projects = json.loads(fp.read())
-        fp.close()
-        projects[os.path.basename(path)] = path
-        fp = open('library_config/projects.json', 'w')
-        fp.write(json.dumps(projects))
-        fp.close()
-        self.load_project_list()
-        self.processes.append(subprocess.Popen([sys.executable, 'editor.py', path]))
 
-    def closeEvent(self, event):
-        for p in self.processes:
-            p.terminate()
-        return super().closeEvent(event)
+        self.add_to_project_list(path)
+        self.open_in_editor(path)
 
     def load_project_list(self):
         self.project_list.clear()

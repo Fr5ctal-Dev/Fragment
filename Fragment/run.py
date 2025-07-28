@@ -1,7 +1,7 @@
+from python_env.executable import python_executable
 import subprocess
-import sys
 
 
 def run(path):
-    process = subprocess.Popen([sys.executable, path + '/main.py'], stdout=subprocess.PIPE, text=True)
+    process = subprocess.Popen([python_executable, path + '/main.py'], stdout=subprocess.PIPE, text=True)
     return process

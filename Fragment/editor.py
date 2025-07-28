@@ -1,5 +1,3 @@
-import sys
-
 from editors.scene import SceneEditor
 from editors.script import ScriptEditor
 
@@ -9,14 +7,11 @@ from widgets.notifications import Notifications
 
 from splash_screen import SplashScreen
 
-from qdarktheme import setup_theme
-
 from PySide6 import QtWidgets, QtGui, QtCore
 from PySide6.QtCore import Qt
 
 import os
 import json
-import platform
 
 fp = open('filetypes/filetypes.json')
 FILETYPES = json.loads(fp.read())
@@ -32,14 +27,7 @@ def get_filetype(path):
             return name
 
 
-def launch_editor():
-    app = QtWidgets.QApplication([])
-    setup_theme()
-    if platform.system() == 'Windows':
-        app.setWindowIcon(QtGui.QIcon('fragment/icon/icon_win.ico'))
-    else:
-        app.setWindowIcon(QtGui.QIcon('fragment/icon/icon.png'))
-
+def launch_editor(path):
     window = EditorWindow()
     window_layout = QtWidgets.QStackedLayout(window)
 
@@ -49,13 +37,12 @@ def launch_editor():
     window_layout.setCurrentWidget(splash)
     window.showMaximized()
 
-    editor = Editor(sys.argv[1])
+    editor = Editor(path)
     window_layout.addWidget(editor)
     window_layout.setCurrentWidget(editor)
 
     window.closed.connect(editor.save_settings)
-
-    sys.exit(app.exec())
+    return window
 
 
 class EditorWindow(QtWidgets.QWidget):
@@ -176,6 +163,3 @@ class Editor(QtWidgets.QMainWindow):
 
         if filetype == 'script':
             self.new_tab(lambda _path: ScriptEditor(_path, self, path), os.path.basename(path))
-
-
-launch_editor()

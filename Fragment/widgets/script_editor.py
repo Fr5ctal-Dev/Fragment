@@ -1,4 +1,5 @@
 from .tool_tip import Tooltip
+from python_env.executable import python_executable
 import jedi
 from PySide6 import QtWidgets, QtGui, QtCore
 from PySide6.QtCore import Qt
@@ -7,7 +8,7 @@ from pygments.lexers import PythonLexer
 from pygments.styles import get_style_by_name
 from pygments.token import Token
 import subprocess
-import sys
+
 
 class Highlighter(QtGui.QSyntaxHighlighter):
     def __init__(self, document, script):
@@ -209,7 +210,7 @@ class ScriptEditor(QtWidgets.QPlainTextEdit):
 
     def spawn_lint_process(self):
         return subprocess.Popen(
-            [sys.executable, '-m', 'pylint', '--msg-template={C}{line};{column}:{end_column};{msg_id}: {msg}', '-sn', self.script],
+            [python_executable, '-m', 'pylint', '--msg-template={C}{line};{column}:{end_column};{msg_id}: {msg}', '-sn', self.script],
             stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True
         )
 
