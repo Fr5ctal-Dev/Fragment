@@ -2,9 +2,8 @@ from .selection import SelectionDialog
 from PySide6 import QtWidgets, QtGui
 import json
 
-fp = open('filetypes/filetypes.json', 'r')
-filetypes = json.loads(fp.read())
-fp.close()
+with open('filetypes/filetypes.json', 'r') as f:
+    filetypes = json.loads(f.read())
 
 
 class FiletypeSelectionDialog(SelectionDialog):

@@ -70,9 +70,9 @@ class PropertyList(QtWidgets.QTreeWidget):
                     else:
                         if not os.path.exists(self.nodes[node]['scene_path']):
                             return
-                        fp = open(self.nodes[node]['scene_path'])
-                        nodes = eval(fp.read())
-                        fp.close()
+
+                        with open(self.nodes[node]['scene_path']) as f:
+                            nodes = eval(f.read())
 
                         self.nodes[node]['properties'][type][prop] = nodes[tuple(node_path_to_string(node)[len(node_path_to_string(self.nodes[node]['scene_root_node'].parent)):])]['properties'][type][prop]
 

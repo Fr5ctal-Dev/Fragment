@@ -21,9 +21,8 @@ class SceneEditor(Editor):
         self.scene = scene
         self.current_node = None
 
-        fp = open(self.scene)
-        content = fp.read()
-        fp.close()
+        with open(self.scene) as f:
+            content = f.read()
 
         self.nodes = string_to_node_data(eval(content))
 
@@ -103,9 +102,9 @@ class SceneEditor(Editor):
     def new_nested_scene(self, dir, parent, old_data=None):
         if not os.path.exists(dir):
             return
-        fp = open(dir)
-        content = fp.read()
-        fp.close()
+        with open(dir) as f:
+            content = f.read()
+
         nodes = string_to_node_data(eval(content))
 
         for node_path in list(nodes.keys()):
@@ -308,9 +307,8 @@ class SceneEditor(Editor):
         for node in list(self.nodes.keys()):
             viewport_entities.append(self.nodes[node]['viewport_entity'])
             self.nodes[node].pop('viewport_entity')
-        fp = open(self.scene, 'w')
-        fp.write(str(node_data_to_string(self.nodes)))
-        fp.close()
+        with open(self.scene, 'w') as f:
+            f.write(str(node_data_to_string(self.nodes)))
 
         for i, path in enumerate(self.nodes.keys()):
             self.nodes[path]['element'] = elements[i]

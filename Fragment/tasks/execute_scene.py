@@ -21,9 +21,8 @@ class ExecuteSceneTask(BaseTask):
         shutil.copytree(self.scene_editor.path, os.path.dirname(self.file))
         shutil.copytree('fragment', os.path.dirname(self.file) + '/fragment')
 
-        fp = open(self.file, 'w')
-        fp.write(code)
-        fp.close()
+        with open(self.file, 'w') as f:
+            f.write(code)
 
         self.process = subprocess.Popen([python_executable, self.file], cwd=os.path.dirname(self.file), stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
         while self.process.poll() is None:

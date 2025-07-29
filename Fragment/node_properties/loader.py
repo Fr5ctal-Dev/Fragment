@@ -13,17 +13,15 @@ def load_tree(tree, properties):
     return data
 
 def load_json(file):
-    fp = open(file)
-    content = json.loads(fp.read())
-    fp.close()
+    with open(file) as f:
+        content = json.loads(f.read())
     return content
 
 node_properties = load_json('node_properties/node_properties.json')
 
 node_types = load_json('node_properties/node_types.json')
 
-fp = open('node_properties/tree.vtree')
-content = fp.read()
-fp.close()
+with open('node_properties/tree.vtree') as f:
+    content = f.read()
 
 tree = load_tree(content, node_properties)

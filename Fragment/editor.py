@@ -13,13 +13,11 @@ from PySide6.QtCore import Qt
 import os
 import json
 
-fp = open('filetypes/filetypes.json')
-FILETYPES = json.loads(fp.read())
-fp.close()
+with open('filetypes/filetypes.json') as f:
+    FILETYPES = json.loads(f.read())
 
-fp = open('filetypes/uncreatable.json')
-FILETYPES = {**FILETYPES, **json.loads(fp.read())}
-fp.close()
+with open('filetypes/uncreatable.json') as f:
+    FILETYPES = {**FILETYPES, **json.loads(f.read())}
 
 def get_filetype(path):
     for name, ext in FILETYPES.items():
@@ -101,24 +99,21 @@ class Editor(QtWidgets.QMainWindow):
         self.reopen_last()
 
     def save_settings(self):
-        fp = open(self.path + '/main.fragment')
-        content = eval(fp.read())
-        fp.close()
+        with open(self.path + '/main.fragment') as f:
+            content = eval(f.read())
 
         content['reopen']['tabs'] = list([self.tab_view.widget(e).file for e in range(self.tab_view.count())])
         content['reopen']['last_tab'] = self.tab_view.currentIndex()
 
-        fp = open(self.path + '/main.fragment', 'w')
-        fp.write(str(content))
-        fp.close()
+        with open(self.path + '/main.fragment', 'w') as f:
+            f.write(str(content))
 
         for i in range(self.tab_view.count()):
             self.delete_tab(0)
 
     def reopen_last(self):
-        fp = open(self.path + '/main.fragment')
-        content = eval(fp.read())
-        fp.close()
+        with open(self.path + '/main.fragment') as f:
+            content = eval(f.read())
 
         tabs = content['reopen']['tabs']
         last_tab = content['reopen']['last_tab']

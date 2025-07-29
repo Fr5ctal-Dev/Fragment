@@ -17,9 +17,9 @@ class NewNodeSelectionDialog(SelectionDialog):
         self.node_tree.itemClicked.connect(self.enable_continue)
         self.central_layout.addWidget(self.node_tree)
 
-        fp = open('node_properties/tree.vtree')
-        content = fp.read()
-        fp.close()
+        with open('node_properties/tree.vtree') as f:
+            content = f.read()
+
         indentation = {}
 
         for line in content.split('\n'):

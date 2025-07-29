@@ -8,13 +8,11 @@ import shutil
 import os
 
 
-fp = open('filetypes/filetypes.json')
-filetypes = json.loads(fp.read())
-fp.close()
+with open('filetypes/filetypes.json') as f:
+    filetypes = json.loads(f.read())
 
-fp = open('filetypes/uncreatable.json')
-uncreatable_filetypes = json.loads(fp.read())
-fp.close()
+with open('filetypes/uncreatable.json') as f:
+    uncreatable_filetypes = json.loads(f.read())
 
 
 class FileIconProvider(QtWidgets.QFileIconProvider):

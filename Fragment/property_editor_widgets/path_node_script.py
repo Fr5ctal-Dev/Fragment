@@ -18,9 +18,8 @@ class PathNodeScript(PathScript):
             return
 
         path += '.py'
-        fp = open(path, 'w')
-        fp.write(code)
-        fp.close()
+        with open(path, 'w') as f:
+            f.write(code)
 
         self.value = path
         self.update_editor()

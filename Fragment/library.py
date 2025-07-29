@@ -62,13 +62,11 @@ class Library(QtWidgets.QWidget):
         self.editor_instances.append(launch_editor(path))
 
     def add_to_project_list(self, path):
-        fp = open('library_config/projects.json')
-        projects = json.loads(fp.read())
-        fp.close()
+        with open('library_config/projects.json') as f:
+            projects = json.loads(f.read())
         projects[os.path.basename(path)] = path
-        fp = open('library_config/projects.json', 'w')
-        fp.write(json.dumps(projects))
-        fp.close()
+        with open('library_config/projects.json', 'w') as f:
+            f.write(json.dumps(projects))
         self.load_project_list()
 
     def new_project(self):
@@ -81,9 +79,8 @@ class Library(QtWidgets.QWidget):
         except:
             return
 
-        fp = open(path + '/main.fragment', 'w')
-        fp.write("{'reopen': {'tabs': [], 'last_tab': None}}")
-        fp.close()
+        with open(path + '/main.fragment', 'w') as f:
+            f.write("{'reopen': {'tabs': [], 'last_tab': None}}")
 
         self.add_to_project_list(path)
         self.open_in_editor(path)
@@ -99,9 +96,8 @@ class Library(QtWidgets.QWidget):
 
     def load_project_list(self):
         self.project_list.clear()
-        fp = open('library_config/projects.json')
-        projects = json.loads(fp.read())
-        fp.close()
+        with open('library_config/projects.json') as f:
+            projects = json.loads(f.read())
         delete = []
         for project in projects.keys():
             if not os.path.exists(projects[project]):
@@ -114,14 +110,12 @@ class Library(QtWidgets.QWidget):
         for key in delete:
             projects.pop(key)
 
-        fp = open('library_config/projects.json', 'w')
-        fp.write(json.dumps(projects))
-        fp.close()
+        with open('library_config/projects.json', 'w') as f:
+            f.write(json.dumps(projects))
 
     def check_for_missing_projects(self):
-        fp = open('library_config/projects.json')
-        projects = json.loads(fp.read())
-        fp.close()
+        with open('library_config/projects.json') as f:
+            projects = json.loads(f.read())
 
         for project in projects.values():
             if not os.path.exists(project):
