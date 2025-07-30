@@ -1,6 +1,6 @@
+from tasks import TASKS
 from PySide6 import QtWidgets, QtCore, QtGui
 from PySide6.QtCore import Signal
-import importlib
 
 
 class TaskListWidget(QtWidgets.QWidget):
@@ -67,9 +67,7 @@ class TaskManager(QtWidgets.QWidget):
         self.main_layout.addWidget(self.stacked_widget)
 
     def new_task(self, name, args):
-        module = importlib.import_module(f'tasks.{name}')
-        get_task = eval(f'module.{name}')
-        task = get_task(*args)
+        task = TASKS[name](*args)
 
         task_list_widget = TaskListWidget(task)
 

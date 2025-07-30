@@ -1,4 +1,5 @@
 from .manager import Manager
+from ..nodes import NODES
 import importlib
 import json
 from pathlib import Path
@@ -39,7 +40,7 @@ class Scene(Manager):
                 module = '.'.join(path.with_suffix('').parts)
                 node_class = getattr(importlib.import_module(module), 'Node')
             else:
-                node_class = getattr(importlib.import_module(f'fragment.nodes.{scene_content[node_path]["type"].lower()}'), scene_content[node_path]['type'])
+                node_class = NODES[scene_content[node_path]['type']]
 
             node = node_class(self.game_manager, self.convert_node_properties(properties))
             if scene_content[node_path]['parent']:
