@@ -150,10 +150,6 @@ class Editor(QtWidgets.QMainWindow):
 
         filetype = get_filetype(path).lower()
         if filetype == 'scene':
-            for i in range(self.tab_view.count()):
-                if isinstance(self.tab_view.widget(i), SceneEditor):
-                    self.delete_tab(i)
-                    break
             self.new_tab(lambda _path: SceneEditor(_path, self, path), os.path.basename(path))
 
         if filetype == 'script':
