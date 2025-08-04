@@ -17,7 +17,7 @@ class ScriptEditor(Editor):
         self.script_editor = ScriptEditor_(script, path)
 
         self.line_numbers = LineNumberWidget(self.script_editor)
-        self.script_editor.lint_timer.timeout.connect(self.line_numbers.repaint)
+        self.script_editor.update_timer.timeout.connect(self.line_numbers.repaint)
 
         self.central_widget_layout.addWidget(self.line_numbers)
         self.central_widget_layout.addWidget(self.script_editor)
@@ -30,5 +30,4 @@ class ScriptEditor(Editor):
         self.save()
 
     def _destroy(self):
-        self.script_editor.lint_timer.stop()
         self.script_editor.update_timer.stop()
