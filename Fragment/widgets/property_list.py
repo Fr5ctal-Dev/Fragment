@@ -1,7 +1,7 @@
 from property_editor_widgets.string import String
 from property_editor_widgets.bool import Bool
 from property_editor_widgets.float import Float
-from property_editor_widgets.coordinates import Coordinates
+from property_editor_widgets.vector2 import Vector2
 from property_editor_widgets.path import Path
 from property_editor_widgets.color import Color
 from property_editor_widgets.timeline import Timeline
@@ -18,7 +18,7 @@ EDITOR_TYPE_CLASS_MAP = {
     'string': String,
     'bool': Bool,
     'float': Float,
-    'coordinates': Coordinates,
+    'vector2': Vector2,
     'path': Path,
     'color': Color,
     'timeline': Timeline,

@@ -1,5 +1,10 @@
 {
   "Node": {
     "script": "path_node_script"
+  },
+  "Node2D": {
+    "position": "vector2",
+    "rotation": "float",
+    "scale": "vector2"
   }
 }

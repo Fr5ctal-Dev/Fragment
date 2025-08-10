@@ -1,5 +1,10 @@
 {
   "Node": {
     "script": null
+  },
+  "Node2D": {
+    "position": "position",
+    "rotation": "rotation",
+    "scale": "scale"
   }
 }
