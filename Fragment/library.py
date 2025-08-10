@@ -8,6 +8,7 @@ import platform
 import sys
 import os
 import json
+import shutil
 
 
 class Library(QtWidgets.QWidget):
@@ -81,6 +82,12 @@ class Library(QtWidgets.QWidget):
 
         with open(path + '/main.fragment', 'w') as f:
             f.write("{'reopen': {'tabs': [], 'last_tab': None}}")
+
+        shutil.copytree('fragment', path + '/fragment')
+
+        os.mkdir(path + '/scenes')
+        os.mkdir(path + '/scripts')
+        os.mkdir(path + '/assets')
 
         self.add_to_project_list(path)
         self.open_in_editor(path)
