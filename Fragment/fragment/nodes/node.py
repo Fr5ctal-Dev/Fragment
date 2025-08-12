@@ -36,6 +36,22 @@ class Node(GameElement):
     def destroy_self(self): # Destroys node without destroying children
         self.on_destroy()
 
+    def is_ancestor(self, node):
+        while True:
+            if node == self:
+                return True
+            if not node.parent:
+                return False
+            node = node.parent
+
+    @property
+    def top_node(self):
+        current_node = self
+        while True:
+            if not current_node.parent:
+                return current_node
+            current_node = current_node.parent
+
     def on_start(self):
         pass
 
