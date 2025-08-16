@@ -1,6 +1,5 @@
 from .base_task import BaseTask
-from python_env.executable import python_executable
-from utils import get_code
+from utils.python import python_executable
 import subprocess
 import os
 import shutil
@@ -17,7 +16,7 @@ class ExecuteSceneTask(BaseTask):
 
     def run(self):
         self.scene_editor._close()
-        code = get_code(self.scene_editor.scene, self.scene_editor.path)
+        code = f'import fragment.main\nfragment.main.setup("{self.scene_editor.scene}", "{self.scene_editor.path}")'
         shutil.copytree(self.scene_editor.path, os.path.dirname(self.file))
 
         with open(self.file, 'w') as f:

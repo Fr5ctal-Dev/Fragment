@@ -9,7 +9,7 @@ from property_editor_widgets.path_dict import PathDict
 from property_editor_widgets.input_map import InputMap
 from property_editor_widgets.hidden import Hidden
 from property_editor_widgets.path_node_script import PathNodeScript
-from utils import node_path_to_string
+from utils.node import node_path_to_string
 from node_properties.loader import node_types
 from PySide6 import QtWidgets, QtGui
 import os

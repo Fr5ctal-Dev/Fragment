@@ -1,15 +1,6 @@
-from panda3d.core import NodePath
+from panda3d.core import NodePath # Replace this
 import copy
 import uuid
-import re
-
-
-def get_code(scene, project_path):
-    code = f'''
-import fragment.main
-fragment.main.setup('{scene}', '{project_path}')
-    '''
-    return code
 
 
 def generate_uuid():
@@ -19,12 +10,14 @@ def generate_uuid():
 def get_node_string_data(name, uid, parent, type, properties):
     return {'name': name, 'uid': uid, 'parent': parent, 'type': type, 'properties': properties}
 
+
 def get_node_data(name, uid, parent, type, properties):
     node_path = NodePath(name)
     node_path.set_python_tag('uid', uid)
     if parent:
         node_path.reparent_to(parent)
     return {node_path: {'uid': uid, 'type': type, 'properties': properties}}
+
 
 def node_path_to_string(node_path):
     string_path = []
@@ -35,6 +28,7 @@ def node_path_to_string(node_path):
         if current_parent_step is None:
             break
     return string_path
+
 
 def node_data_to_string(data):
     result = {}
@@ -50,6 +44,7 @@ def node_data_to_string(data):
         if result[tuple(tuple_path)].get('scene_root_node') is not None:
             result[tuple(tuple_path)]['scene_root_node'] = scene_root_node_parent_path + node_path_to_string(result[tuple(tuple_path)]['scene_root_node'])
     return result
+
 
 def string_to_node_data(data):
     result = {}
@@ -68,17 +63,3 @@ def string_to_node_data(data):
         if result[node_path].get('scene_root_node') is not None:
             result[node_path]['scene_root_node'] = tuple_node_path_map[tuple(result[node_path]['scene_root_node'])]
     return result
-
-def extract_extensions_from_filter(filter_string):
-    match = re.search(r'\((.*?)\)', filter_string)
-    if not match:
-        return []
-    pattern = match.group(1)
-    extensions = []
-    for ext in pattern.split():
-        ext = ext.strip()
-        if ext.startswith('*.'):
-            extensions.append(ext[1:])
-        elif ext == '*':
-            extensions.append('*')
-    return extensions
