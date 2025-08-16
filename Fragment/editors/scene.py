@@ -6,7 +6,7 @@ from dialogs.text_selection import TextSelectionDialog
 from node_properties.loader import tree as node_properties
 from node_properties.loader import node_types
 from .editor import Editor
-from utils import get_node_data, string_to_node_data, node_data_to_string, generate_uuid
+from utils.node import get_node_data, string_to_node_data, node_data_to_string, generate_uuid
 from PySide6 import QtWidgets, QtGui, QtCore
 from PySide6.QtCore import Qt
 import os

@@ -1,5 +1,5 @@
 from .editor_widget import EditorWidget
-from utils import extract_extensions_from_filter
+from utils.path import extract_extensions_from_filter
 from widgets.filesystem import FileIconProvider
 from PySide6.QtWidgets import QPushButton, QLineEdit, QFileDialog, QLabel, QSpacerItem
 from PySide6.QtGui import QIcon

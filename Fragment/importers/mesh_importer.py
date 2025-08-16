@@ -1,6 +1,6 @@
 from .base_importer import BaseImporter
 from node_properties.loader import tree as node_properties
-from utils import get_node_string_data, generate_uuid, node_path_to_string
+from utils.node import get_node_string_data, generate_uuid, node_path_to_string
 from direct.showbase.Loader import Loader
 from direct.actor.Actor import Actor
 from panda3d.core import GeomNode, Character, AnimBundleNode, PandaNode, ModelRoot, Filename, CharacterJoint
