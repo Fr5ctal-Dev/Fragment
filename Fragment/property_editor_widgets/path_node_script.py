@@ -1,4 +1,5 @@
 from .path_script import PathScript
+from utils.path import get_resource_path
 from PySide6.QtWidgets import QPushButton, QFileDialog
 from PySide6.QtGui import QIcon
 
@@ -8,7 +9,7 @@ class PathNodeScript(PathScript):
         super().__init__(*args, **kwargs)
         self.create_script_button = QPushButton()
         self.main_layout.addWidget(self.create_script_button)
-        self.create_script_button.setIcon(QIcon('assets/ui_icons/add.png'))
+        self.create_script_button.setIcon(QIcon(get_resource_path('assets/ui_icons/add.png')))
         self.create_script_button.clicked.connect(self.create_node_script)
 
     def create_node_script(self):

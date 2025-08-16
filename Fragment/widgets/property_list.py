@@ -10,6 +10,7 @@ from property_editor_widgets.input_map import InputMap
 from property_editor_widgets.hidden import Hidden
 from property_editor_widgets.path_node_script import PathNodeScript
 from utils.node import node_path_to_string
+from utils.path import get_resource_path
 from node_properties.loader import node_types
 from PySide6 import QtWidgets, QtGui
 import os
@@ -55,7 +56,7 @@ class PropertyList(QtWidgets.QTreeWidget):
 
         for type in self.nodes[node]['properties'].keys():
             chunk = QtWidgets.QTreeWidgetItem([type])
-            chunk.setIcon(0, QtGui.QIcon(f'assets/node_icons/{type}.png'))
+            chunk.setIcon(0, QtGui.QIcon(get_resource_path(f'assets/node_icons/{type}.png')))
             self.topLevelItem(0).addChild(chunk)
             self.expandItem(chunk)
             for prop in self.nodes[node]['properties'][type].keys():

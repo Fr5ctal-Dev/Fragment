@@ -7,6 +7,7 @@ from node_properties.loader import tree as node_properties
 from node_properties.loader import node_types
 from .editor import Editor
 from utils.node import get_node_data, string_to_node_data, node_data_to_string, generate_uuid
+from utils.path import get_resource_path
 from PySide6 import QtWidgets, QtGui, QtCore
 from PySide6.QtCore import Qt
 import os
@@ -33,7 +34,7 @@ class SceneEditor(Editor):
         self.menu_bar_layout = QtWidgets.QHBoxLayout(self.menu_bar)
         self.run_button = QtWidgets.QPushButton()
         self.run_button.setFixedHeight(20)
-        self.run_button.setIcon(QtGui.QIcon('assets/ui_icons/play.png'))
+        self.run_button.setIcon(QtGui.QIcon(get_resource_path('assets/ui_icons/play.png')))
         self.run_button.setIconSize(QtCore.QSize(10, 10))
         self.run_button.clicked.connect(self.run)
         self.menu_bar_layout.addWidget(self.run_button)
@@ -141,7 +142,7 @@ class SceneEditor(Editor):
 
     def add_node_to_tree(self, node):
         self.nodes[node]['element'] = QtWidgets.QTreeWidgetItem([node.get_name(), ''])
-        self.nodes[node]['element'].setIcon(0, QtGui.QIcon('assets/node_icons/' + self.nodes[node]['type'] + '.png'))
+        self.nodes[node]['element'].setIcon(0, QtGui.QIcon(get_resource_path('assets/node_icons/' + self.nodes[node]['type'] + '.png')))
 
         self.nodes[node]['element'].node_path = node
         parent = node.parent

@@ -1,6 +1,7 @@
 from .base_task import BaseTask
+import importers
+from utils.path import get_resource_path
 import json
-import importlib
 
 
 def snake_to_pascal(text):
@@ -25,7 +26,7 @@ class ImportAssetTask(BaseTask):
         self.files = files
         self.path = path
 
-        with open('importers/filetypes.json') as fp:
+        with open(get_resource_path('importers/filetypes.json')) as fp:
             filetypes = json.loads(fp.read())
 
         self.filetypes = inverse_dictionary(filetypes)
@@ -35,7 +36,7 @@ class ImportAssetTask(BaseTask):
             importer_type = self.filetypes.get('.' + file.split('.')[-1])
             if importer_type is None:
                 importer_type = 'base_importer'
-            importer = getattr(importlib.import_module('importers.' + importer_type), snake_to_pascal(importer_type))(self.path)
+            importer = getattr(importers, snake_to_pascal(importer_type))(self.path)
             importer.import_file(file)
         self.finished.emit()
 

@@ -1,4 +1,5 @@
 from .tool_tip import Tooltip
+from utils.path import get_resource_path
 import jedi
 from PySide6 import QtWidgets, QtGui, QtCore
 from PySide6.QtCore import Qt
@@ -233,7 +234,7 @@ class ScriptEditor(QtWidgets.QPlainTextEdit):
         self.completion_model.removeRows(0, self.completion_model.rowCount())
         completions = completions[:min(len(completions), 10)]
         for completion in completions:
-            item = QtGui.QStandardItem(QtGui.QIcon('assets/file_icons/script.png'), completion)
+            item = QtGui.QStandardItem(QtGui.QIcon(get_resource_path('assets/file_icons/script.png')), completion)
             item.setFont(QtGui.QFont('Consolas', 11))
             self.completion_model.appendRow(item)
         cursor_rect = self.cursorRect()
