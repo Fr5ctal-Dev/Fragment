@@ -16,7 +16,6 @@ class StringList(BaseListEditor):
         string_edit = String([value, 'string'], *self.args[1:], **self.kwargs)
         string_edit.value_changed.connect(lambda *args: self.change_property())
         self.tree_widget.setItemWidget(item, 0, string_edit)
-        print(item)
 
     def update_editor(self):
         for item in self.value:

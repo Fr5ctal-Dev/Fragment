@@ -7,16 +7,18 @@ from widgets.notifications import Notifications
 
 from splash_screen import SplashScreen
 
+from utils.path import get_resource_path
+
 from PySide6 import QtWidgets, QtGui, QtCore
 from PySide6.QtCore import Qt
 
 import os
 import json
 
-with open('filetypes/filetypes.json') as f:
+with open(get_resource_path('filetypes/filetypes.json')) as f:
     FILETYPES = json.loads(f.read())
 
-with open('filetypes/uncreatable.json') as f:
+with open(get_resource_path('filetypes/uncreatable.json')) as f:
     FILETYPES = {**FILETYPES, **json.loads(f.read())}
 
 def get_filetype(path):
@@ -132,7 +134,7 @@ class Editor(QtWidgets.QMainWindow):
             self.tab_view.widget(index)._reload()
 
     def new_tab(self, editor, name):
-        self.tab_view.setCurrentIndex(self.tab_view.addTab(editor(self.path), QtGui.QIcon(f'assets/file_icons/{get_filetype(name).lower()}.png'), name))
+        self.tab_view.setCurrentIndex(self.tab_view.addTab(editor(self.path), QtGui.QIcon(get_resource_path(f'assets/file_icons/{get_filetype(name).lower()}.png')), name))
 
     def delete_tab(self, index):
         self.tab_view.widget(index)._close()
@@ -148,7 +150,10 @@ class Editor(QtWidgets.QMainWindow):
                 self.tab_view.setCurrentIndex(i)
                 return
 
-        filetype = get_filetype(path).lower()
+        filetype = get_filetype(path)
+        if filetype is None: # Unsupported file format
+            return
+        filetype = filetype.lower()
         if filetype == 'scene':
             self.new_tab(lambda _path: SceneEditor(_path, self, path), os.path.basename(path))
 

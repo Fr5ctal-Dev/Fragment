@@ -1,4 +1,6 @@
 import re
+import os
+import sys
 
 
 def extract_extensions_from_filter(filter_string):
@@ -14,3 +16,10 @@ def extract_extensions_from_filter(filter_string):
         elif ext == '*':
             extensions.append('*')
     return extensions
+
+
+def get_resource_path(relative_path):
+    base_path = getattr(sys, '_MEIPASS', None) # PyInstaller
+    if base_path:
+        return os.path.join(base_path, relative_path)
+    return relative_path

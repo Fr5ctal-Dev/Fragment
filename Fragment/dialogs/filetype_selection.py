@@ -1,8 +1,9 @@
 from .selection import SelectionDialog
+from utils.path import get_resource_path
 from PySide6 import QtWidgets, QtGui
 import json
 
-with open('filetypes/filetypes.json', 'r') as f:
+with open(get_resource_path('filetypes/filetypes.json'), 'r') as f:
     filetypes = json.loads(f.read())
 
 
@@ -15,7 +16,7 @@ class FiletypeSelectionDialog(SelectionDialog):
         self.central_layout.addWidget(self.filelist)
 
         for file in filetypes.keys():
-            list_item = QtWidgets.QListWidgetItem(QtGui.QIcon(f'assets/file_icons/{file}.png'), file)
+            list_item = QtWidgets.QListWidgetItem(QtGui.QIcon(get_resource_path(f'assets/file_icons/{file}.png')), file)
             self.filelist.addItem(list_item)
 
         self.name_edit = QtWidgets.QLineEdit()
