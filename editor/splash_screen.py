@@ -7,7 +7,7 @@ from PySide6.QtCore import Qt
 class SplashScreen(QWidget):
     def __init__(self):
         super().__init__()
-        self.pixmap = QPixmap(get_resource_path('editor/fragment/icon/splash_screens/logo.png'))
+        self.pixmap = QPixmap(get_resource_path('fragment/icon/splash_screens/logo.png'))
         self.setStyleSheet('background-color: #121212')
 
     def resizeEvent(self, event):

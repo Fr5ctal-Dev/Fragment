@@ -84,7 +84,7 @@ class Library(QtWidgets.QWidget):
         with open(path + '/main.fragment', 'w') as f:
             f.write("{'reopen': {'tabs': [], 'last_tab': None}}")
 
-        shutil.copytree('fragment', path + '/fragment')
+        shutil.copytree(get_resource_path('fragment'), path + '/fragment')
 
         os.mkdir(path + '/scenes')
         os.mkdir(path + '/scripts')
@@ -136,9 +136,9 @@ def launch_library():
     app = QApplication([])
     setup_theme()
     if platform.system() == 'Windows':
-        app.setWindowIcon(QtGui.QIcon(get_resource_path('editor/fragment/icon/icon_win.ico')))
+        app.setWindowIcon(QtGui.QIcon(get_resource_path('fragment/icon/icon_win.ico')))
     else:
-        app.setWindowIcon(QtGui.QIcon(get_resource_path('editor/fragment/icon/icon.png')))
+        app.setWindowIcon(QtGui.QIcon(get_resource_path('fragment/icon/icon.png')))
 
     window = QWidget()
     window.setWindowTitle('Fragment Library')
