@@ -1,13 +1,13 @@
-from editors.scene import SceneEditor
-from editors.script import ScriptEditor
+from .editors.scene import SceneEditor
+from .editors.script import ScriptEditor
 
-from widgets.filesystem import FileSystem
-from widgets.task_manager import TaskManager
-from widgets.notifications import Notifications
+from editor.widgets.filesystem import FileSystem
+from editor.widgets.task_manager import TaskManager
+from editor.widgets.notifications import Notifications
 
-from splash_screen import SplashScreen
+from editor.splash_screen import SplashScreen
 
-from utils.path import get_resource_path
+from editor.utils.path import get_resource_path
 
 from PySide6 import QtWidgets, QtGui, QtCore
 from PySide6.QtCore import Qt
@@ -15,10 +15,10 @@ from PySide6.QtCore import Qt
 import os
 import json
 
-with open(get_resource_path('filetypes/filetypes.json')) as f:
+with open(get_resource_path('editor/filetypes/filetypes.json')) as f:
     FILETYPES = json.loads(f.read())
 
-with open(get_resource_path('filetypes/uncreatable.json')) as f:
+with open(get_resource_path('editor/filetypes/uncreatable.json')) as f:
     FILETYPES = {**FILETYPES, **json.loads(f.read())}
 
 def get_filetype(path):
@@ -134,7 +134,7 @@ class Editor(QtWidgets.QMainWindow):
             self.tab_view.widget(index)._reload()
 
     def new_tab(self, editor, name):
-        self.tab_view.setCurrentIndex(self.tab_view.addTab(editor(self.path), QtGui.QIcon(get_resource_path(f'assets/file_icons/{get_filetype(name).lower()}.png')), name))
+        self.tab_view.setCurrentIndex(self.tab_view.addTab(editor(self.path), QtGui.QIcon(get_resource_path(f'editor/assets/file_icons/{get_filetype(name).lower()}.png')), name))
 
     def delete_tab(self, index):
         self.tab_view.widget(index)._close()

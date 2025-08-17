@@ -1,13 +1,13 @@
-from widgets.node_tree import NodeTree
-from widgets.property_list import PropertyList
-#from widgets.viewport import Viewport
-from dialogs.new_node_selection import NewNodeSelectionDialog
-from dialogs.text_selection import TextSelectionDialog
-from node_properties.loader import tree as node_properties
-from node_properties.loader import node_types
+from editor.widgets.node_tree import NodeTree
+from editor.widgets.property_list import PropertyList
+#from editor.widgets.viewport import Viewport
+from editor.dialogs.new_node_selection import NewNodeSelectionDialog
+from editor.dialogs.text_selection import TextSelectionDialog
+from editor.node_properties.loader import tree as node_properties
+from editor.node_properties.loader import node_types
 from .editor import Editor
-from utils.node import get_node_data, string_to_node_data, node_data_to_string, generate_uuid
-from utils.path import get_resource_path
+from editor.utils.node import get_node_data, string_to_node_data, node_data_to_string, generate_uuid
+from editor.utils.path import get_resource_path
 from PySide6 import QtWidgets, QtGui, QtCore
 from PySide6.QtCore import Qt
 import os
@@ -34,7 +34,7 @@ class SceneEditor(Editor):
         self.menu_bar_layout = QtWidgets.QHBoxLayout(self.menu_bar)
         self.run_button = QtWidgets.QPushButton()
         self.run_button.setFixedHeight(20)
-        self.run_button.setIcon(QtGui.QIcon(get_resource_path('assets/ui_icons/play.png')))
+        self.run_button.setIcon(QtGui.QIcon(get_resource_path('editor/assets/ui_icons/play.png')))
         self.run_button.setIconSize(QtCore.QSize(10, 10))
         self.run_button.clicked.connect(self.run)
         self.menu_bar_layout.addWidget(self.run_button)
@@ -142,7 +142,7 @@ class SceneEditor(Editor):
 
     def add_node_to_tree(self, node):
         self.nodes[node]['element'] = QtWidgets.QTreeWidgetItem([node.get_name(), ''])
-        self.nodes[node]['element'].setIcon(0, QtGui.QIcon(get_resource_path('assets/node_icons/' + self.nodes[node]['type'] + '.png')))
+        self.nodes[node]['element'].setIcon(0, QtGui.QIcon(get_resource_path('editor/assets/node_icons/' + self.nodes[node]['type'] + '.png')))
 
         self.nodes[node]['element'].node_path = node
         parent = node.parent

@@ -1,9 +1,9 @@
-from editor import launch_editor
-from utils.path import get_resource_path
+from editor.editor import launch_editor
+from editor.utils.path import get_resource_path
 from PySide6 import QtWidgets, QtCore
 from PySide6.QtWidgets import QApplication, QWidget, QStackedLayout
 from PySide6 import QtGui
-from splash_screen import SplashScreen
+from editor.splash_screen import SplashScreen
 from qdarktheme import setup_theme
 import platform
 import sys
@@ -64,10 +64,10 @@ class Library(QtWidgets.QWidget):
         self.editor_instances.append(launch_editor(path))
 
     def add_to_project_list(self, path):
-        with open(get_resource_path('library_config/projects.json')) as f:
+        with open(get_resource_path('editor/library_config/projects.json')) as f:
             projects = json.loads(f.read())
         projects[os.path.basename(path)] = path
-        with open(get_resource_path('library_config/projects.json'), 'w') as f:
+        with open(get_resource_path('editor/library_config/projects.json'), 'w') as f:
             f.write(json.dumps(projects))
         self.load_project_list()
 
@@ -104,7 +104,7 @@ class Library(QtWidgets.QWidget):
 
     def load_project_list(self):
         self.project_list.clear()
-        with open(get_resource_path('library_config/projects.json')) as f:
+        with open(get_resource_path('editor/library_config/projects.json')) as f:
             projects = json.loads(f.read())
         delete = []
         for project in projects.keys():
@@ -118,11 +118,11 @@ class Library(QtWidgets.QWidget):
         for key in delete:
             projects.pop(key)
 
-        with open(get_resource_path('library_config/projects.json'), 'w') as f:
+        with open(get_resource_path('editor/library_config/projects.json'), 'w') as f:
             f.write(json.dumps(projects))
 
     def check_for_missing_projects(self):
-        with open(get_resource_path('library_config/projects.json')) as f:
+        with open(get_resource_path('editor/library_config/projects.json')) as f:
             projects = json.loads(f.read())
 
         for project in projects.values():
@@ -136,9 +136,9 @@ def launch_library():
     app = QApplication([])
     setup_theme()
     if platform.system() == 'Windows':
-        app.setWindowIcon(QtGui.QIcon(get_resource_path('fragment/icon/icon_win.ico')))
+        app.setWindowIcon(QtGui.QIcon(get_resource_path('editor/fragment/icon/icon_win.ico')))
     else:
-        app.setWindowIcon(QtGui.QIcon(get_resource_path('fragment/icon/icon.png')))
+        app.setWindowIcon(QtGui.QIcon(get_resource_path('editor/fragment/icon/icon.png')))
 
     window = QWidget()
     window.setWindowTitle('Fragment Library')

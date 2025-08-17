@@ -1,4 +1,1 @@
-from library import launch_library
-
-if __name__ == '__main__':
-    launch_library()
+from editor.library import launch_library as launch

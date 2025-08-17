@@ -1,5 +1,5 @@
-from tasks import TASKS
-from utils.path import get_resource_path
+from editor.tasks import TASKS
+from editor.utils.path import get_resource_path
 from PySide6 import QtWidgets, QtCore, QtGui
 from PySide6.QtCore import Signal
 
@@ -26,7 +26,7 @@ class TaskListWidget(QtWidgets.QWidget):
         self.main_layout.addWidget(self.progress_bar)
 
         self.delete_button = QtWidgets.QPushButton()
-        self.delete_button.setIcon(QtGui.QIcon(get_resource_path('assets/ui_icons/trash.png')))
+        self.delete_button.setIcon(QtGui.QIcon(get_resource_path('editor/assets/ui_icons/trash.png')))
         self.delete_button.clicked.connect(lambda: self.delete_task.emit(self))
         self.delete_button.setEnabled(False)
         self.main_layout.addWidget(self.delete_button)
