@@ -1,4 +1,4 @@
-from utils.path import get_resource_path
+from editor.utils.path import get_resource_path
 from PySide6.QtWidgets import QWidget
 from PySide6.QtGui import QPainter, QPixmap
 from PySide6.QtCore import Qt

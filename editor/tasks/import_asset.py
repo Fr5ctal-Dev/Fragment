@@ -1,6 +1,6 @@
 from .base_task import BaseTask
-import importers
-from utils.path import get_resource_path
+from .. import importers
+from editor.utils.path import get_resource_path
 import json
 
 
@@ -26,7 +26,7 @@ class ImportAssetTask(BaseTask):
         self.files = files
         self.path = path
 
-        with open(get_resource_path('importers/filetypes.json')) as fp:
+        with open(get_resource_path('editor/importers/filetypes.json')) as fp:
             filetypes = json.loads(fp.read())
 
         self.filetypes = inverse_dictionary(filetypes)

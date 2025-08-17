@@ -1,7 +1,7 @@
-from dialogs.filetype_selection import FiletypeSelectionDialog
-from dialogs.text_selection import TextSelectionDialog
+from editor.dialogs.filetype_selection import FiletypeSelectionDialog
+from editor.dialogs.text_selection import TextSelectionDialog
 
-from utils.path import get_resource_path
+from editor.utils.path import get_resource_path
 
 from PySide6 import QtWidgets, QtCore, QtGui
 
@@ -10,24 +10,24 @@ import shutil
 import os
 
 
-with open(get_resource_path('filetypes/filetypes.json')) as f:
+with open(get_resource_path('editor/filetypes/filetypes.json')) as f:
     filetypes = json.loads(f.read())
 
-with open(get_resource_path('filetypes/uncreatable.json')) as f:
+with open(get_resource_path('editor/filetypes/uncreatable.json')) as f:
     uncreatable_filetypes = json.loads(f.read())
 
 
 class FileIconProvider(QtWidgets.QFileIconProvider):
     def icon(self, file_info):
         if not hasattr(file_info, 'suffix'):
-            return QtGui.QIcon(get_resource_path('assets/file_icons/folder.png'))
+            return QtGui.QIcon(get_resource_path('editor/assets/file_icons/folder.png'))
         if file_info.suffix() == '':
-            return QtGui.QIcon(get_resource_path('assets/file_icons/folder.png'))
+            return QtGui.QIcon(get_resource_path('editor/assets/file_icons/folder.png'))
         else:
             for key, item in {**filetypes, **uncreatable_filetypes}.items():
                 if file_info.suffix() == item.split('.')[-1]:
-                    return QtGui.QIcon(get_resource_path('assets/file_icons/' + key + '.png'))
-            return QtGui.QIcon(get_resource_path('assets/file_icons/file.png'))
+                    return QtGui.QIcon(get_resource_path('editor/assets/file_icons/' + key + '.png'))
+            return QtGui.QIcon(get_resource_path('editor/assets/file_icons/file.png'))
 
 
 class FileSystem(QtWidgets.QTreeView):
@@ -113,7 +113,7 @@ class FileSystem(QtWidgets.QTreeView):
 
         path += '/' + name + '.' + filepath.split('.')[1]
         if not os.path.exists(path):
-            shutil.copy(get_resource_path(f'filetypes/{filepath}'), path)
+            shutil.copy(get_resource_path(f'editor/filetypes/{filepath}'), path)
 
     def create_folder(self):
         dialog = TextSelectionDialog(self, 'Name of Directory', 'Name')

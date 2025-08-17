@@ -1,17 +1,17 @@
-from property_editor_widgets.string import String
-from property_editor_widgets.bool import Bool
-from property_editor_widgets.float import Float
-from property_editor_widgets.vector2 import Vector2
-from property_editor_widgets.path import Path
-from property_editor_widgets.color import Color
-from property_editor_widgets.timeline import Timeline
-from property_editor_widgets.path_dict import PathDict
-from property_editor_widgets.input_map import InputMap
-from property_editor_widgets.hidden import Hidden
-from property_editor_widgets.path_node_script import PathNodeScript
-from utils.node import node_path_to_string
-from utils.path import get_resource_path
-from node_properties.loader import node_types
+from editor.property_editor_widgets.string import String
+from editor.property_editor_widgets.bool import Bool
+from editor.property_editor_widgets.float import Float
+from editor.property_editor_widgets.vector2 import Vector2
+from editor.property_editor_widgets.path import Path
+from editor.property_editor_widgets.color import Color
+from editor.property_editor_widgets.timeline import Timeline
+from editor.property_editor_widgets.path_dict import PathDict
+from editor.property_editor_widgets.input_map import InputMap
+from editor.property_editor_widgets.hidden import Hidden
+from editor.property_editor_widgets.path_node_script import PathNodeScript
+from editor.utils.node import node_path_to_string
+from editor.utils.path import get_resource_path
+from editor.node_properties.loader import node_types
 from PySide6 import QtWidgets, QtGui
 import os
 
@@ -56,7 +56,7 @@ class PropertyList(QtWidgets.QTreeWidget):
 
         for type in self.nodes[node]['properties'].keys():
             chunk = QtWidgets.QTreeWidgetItem([type])
-            chunk.setIcon(0, QtGui.QIcon(get_resource_path(f'assets/node_icons/{type}.png')))
+            chunk.setIcon(0, QtGui.QIcon(get_resource_path(f'editor/assets/node_icons/{type}.png')))
             self.topLevelItem(0).addChild(chunk)
             self.expandItem(chunk)
             for prop in self.nodes[node]['properties'][type].keys():

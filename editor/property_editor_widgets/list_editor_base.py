@@ -1,5 +1,5 @@
 from .editor_widget import EditorWidget
-from utils.path import get_resource_path
+from editor.utils.path import get_resource_path
 from PySide6.QtWidgets import QTreeWidget, QPushButton, QTreeWidgetItem, QHBoxLayout, QVBoxLayout
 from PySide6.QtGui import QIcon
 
@@ -11,9 +11,9 @@ class BaseListEditor(EditorWidget):
         self.main_layout.addLayout(self.list_layout)
 
         self.add_button = QPushButton()
-        self.add_button.setIcon(QIcon(get_resource_path('assets/ui_icons/add.png')))
+        self.add_button.setIcon(QIcon(get_resource_path('editor/assets/ui_icons/add.png')))
         self.remove_button = QPushButton()
-        self.remove_button.setIcon(QIcon(get_resource_path('assets/ui_icons/minus.png')))
+        self.remove_button.setIcon(QIcon(get_resource_path('editor/assets/ui_icons/minus.png')))
         self.remove_button.clicked.connect(self.remove_current_item)
         self.button_layout = QHBoxLayout()
         self.button_layout.addWidget(self.add_button)

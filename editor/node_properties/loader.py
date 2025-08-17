@@ -1,4 +1,4 @@
-from utils.path import get_resource_path
+from editor.utils.path import get_resource_path
 import json
 
 def load_tree(tree, properties):
@@ -18,11 +18,11 @@ def load_json(file):
         content = json.loads(f.read())
     return content
 
-node_properties = load_json(get_resource_path('node_properties/node_properties.json'))
+node_properties = load_json(get_resource_path('editor/node_properties/node_properties.json'))
 
-node_types = load_json(get_resource_path('node_properties/node_types.json'))
+node_types = load_json(get_resource_path('editor/node_properties/node_types.json'))
 
-with open(get_resource_path('node_properties/tree.vtree')) as f:
+with open(get_resource_path('editor/node_properties/tree.vtree')) as f:
     content = f.read()
 
 tree = load_tree(content, node_properties)

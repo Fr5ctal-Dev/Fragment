@@ -1,5 +1,5 @@
-from widgets.script_editor import ScriptEditor as ScriptEditor_
-from widgets.line_numbers import LineNumberWidget
+from editor.widgets.script_editor import ScriptEditor as ScriptEditor_
+from editor.widgets.line_numbers import LineNumberWidget
 from .editor import Editor
 from PySide6 import QtWidgets
 

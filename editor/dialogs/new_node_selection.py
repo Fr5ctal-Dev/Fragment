@@ -1,5 +1,5 @@
 from .selection import SelectionDialog
-from utils.path import get_resource_path
+from editor.utils.path import get_resource_path
 from PySide6 import QtWidgets, QtGui
 
 
@@ -18,14 +18,14 @@ class NewNodeSelectionDialog(SelectionDialog):
         self.node_tree.itemClicked.connect(self.enable_continue)
         self.central_layout.addWidget(self.node_tree)
 
-        with open(get_resource_path('node_properties/tree.vtree')) as f:
+        with open(get_resource_path('editor/node_properties/tree.vtree')) as f:
             content = f.read()
 
         indentation = {}
 
         for line in content.split('\n'):
             widget = QtWidgets.QTreeWidgetItem([line.strip()])
-            widget.setIcon(0, QtGui.QIcon(get_resource_path(f'assets/node_icons/{line.strip()}.png')))
+            widget.setIcon(0, QtGui.QIcon(get_resource_path(f'editor/assets/node_icons/{line.strip()}.png')))
             indent = len(line.split(' ')) - 1
             indentation[indent] = widget
             if indent == 0:

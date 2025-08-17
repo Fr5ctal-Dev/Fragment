@@ -1,6 +1,6 @@
 from .editor_widget import EditorWidget
-from utils.path import extract_extensions_from_filter, get_resource_path
-from widgets.filesystem import FileIconProvider
+from editor.utils.path import extract_extensions_from_filter, get_resource_path
+from editor.widgets.filesystem import FileIconProvider
 from PySide6.QtWidgets import QPushButton, QLineEdit, QFileDialog, QLabel, QSpacerItem
 from PySide6.QtGui import QIcon
 from PySide6.QtCore import QFileInfo
@@ -21,11 +21,11 @@ class Path(EditorWidget):
         self.path_display.setReadOnly(True)
         self.path_selection_button = QPushButton()
         self.main_layout.addWidget(self.path_selection_button)
-        self.path_selection_button.setIcon(QIcon(get_resource_path('assets/file_icons/folder.png')))
+        self.path_selection_button.setIcon(QIcon(get_resource_path('editor/assets/file_icons/folder.png')))
         self.path_selection_button.clicked.connect(lambda: self.select_path()) # Do not remove 'lambda'
         self.open_path_button = QPushButton()
         self.main_layout.addWidget(self.open_path_button)
-        self.open_path_button.setIcon(QIcon(get_resource_path('assets/ui_icons/open.png')))
+        self.open_path_button.setIcon(QIcon(get_resource_path('editor/assets/ui_icons/open.png')))
         self.open_path_button.clicked.connect(self.open_path)
 
         self.update_file_icon()

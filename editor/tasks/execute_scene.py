@@ -1,5 +1,5 @@
 from .base_task import BaseTask
-from utils.python import python_executable
+from editor.utils.python import python_executable
 import subprocess
 import os
 import shutil
