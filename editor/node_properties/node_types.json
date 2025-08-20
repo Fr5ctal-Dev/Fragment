@@ -6,5 +6,6 @@
     "position": "vector2",
     "rotation": "float",
     "scale": "vector2"
-  }
+  },
+  "Canvas": {}
 }

@@ -6,5 +6,6 @@
     "position": "position",
     "rotation": "rotation",
     "scale": "scale"
-  }
+  },
+  "Canvas": {}
 }

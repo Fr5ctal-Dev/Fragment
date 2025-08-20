@@ -1,5 +1,6 @@
 from .manager import Manager
 from ..types.vector import Vector2
+from ..nodes.canvas import Canvas
 import pygame
 
 
@@ -7,6 +8,7 @@ class Renderer(Manager):
     def __init__(self, game_manager, size = Vector2(0, 0)):
         super().__init__(game_manager)
         self.surface = pygame.Surface(size)
+        self.global_canvas = Canvas(self.game_manager, {})
 
     @property
     def size(self):
@@ -17,4 +19,4 @@ class Renderer(Manager):
         self.surface = pygame.Surface(size)
 
     def update(self, dt):
-        pass
+        self.surface.blit(self.global_canvas.render(), (0, 0))
