@@ -5,7 +5,7 @@ import pygame
 class Canvas(Node):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.drawables = []
+        self.drawables = [] # TODO: Keep them as a dict where the keys are their layers
         self.cameras = []
 
     def register_camera(self, camera):
