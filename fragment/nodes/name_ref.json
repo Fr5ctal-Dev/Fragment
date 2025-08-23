@@ -8,5 +8,10 @@
     "scale": "scale"
   },
   "Canvas": {},
-  "Drawable": {}
+  "Drawable": {
+    "draw_priority": "draw_priority"
+  },
+  "Camera": {
+    "zoom": "zoom"
+  }
 }

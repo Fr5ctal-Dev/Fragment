@@ -8,7 +8,11 @@ class Renderer(Manager):
     def __init__(self, game_manager, size = Vector2(0, 0)):
         super().__init__(game_manager)
         self.surface = pygame.Surface(size)
-        self.global_canvas = Canvas(self.game_manager, {})
+        self.canvases = []
+        self.global_canvas = Canvas(self.game_manager, {}, is_global_canvas=True)
+
+    def register_canvas(self, canvas):
+        self.canvases.append(canvas)
 
     @property
     def size(self):
@@ -20,3 +24,5 @@ class Renderer(Manager):
 
     def update(self, dt):
         self.surface.blit(self.global_canvas.render(), (0, 0))
+        for canvas in self.canvases:
+            self.surface.blit(canvas.render(), (0, 0))

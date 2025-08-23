@@ -8,5 +8,10 @@
     "scale": "vector2"
   },
   "Canvas": {},
-  "Drawable": {}
+  "Drawable": {
+    "draw_priority": "integer"
+  },
+  "Camera": {
+    "zoom": "float"
+  }
 }
