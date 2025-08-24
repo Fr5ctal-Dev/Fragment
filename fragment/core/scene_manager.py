@@ -42,13 +42,15 @@ class Scene(Manager):
             else:
                 node_class = NODES[scene_content[node_path]['type']]
 
-            node = node_class(self.game_manager, self.convert_node_properties(properties))
-            node.name = scene_content[node_path]['name']
-            node.uuid = scene_content[node_path]['uid']
+            node = node_class(
+                self.game_manager,
+                self.convert_node_properties(properties),
+                name=scene_content[node_path]['name'],
+                uuid=scene_content[node_path]['uid'],
+                parent=temp_node_storage[scene_content[node_path]['parent']] if scene_content[node_path]['parent'] else None
+            )
 
-            if scene_content[node_path]['parent']:
-                node.set_parent(temp_node_storage[scene_content[node_path]['parent']])
-            else:
+            if not scene_content[node_path]['parent']:
                 self.root_node = node
 
             temp_node_storage[node_path] = node

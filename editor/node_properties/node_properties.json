@@ -6,5 +6,12 @@
     "position": [0, 0],
     "rotation": 0.0,
     "scale": [1, 1]
+  },
+  "Canvas": {},
+  "Drawable": {
+    "draw_priority": 0
+  },
+  "Camera": {
+    "zoom": 1.0
   }
 }
