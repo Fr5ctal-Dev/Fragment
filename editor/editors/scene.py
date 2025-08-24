@@ -256,14 +256,14 @@ class SceneEditor(Editor):
 
     def sort_nodes(self):
         node_string_path_map = {}
-        sorted_nodes = {}
-        for node in self.nodes:
+        sorted_nodes = copy.copy(self.nodes)
+        self.nodes.clear()
+        for node in sorted_nodes:
             node_string_path_map[str(node)] = node
         sorted_string_paths = list(sorted(node_string_path_map))
         for string_path in sorted_string_paths:
             node = node_string_path_map[string_path]
-            sorted_nodes[node] = self.nodes[node]
-        self.nodes = sorted_nodes
+            self.nodes[node] = sorted_nodes[node]
 
     def reload_viewport_entities(self):
         #list(self.nodes.values())[0]['viewport_entity'].destroy()

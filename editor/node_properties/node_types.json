@@ -6,5 +6,12 @@
     "position": "vector2",
     "rotation": "float",
     "scale": "vector2"
+  },
+  "Canvas": {},
+  "Drawable": {
+    "draw_priority": "integer"
+  },
+  "Camera": {
+    "zoom": "float"
   }
 }

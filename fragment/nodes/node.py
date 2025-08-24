@@ -2,13 +2,14 @@ from ..core.element import GameElement
 
 
 class Node(GameElement):
-    def __init__(self, game_manager, properties):
+    def __init__(self, game_manager, properties, name=None, uuid=None, parent=None):
         super().__init__(game_manager)
-        self.name = None
-        self.uuid = None
+        self.name = name
+        self.uuid = uuid
         self.parent = None
         self.children = []
         self.properties = properties
+        self.set_parent(parent)
         self.initialize_properties(self.properties)
 
     def set_parent(self, node):
@@ -26,6 +27,19 @@ class Node(GameElement):
         action(self)
         for child in self.children:
             child.traverse(action)
+
+    def find_ancestor_of_type(self, node_type):
+        if self.parent is None:
+            return
+
+        current_node = self.parent
+        while True:
+            if isinstance(current_node, node_type):
+                return current_node
+
+            if current_node.parent is None:
+                return
+            current_node = current_node.parent
 
     def update(self, dt):
         self.on_update()

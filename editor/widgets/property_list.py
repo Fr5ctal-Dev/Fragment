@@ -1,6 +1,7 @@
 from editor.property_editor_widgets.string import String
 from editor.property_editor_widgets.bool import Bool
 from editor.property_editor_widgets.float import Float
+from editor.property_editor_widgets.integer import Integer
 from editor.property_editor_widgets.vector2 import Vector2
 from editor.property_editor_widgets.path import Path
 from editor.property_editor_widgets.color import Color
@@ -19,6 +20,7 @@ EDITOR_TYPE_CLASS_MAP = {
     'string': String,
     'bool': Bool,
     'float': Float,
+    'integer': Integer,
     'vector2': Vector2,
     'path': Path,
     'color': Color,
