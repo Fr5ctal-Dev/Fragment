@@ -1,6 +1,0 @@
-PySide6
-jedi
-pygments
-pyflakes
-pyperclip
-pygame
