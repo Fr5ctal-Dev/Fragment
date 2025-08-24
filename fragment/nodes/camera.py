@@ -11,8 +11,8 @@ class Camera(Node2D):
 
     def render(self):
         drawables = self.target_canvas.drawables
-        render_layer = pygame.Surface(self.target_canvas.size, pygame.SRCALPHA)
-        render_rect = pygame.Rect((0, 0), self.target_canvas.size / self.zoom)
+        render_layer = pygame.Surface(self.view_size, pygame.SRCALPHA)
+        render_rect = pygame.Rect((0, 0), self.view_size)
         for nodes in drawables.values():
             for node in nodes:
                 draw_surface = node.render()
@@ -25,7 +25,7 @@ class Camera(Node2D):
 
     @property
     def view_size(self):
-        return self.game_manager.window_manager.renderer.size / self.zoom
+        return self.target_canvas.size / self.zoom
 
     @property
     def zoom(self):

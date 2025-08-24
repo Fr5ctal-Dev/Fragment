@@ -9,7 +9,7 @@ class Node2D(Node):
 
     @position.setter
     def position(self, position):
-        self.properties['position'] = Vector2(position[0], position[1])
+        self.properties['position'] = Vector2(position)
 
     @property
     def world_position(self):
@@ -40,7 +40,7 @@ class Node2D(Node):
 
     @scale.setter
     def scale(self, scale):
-        self.properties['scale'] = Vector2(scale[0], scale[1])
+        self.properties['scale'] = Vector2(scale)
 
     @property
     def world_scale(self):

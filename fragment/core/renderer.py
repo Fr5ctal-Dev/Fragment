@@ -23,6 +23,7 @@ class Renderer(Manager):
         self.surface = pygame.Surface(size)
 
     def update(self, dt):
+        self.surface.fill((0, 0, 0))
         self.surface.blit(self.global_canvas.render(), (0, 0))
         for canvas in self.canvases:
             self.surface.blit(canvas.render(), (0, 0))

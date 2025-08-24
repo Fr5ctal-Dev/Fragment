@@ -15,7 +15,7 @@ class Drawable(Node2D):
 
     def render(self):
         image = self.image()
-        return pygame.transform.scale(pygame.transform.rotate(image, self.world_rotation), (int(image.get_width() * self.world_scale[0]), int(image.get_height() * self.world_scale[1])))
+        return pygame.transform.rotate(pygame.transform.scale(image, (int(image.get_width() * self.world_scale[0]), int(image.get_height() * self.world_scale[1]))), -self.world_rotation)
 
     def destroy_self(self):
         self.target_canvas.unregister_drawable(self)
