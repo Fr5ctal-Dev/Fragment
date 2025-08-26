@@ -1,7 +1,14 @@
 from ..core.element import GameElement
+from typing import Callable
 
 
 class Node(GameElement):
+    """The base class for all node objects.
+
+    A node is defined as a class with a parent, children and properties.
+    Every node has a node script, which is used to define custom logic using Python.
+    Each node parents to other nodes to form a scene tree.
+    """
     def __init__(self, game_manager, properties, name=None, uuid=None, parent=None):
         super().__init__(game_manager)
         self.name = name
@@ -12,23 +19,26 @@ class Node(GameElement):
         self.set_parent(parent)
         self.initialize_properties(self.properties)
 
-    def set_parent(self, node):
+    def set_parent(self, node) -> None:
         if self.parent:
             self.parent.children.remove(self)
         self.parent = node
         if node:
             node.children.append(self)
 
-    def initialize_properties(self, properties):
+    def initialize_properties(self, properties: dict) -> None:
+        """Sets the properties in a dict onto the node."""
         for key in properties.keys():
             setattr(self, key, properties[key])
 
-    def traverse(self, action):
+    def traverse(self, action: Callable) -> None:
+        """Recursively performs an action on node and its children."""
         action(self)
         for child in self.children:
             child.traverse(action)
 
-    def find_ancestor_of_type(self, node_type):
+    def find_ancestor_of_type(self, node_type: type):
+        """Finds nearest ancestor with a type satisfying node_type."""
         if self.parent is None:
             return
 
@@ -41,16 +51,18 @@ class Node(GameElement):
                 return
             current_node = current_node.parent
 
-    def update(self, dt):
+    def update(self, dt: float) -> None:
         self.on_update()
 
-    def destroy(self):
+    def destroy(self) -> None:
+        """Destroys node and children."""
         self.traverse(Node.destroy_self)
 
-    def destroy_self(self): # Destroys node without destroying children
+    def destroy_self(self) -> None:
+        """Destroys node without destroying children."""
         self.on_destroy()
 
-    def is_ancestor(self, node):
+    def is_ancestor(self, node) -> bool:
         while True:
             if node == self:
                 return True
@@ -60,6 +72,7 @@ class Node(GameElement):
 
     @property
     def top_node(self):
+        """Get the root node of the node tree the node is in."""
         current_node = self
         while True:
             if not current_node.parent:
