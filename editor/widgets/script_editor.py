@@ -1,18 +1,15 @@
-from .tool_tip import Tooltip
-from editor.utils.path import get_resource_path
-import jedi
 from PySide6 import QtWidgets, QtGui, QtCore
 from PySide6.QtCore import Qt
 from pygments import lex
 from pygments.lexers import PythonLexer
 from pygments.styles import get_style_by_name
 from pygments.token import Token
-from pyflakes.api import check as pyflakes_check
+from pyflakes.api import check
 from pyflakes.reporter import Reporter
 import io
 
 
-class Highlighter(QtGui.QSyntaxHighlighter):
+class SyntaxHighlighter(QtGui.QSyntaxHighlighter):
     def __init__(self, document, script):
         super().__init__(document)
         self.script = script
@@ -57,53 +54,34 @@ class LintWorker(QtCore.QObject):
         results = self.lint_code(self.code)
         self.finished.emit(results)
 
-    def lint_code(self, source, filename = 'main.py'):
-        results = {}
-        lines = source.splitlines()
-
-        class RangeReporter(Reporter):
+    def lint_code(self, code):
+        class CustomReporter(Reporter):
             def __init__(self):
                 super().__init__(io.StringIO(), io.StringIO())
-
-            def syntaxError(self, filename, msg, lineno, offset, text):
-                start = offset - 1
-                end = start + 1
-                lineno -= 1
-                results[lineno] = {
-                    'filename': filename,
-                    'lineno': lineno,
-                    'start': start,
-                    'end': end,
-                    'message': msg
-                }
+                self.issues = []
 
             def flake(self, message):
-                lineno = message.lineno
-                lineno -= 1
-                line = lines[lineno] if 1 <= lineno + 1 <= len(lines) else ''
-                name = message.message_args[0] if message.message_args else None
-
-                if name and name in line:
-                    start = line.index(name)
-                    end = start + len(name)
-                elif hasattr(message, 'node') and hasattr(message.node, 'col_offset'):
-                    start = message.node.col_offset
-                    end = getattr(message.node, 'end_col_offset', start + 1)
-                else:
-                    start = 0
-                    end = 1
-
-                text = message.message % message.message_args
-                results[lineno] = {
+                self.issues.append({
                     'filename': message.filename,
-                    'lineno': lineno,
-                    'start': start,
-                    'end': end,
-                    'message': text
-                }
+                    'line': message.lineno,
+                    'col': message.col + 1,
+                    'type': message.__class__.__name__,
+                    'text': message.message % message.message_args,
+                })
 
-        pyflakes_check(source, filename, RangeReporter())
-        return results
+            def syntaxError(self, filename, msg, lineno, offset, text):
+                self.issues.append({
+                    'filename': filename, 'line': lineno, 'col': offset,
+                    'type': 'SyntaxError', 'text': msg,
+                })
+
+            def unexpectedError(self, filename, msg):
+                self.issues.append({'filename': filename, 'type': 'UnexpectedError', 'text': msg})
+
+        rep = CustomReporter()
+        check(code, filename='main.py', reporter=rep)
+
+        return rep.issues
 
 
 class ScriptEditor(QtWidgets.QPlainTextEdit):
@@ -115,187 +93,44 @@ class ScriptEditor(QtWidgets.QPlainTextEdit):
         with open(self.script) as fp:
             self.insertPlainText(fp.read())
 
-        font = QtGui.QFont('Consolas', 12)
-
-        self.setFont(font)
-        self.setLineWrapMode(self.LineWrapMode.NoWrap)
-        self.lint_tooltip = Tooltip()
-        self.lint_tooltip.setFont(font)
-        self.lint_tooltip.hide()
-        self.completer = QtWidgets.QCompleter(self)
-        self.completer.setWidget(self)
-        self.completer.setCompletionMode(QtWidgets.QCompleter.CompletionMode.PopupCompletion)
-        self.completer.setCaseSensitivity(Qt.CaseSensitivity.CaseInsensitive)
-        self.completion_model = QtGui.QStandardItemModel()
-        self.completer.setModel(self.completion_model)
-        self.completer_highlight = None
-        self.textChanged.connect(self.on_text_changed)
-        self.completer.activated.connect(self.insert_completion)
-        self.completer.highlighted.connect(self.set_highlight_completion)
-        self.previous_text = None
-        self.highlighter = Highlighter(self.document(), script)
-        self.mouse_position = QtCore.QPoint()
         self.update_timer = QtCore.QTimer()
-        self.update_timer.timeout.connect(self.update_linting)
-        self.update_timer.timeout.connect(self.update_tick)
-        self.update_timer.start(10)
+        self.update_timer.timeout.connect(self.on_update)
+        self.update_timer.start(0)
 
-        self.lint_worker_running = False
-        self.lint_worker = None # Used to store lint worker in memory so that it does not get garbage collected
+        self.font = QtGui.QFont('Consolas', 11)
+        self.setFont(self.font)
+        self.setLineWrapMode(self.LineWrapMode.NoWrap)
+
+        self.syntax_highlighter = SyntaxHighlighter(self.document(), self.script)
+
+        self.lint_worker = None
         self.lint_worker_thread = None
         self.lint_output = None
 
-    def set_highlight_completion(self, text):
-        self.completer_highlight = text
+    def on_update(self):
+        self.start_lint_worker()
 
-    def on_text_changed(self):
-        if (self.previous_text is not None) and (self.toPlainText() == self.previous_text):
-            return
-        self.previous_text = self.toPlainText()
-        self.save()
-        cursor = self.textCursor()
-        current_text = self.toPlainText()
-        position = cursor.position()
-        completions = self.get_completions(current_text, position)
-        if completions:
-            self.show_completions(completions)
-        else:
-            self.completer.popup().hide()
+    def get_line_indentation(self, line):
+        return len(line) - len(line.lstrip())
 
-    def update_tick(self):
-        self.update_tooltip_based_on_cursor()
-        self.lint()
+    def should_increase_indent(self, line):
+        stripped_line = line.strip()
+        if ':' in stripped_line:
+            colon_pos = stripped_line.find(':')
+            after_colon = stripped_line[colon_pos + 1:].strip()
+            if not after_colon or after_colon.startswith('#'):
+                return True
 
-    def update_linting(self):
-        if self.lint_output is None:
-            return
-        cursor = self.textCursor()
-        extra_selections = []
-        if cursor.block().blockNumber() not in self.lint_output.keys():
-            extra_selection = QtWidgets.QTextEdit.ExtraSelection()
-            extra_selection.cursor = cursor
-            extra_selection.format.setBackground(QtGui.QColor(50, 50, 50))
-            extra_selection.format.setProperty(QtGui.QTextFormat.Property.FullWidthSelection, True)
-            extra_selections.append(extra_selection)
-        for line_number in self.lint_output.keys():
-            lint_selection = QtWidgets.QTextEdit.ExtraSelection()
-            lint_selection.cursor = self.textCursor()
-            lint_selection.cursor.setPosition(self.document().findBlockByLineNumber(line_number).position() + self.lint_output[line_number]['start'])
-            lint_selection.cursor.movePosition(cursor.MoveOperation.NextCharacter, cursor.MoveMode.KeepAnchor, self.lint_output[line_number]['end'] - self.lint_output[line_number]['start'])
-            lint_selection.format.setFontUnderline(True)
-            lint_selection.format.setUnderlineStyle(lint_selection.format.UnderlineStyle.WaveUnderline)
+    def should_decrease_indent(self, line):
+        stripped_line = line.strip()
 
-            lint_selection.format.setUnderlineColor(QtGui.QColor(255, 50, 50))
-            extra_selections.append(lint_selection)
-        self.setExtraSelections(extra_selections)
+        for keyword in ['return', 'pass', 'raise']: # Add more if I missed some
+            if stripped_line.startswith(keyword) or stripped_line == keyword + ':':
+                return True
 
-    def mouseMoveEvent(self, event):
-        self.mouse_position = event.pos()
-        super().mouseMoveEvent(event)
-
-    def update_tooltip_based_on_cursor(self):
-        cursor = self.cursorForPosition(self.mapFromGlobal(self.cursor().pos()))
-        column = cursor.columnNumber()
-        block = cursor.block()
-        line_number = block.blockNumber()
-        if self.lint_output and line_number in self.lint_output and self.hasFocus() and column in range(self.lint_output[line_number]['start'], self.lint_output[line_number]['end'] + 1) and self.rect().contains(self.mapFromGlobal(self.cursor().pos())):
-            lint_info = self.lint_output[line_number]
-            tooltip_text = lint_info['message']
-            self.lint_tooltip.setFont(QtGui.QFont('Consolas', 11))
-            self.lint_tooltip.setText(tooltip_text)
-            self.lint_tooltip.adjustSize()
-            self.lint_tooltip.show()
-        else:
-            self.lint_tooltip.hide()
-
-    def get_completions(self, source_code, position):
-        line, column = self.get_line_and_column(source_code, position)
-        try:
-            if (source_code[position - 1] == ' ') or (self.textCursor().atBlockStart()):
-                return []
-        except:
-            return []
-        script = jedi.Script(path=self.script, project=jedi.Project(self.path))
-        completions = script.complete(line=line, column=column)
-        comps = []
-        for completion in completions:
-            if completion.complete:
-                comps.append(completion.name)
-        return comps
-
-    def get_line_and_column(self, text, position):
-        text_up_to_cursor = text[:position]
-        lines = text_up_to_cursor.splitlines()
-        line_number = len(lines)
-        column_number = len(lines[-1]) if lines else 0
-        return line_number, column_number
-
-    def show_completions(self, completions):
-        self.completion_model.removeRows(0, self.completion_model.rowCount())
-        completions = completions[:min(len(completions), 10)]
-        for completion in completions:
-            item = QtGui.QStandardItem(QtGui.QIcon(get_resource_path('editor/assets/file_icons/script.png')), completion)
-            item.setFont(QtGui.QFont('Consolas', 11))
-            self.completion_model.appendRow(item)
-        cursor_rect = self.cursorRect()
-        cursor_rect.setWidth(self.completer.popup().sizeHintForColumn(0) + self.completer.popup().verticalScrollBar().sizeHint().width())
-        self.completer.complete(cursor_rect)
-        self.set_highlight_completion(self.completer.currentCompletion())
-
-    def insert_completion(self, completion):
-        cursor = self.textCursor()
-        if (not cursor.positionInBlock() == 0) and cursor.block().text().strip():
-            cursor.movePosition(cursor.MoveOperation.Left, cursor.MoveMode.KeepAnchor, 1)
-        cursor.select(cursor.SelectionType.WordUnderCursor)
-        cursor.deleteChar()
-        cursor.insertText(completion)
-        self.setTextCursor(cursor)
-        self.completer.popup().hide()
-
-    def lint(self):
-        if self.lint_worker is not None: # Previous lint process is not finished
-            return
-
-        self.lint_worker = LintWorker(self.toPlainText())
-        self.lint_worker_thread = QtCore.QThread()
-        self.lint_worker.moveToThread(self.lint_worker_thread)
-        self.lint_worker_thread.started.connect(self.lint_worker.run)
-        self.lint_worker_thread.start()
-        self.lint_worker.finished.connect(self.lint_finished)
-
-    def lint_finished(self, data):
-        self.lint_worker_thread.quit()
-        self.lint_worker_thread.wait()
-        self.lint_worker = None
-        self.lint_worker_thread = None
-        self.lint_output = data
+        return False
 
     def keyPressEvent(self, event):
-        self.ensureCursorVisible()
-        if self.completer.popup().isVisible():
-            if event.key() == Qt.Key.Key_Tab:
-                event.accept()
-                self.insert_completion(self.completer_highlight)
-                return
-            elif event.key() == Qt.Key.Key_Escape:
-                self.completer.popup().hide()
-                event.ignore()
-                return
-        else:
-            if event.key() == Qt.Key.Key_Tab:
-                cursor = self.textCursor()
-                position = cursor.position()
-                cursor.movePosition(cursor.MoveOperation.StartOfLine, cursor.MoveMode.KeepAnchor)
-                selected_text = cursor.selectedText()
-                spaces = len(selected_text) - len(selected_text.lstrip(' '))
-                if selected_text.strip() == '':
-                    add_spaces = 4 - spaces % 4
-                    cursor.beginEditBlock()
-                    cursor.setPosition(position, cursor.MoveMode.KeepAnchor)
-                    cursor.insertText(' ' * add_spaces)
-                    cursor.endEditBlock()
-                    event.accept()
-                    return
         if event.key() in (Qt.Key.Key_Return, Qt.Key.Key_Enter):
             cursor = self.textCursor()
             spaces = 0
@@ -304,19 +139,39 @@ class ScriptEditor(QtWidgets.QPlainTextEdit):
                     spaces += 1
                 else:
                     break
-            if cursor.block().text().endswith(':'):
+            if self.should_increase_indent(cursor.block().text()):
                 spaces += 4
+
+            elif self.should_decrease_indent(cursor.block().text()):
+                spaces = max(spaces - 4, 0)
+
             self.insertPlainText('\n')
             self.insertPlainText(' ' * spaces)
             event.accept()
             self.ensureCursorVisible()
             return
+
+        if event.key() == Qt.Key.Key_Tab:
+            cursor = self.textCursor()
+            position = cursor.position()
+            cursor.movePosition(cursor.MoveOperation.StartOfLine, cursor.MoveMode.KeepAnchor)
+            selected_text = cursor.selectedText()
+            spaces = self.get_line_indentation(selected_text)
+            if selected_text.strip() == '':
+                add_spaces = 4 - spaces % 4
+                cursor.beginEditBlock()
+                cursor.setPosition(position, cursor.MoveMode.KeepAnchor)
+                cursor.insertText(' ' * add_spaces)
+                cursor.endEditBlock()
+                event.accept()
+                return
+
         if event.key() == Qt.Key.Key_Backspace:
             cursor = self.textCursor()
             position = cursor.position()
             cursor.movePosition(cursor.MoveOperation.StartOfLine, cursor.MoveMode.KeepAnchor)
             selected_text = cursor.selectedText()
-            spaces = len(selected_text) - len(selected_text.lstrip(' '))
+            spaces = self.get_line_indentation(selected_text)
             if spaces > 0 and selected_text.strip() == '':
                 delete_spaces = (4 if not spaces % 4 else spaces % 4)
                 cursor.beginEditBlock()
@@ -326,7 +181,41 @@ class ScriptEditor(QtWidgets.QPlainTextEdit):
                 cursor.endEditBlock()
                 event.accept()
                 return
+
         super().keyPressEvent(event)
+
+    def start_lint_worker(self):
+        if self.lint_worker is not None:
+            return
+
+        self.lint_worker = LintWorker(self.toPlainText())
+        self.lint_worker_thread = QtCore.QThread()
+        self.lint_worker.moveToThread(self.lint_worker_thread)
+        self.lint_worker_thread.started.connect(self.lint_worker.run)
+        self.lint_worker_thread.start()
+        self.lint_worker.finished.connect(self.lint_worker_finished)
+
+    def lint_worker_finished(self, output):
+        self.lint_worker_thread.quit()
+        self.lint_worker_thread.wait()
+        self.lint_worker = None
+        self.lint_worker_thread = None
+
+        self.lint_output = output
+
+        self.update_lint_extra_selections()
+
+    def update_lint_extra_selections(self):
+        extra_selections = []
+        for message in self.lint_output:
+            lint_selection = QtWidgets.QTextEdit.ExtraSelection()
+            lint_selection.format.setProperty(QtGui.QTextFormat.Property.FullWidthSelection, True)
+            lint_selection.cursor = self.textCursor()
+            lint_selection.cursor.setPosition(self.document().findBlockByLineNumber(message['line'] - 1).position() + message['col'])
+            lint_selection.format.setBackground(QtGui.QColor(200, 0, 0))
+            extra_selections.append(lint_selection)
+
+        self.setExtraSelections(extra_selections)
 
     def save(self):
         with open(self.script, 'w') as fp:
