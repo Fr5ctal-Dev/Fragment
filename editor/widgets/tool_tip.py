@@ -20,6 +20,10 @@ class Tooltip(QLabel):
         super().hideEvent(event)
         self.timer.stop()
 
+    def setText(self, text):
+        super().setText(text)
+        self.adjustSize()
+
     def update_position(self):
         pos = QCursor.pos()
         self.move(pos + self.offset)
