@@ -5,17 +5,21 @@ from PySide6.QtWidgets import QApplication, QWidget, QStackedLayout
 from PySide6 import QtGui
 from editor.splash_screen import SplashScreen
 from qdarktheme import setup_theme
+from pathlib import Path
 import platform
 import sys
 import os
 import json
 import shutil
+import tempfile
 
 
 class Library(QtWidgets.QWidget):
     def __init__(self):
         super().__init__()
         self.editor_instances = []
+
+        self.config_path_folder = 'fragment_library_temp'
 
         self.check_projects_timer = QtCore.QTimer()
         self.check_projects_timer.timeout.connect(self.check_for_missing_projects)
@@ -64,10 +68,10 @@ class Library(QtWidgets.QWidget):
         self.editor_instances.append(launch_editor(path))
 
     def add_to_project_list(self, path):
-        with open(get_resource_path('editor/library_config/projects.json')) as f:
+        with open(self.config_path() + '/projects.json') as f:
             projects = json.loads(f.read())
         projects[os.path.basename(path)] = path
-        with open(get_resource_path('editor/library_config/projects.json'), 'w') as f:
+        with open(self.config_path() + '/projects.json', 'w') as f:
             f.write(json.dumps(projects))
         self.load_project_list()
 
@@ -104,7 +108,7 @@ class Library(QtWidgets.QWidget):
 
     def load_project_list(self):
         self.project_list.clear()
-        with open(get_resource_path('editor/library_config/projects.json')) as f:
+        with open(self.config_path() + '/projects.json') as f:
             projects = json.loads(f.read())
         delete = []
         for project in projects.keys():
@@ -118,11 +122,11 @@ class Library(QtWidgets.QWidget):
         for key in delete:
             projects.pop(key)
 
-        with open(get_resource_path('editor/library_config/projects.json'), 'w') as f:
+        with open(self.config_path() + '/projects.json', 'w') as f:
             f.write(json.dumps(projects))
 
     def check_for_missing_projects(self):
-        with open(get_resource_path('editor/library_config/projects.json')) as f:
+        with open(self.config_path() + '/projects.json') as f:
             projects = json.loads(f.read())
 
         for project in projects.values():
@@ -130,6 +134,18 @@ class Library(QtWidgets.QWidget):
                 self.load_project_list()
                 return
 
+    def config_path(self):
+        base_temp = Path(tempfile.gettempdir())
+        target = base_temp / self.config_path_folder
+        if not os.path.exists(target):
+            self.create_config_folder(target)
+
+        return str(target)
+
+    def create_config_folder(self, path: Path):
+        path.mkdir(parents=True)
+        with open(path / 'projects.json', 'w') as f:
+            f.write('{}')
 
 
 def launch_library():
