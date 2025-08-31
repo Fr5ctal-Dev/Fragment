@@ -13,5 +13,8 @@
   },
   "Camera": {
     "zoom": 1.0
+  },
+  "Sprite": {
+    "image_source": ""
   }
 }

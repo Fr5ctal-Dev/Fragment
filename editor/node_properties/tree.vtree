@@ -1,5 +1,6 @@
 Node
  Node2D
   Drawable
+   Sprite
   Camera
  Canvas

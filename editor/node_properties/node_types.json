@@ -13,5 +13,8 @@
   },
   "Camera": {
     "zoom": "float"
+  },
+  "Sprite": {
+    "image_source": "path"
   }
 }
