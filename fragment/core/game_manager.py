@@ -16,6 +16,7 @@ class GameManager(Manager):
         super().__init__(self)
         self.project_path = project_path
         self.window_manager = WindowManager(self)
+        self.window_manager.renderer.setup_canvas()
         self.clock = Clock(self)
         self.scene_manager = SceneManager(self)
 

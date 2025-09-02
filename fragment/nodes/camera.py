@@ -1,7 +1,7 @@
 from .node2d import Node2D
 from .canvas import Canvas
 from ..types.vector import Vector2
-import pygame
+from pygame_render import Layer
 
 
 class Camera(Node2D):
@@ -15,21 +15,20 @@ class Camera(Node2D):
         super().__init__(*args, **kwargs)
         self.target_canvas = self.find_ancestor_of_type(Canvas) or self.game_manager.window_manager.renderer.global_canvas
         self.target_canvas.register_camera(self)
+        self.render_layer = self.game_manager.window_manager.renderer.engine.make_layer((int(self.view_size[0]), int(self.view_size[1])))
 
-    def render(self) -> pygame.Surface:
+    def render(self) -> Layer:
         """Render onto its target canvas."""
+        self.render_layer.clear(0, 0, 0, 0)
         drawables = self.target_canvas.drawables
-        render_layer = pygame.Surface(self.view_size, pygame.SRCALPHA)
-        render_rect = pygame.Rect((0, 0), self.view_size)
         for nodes in drawables.values():
             for node in nodes:
-                draw_surface = node.render()
-                rect = draw_surface.get_rect()
-                rect.topleft = node.world_position - self.world_position # TODO: Adjust based on anchor and offset when it is added
-                if render_rect.colliderect(rect): # Only render if on screen
-                    render_layer.blit(draw_surface, rect)
+                draw_layer = node.render()
+                if draw_layer is None: continue
+                position = node.world_position - self.world_position # TODO: Adjust based on anchor and offset when it is added
+                self.game_manager.window_manager.renderer.engine.render(draw_layer, self.render_layer, position, angle=node.world_rotation, scale=node.world_scale)
 
-        return render_layer
+        return self.render_layer
 
     @property
     def view_size(self) -> Vector2:

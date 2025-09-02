@@ -1,12 +1,12 @@
 from .drawable import Drawable
-import pygame
+from pygame_render import Texture
 
 
 class Sprite(Drawable):
     """Node that loads an image source to render on screen."""
     def __init__(self, *args, **kwargs):
-        self.sprite_image = pygame.Surface((1, 1), pygame.SRCALPHA)
         super().__init__(*args, **kwargs)
+        self.sprite_image = None
 
     @property
     def image_source(self) -> str:
@@ -15,7 +15,7 @@ class Sprite(Drawable):
     @image_source.setter
     def image_source(self, source: str) -> None:
         self.properties['image_source'] = source
-        self.sprite_image = pygame.image.load(self.properties['image_source']).convert_alpha()
+        self.sprite_image = self.renderer.engine.load_texture(self.properties['image_source'])
 
-    def image(self) -> pygame.Surface:
+    def render(self) -> Texture:
         return self.sprite_image

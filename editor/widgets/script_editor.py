@@ -111,7 +111,7 @@ class ScriptEditor(QtWidgets.QPlainTextEdit):
         self.completion_worker_thread = None
         self.completion_ran = False
 
-        self.lint_output = None
+        self.lint_output = {}
 
         self.lint_tooltip = Tooltip(parent=self)
         self.lint_tooltip.hide()

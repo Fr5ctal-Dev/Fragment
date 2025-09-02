@@ -17,7 +17,6 @@ class Node(GameElement):
         self.children = []
         self.properties = properties
         self.set_parent(parent)
-        self.initialize_properties(self.properties)
 
     def set_parent(self, node) -> None:
         if self.parent:

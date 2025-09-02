@@ -1,6 +1,6 @@
 from .node2d import Node2D
 from .canvas import Canvas
-import pygame
+from pygame_render import Texture
 
 
 class Drawable(Node2D):
@@ -15,14 +15,10 @@ class Drawable(Node2D):
         self.target_canvas = self.find_ancestor_of_type(Canvas) or self.renderer.global_canvas
         self.target_canvas.register_drawable(self)
 
-    def image(self) -> pygame.Surface:
-        """The image of the drawable, without any post-processing done."""
-        return pygame.Surface((1, 1), pygame.SRCALPHA) # Placeholder
-
-    def render(self) -> pygame.Surface:
-        """Renders the image of the drawable and applies post-processing."""
-        image = self.image()
-        return pygame.transform.rotate(pygame.transform.scale(image, (int(image.get_width() * self.world_scale[0]), int(image.get_height() * self.world_scale[1]))), -self.world_rotation)
+    def render(self) -> Texture:
+        """Renders the drawable onto render layer."""
+        texture = self.renderer.placeholder_layer.texture
+        return texture
 
     def destroy_self(self) -> None:
         self.target_canvas.unregister_drawable(self)

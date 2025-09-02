@@ -1,6 +1,7 @@
 from .manager import Manager
 from .renderer import Renderer
 from ..types.vector import Vector2
+from pygame_render import RenderEngine
 import pygame
 
 
@@ -13,12 +14,12 @@ class WindowManager(Manager):
         if window_size[0] == 0: window_size[0] = pygame.display.Info().current_w
         if window_size[1] == 0: window_size[1] = pygame.display.Info().current_h
 
-        self.renderer = Renderer(self.game_manager)
+        self.window = RenderEngine(int(window_size[0]), int(window_size[1]))
+
+        self.renderer = Renderer(self.game_manager, self, window_size)
 
         self.window_size = window_size
         self.window_title = window_title
-
-        self.window = pygame.display.set_mode(self.window_size)
 
     @property
     def window_size(self) -> Vector2:
@@ -26,8 +27,7 @@ class WindowManager(Manager):
 
     @window_size.setter
     def window_size(self, size: Vector2):
-        self.renderer.size = size
-        self.window = pygame.display.set_mode(size)
+        self.renderer.size = size # TODO: implement resizing of window
 
     @property
     def window_title(self) -> str:
@@ -42,7 +42,7 @@ class WindowManager(Manager):
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 self.game_manager.destroy()
-        self.window.fill((0, 0, 0))
+        self.window.clear()
         self.renderer.update(dt)
-        self.window.blit(self.renderer.surface, (0, 0))
-        pygame.display.update()
+        self.window.render(self.renderer.surface.texture, self.window.screen, (0, 0))
+        pygame.display.flip()

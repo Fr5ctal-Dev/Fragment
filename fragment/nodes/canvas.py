@@ -1,6 +1,6 @@
 from .node import Node
 from ..types.vector import Vector2
-import pygame
+from pygame_render import Layer
 
 
 class Canvas(Node):
@@ -12,6 +12,9 @@ class Canvas(Node):
         super().__init__(*args, **kwargs)
         self.drawables = {} # dict([drawable1, drawable2...])
         self.cameras = []
+
+        self.render_layer = self.game_manager.window_manager.renderer.engine.make_layer((int(self.size[0]), int(self.size[1])))
+
         if not is_global_canvas:
             self.game_manager.window_manager.renderer.register_canvas(self)
 
@@ -42,12 +45,12 @@ class Canvas(Node):
             sorted_drawables[priority] = self.drawables[priority]
         self.drawables = sorted_drawables
 
-    def render(self) -> pygame.Surface:
+    def render(self) -> Layer:
         """Renders drawables captured by its cameras."""
         self.sort_drawable_priorities()
-        canvas_layer = pygame.Surface(self.size, pygame.SRCALPHA)
+        self.render_layer.clear(0, 0, 0, 0)
         for camera in self.cameras:
-            surface = camera.render()
-            canvas_layer.blit(pygame.transform.scale(surface, self.size), (0, 0))
+            layer = camera.render()
+            self.game_manager.window_manager.renderer.engine.render(layer.texture, self.render_layer, (0, 0), camera.zoom)
 
-        return canvas_layer
+        return self.render_layer

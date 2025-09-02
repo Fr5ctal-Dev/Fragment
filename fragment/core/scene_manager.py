@@ -61,6 +61,8 @@ class Scene(Manager):
                 parent=temp_node_storage[scene_content[node_path]['parent']] if scene_content[node_path]['parent'] else None
             )
 
+            node.initialize_properties(node.properties)
+
             if not scene_content[node_path]['parent']:
                 self.root_node = node
 
