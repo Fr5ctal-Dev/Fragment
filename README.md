@@ -1,6 +1,8 @@
-# Fragment (WIP)
+# Fragment
 
-<img src="logo.png" width="400"/>
+<p align="center">
+    <img src="logo.png" width="500"/>
+</p>
 
 ## 2D Python game engine
 Fragment is an open-source, powerful, 2D Python game engine.
