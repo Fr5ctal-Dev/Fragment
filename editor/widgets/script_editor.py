@@ -119,6 +119,7 @@ class ScriptEditor(QtWidgets.QPlainTextEdit):
 
     def on_update(self):
         self.update_lint_tooltip()
+        self.update_cursor_extra_selections()
 
     def get_line_indentation(self, line):
         return len(line) - len(line.lstrip())
@@ -240,6 +241,18 @@ class ScriptEditor(QtWidgets.QPlainTextEdit):
             lint_selection.cursor.setPosition(self.document().findBlockByLineNumber(line).position())
             lint_selection.format.setBackground(QtGui.QColor(200, 0, 0))
             extra_selections.append(lint_selection)
+        self.setExtraSelections(extra_selections)
+
+    def update_cursor_extra_selections(self):
+        extra_selections = []
+
+        if not self.textCursor().selectedText():
+            word_under_cursor_selection = QtWidgets.QTextEdit.ExtraSelection()
+            word_under_cursor_selection.cursor = self.textCursor()
+            word_under_cursor_selection.cursor.select(word_under_cursor_selection.cursor.SelectionType.WordUnderCursor)
+            word_under_cursor_selection.format.setBackground(QtGui.QColor(70, 70, 70))
+            extra_selections.append(word_under_cursor_selection)
+
         self.setExtraSelections(extra_selections)
 
     def update_lint_tooltip(self):
