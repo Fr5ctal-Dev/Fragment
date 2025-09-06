@@ -9,6 +9,7 @@ from pygments.token import Token
 from pyflakes.api import check
 from pyflakes.reporter import Reporter
 import io
+import re
 
 
 class SyntaxHighlighter(QtGui.QSyntaxHighlighter):
@@ -86,11 +87,14 @@ class ScriptEditor(QtWidgets.QPlainTextEdit):
 
         self.update_timer = QtCore.QTimer()
         self.update_timer.timeout.connect(self.on_update)
-        self.update_timer.start(100)
+        self.update_timer.start(10)
 
-        self.font = QtGui.QFont('Consolas', 11)
-        self.setFont(self.font)
+        self.main_font = QtGui.QFont('Consolas', 11)
+        self.setFont(self.main_font)
         self.setLineWrapMode(self.LineWrapMode.NoWrap)
+
+        self.cursor_extra_selections = []
+        self.cursorPositionChanged.connect(self.update_cursor_extra_selections)
 
         self.syntax_highlighter = SyntaxHighlighter(self.document(), self.script)
 
@@ -112,14 +116,15 @@ class ScriptEditor(QtWidgets.QPlainTextEdit):
         self.completion_ran = False
 
         self.lint_output = {}
+        self.lint_extra_selections = []
 
         self.lint_tooltip = Tooltip(parent=self)
         self.lint_tooltip.hide()
-        self.lint_tooltip.setFont(self.font)
+        self.lint_tooltip.setFont(self.main_font)
 
     def on_update(self):
         self.update_lint_tooltip()
-        self.update_cursor_extra_selections()
+        self.update_extra_selections()
 
     def get_line_indentation(self, line):
         return len(line) - len(line.lstrip())
@@ -191,7 +196,7 @@ class ScriptEditor(QtWidgets.QPlainTextEdit):
             cursor.movePosition(cursor.MoveOperation.StartOfLine, cursor.MoveMode.KeepAnchor)
             selected_text = cursor.selectedText()
             spaces = self.get_line_indentation(selected_text)
-            if spaces > 0 and selected_text.strip() == '':
+            if spaces > 0 and selected_text.strip() == '' and not self.textCursor().hasSelection():
                 delete_spaces = (spaces % self.indent_spacing or self.indent_spacing)
                 cursor.beginEditBlock()
                 cursor.setPosition(position - delete_spaces, cursor.MoveMode.MoveAnchor)
@@ -233,27 +238,37 @@ class ScriptEditor(QtWidgets.QPlainTextEdit):
         self.update_lint_extra_selections()
 
     def update_lint_extra_selections(self):
-        extra_selections = []
+        self.lint_extra_selections = []
         for line in self.lint_output:
             lint_selection = QtWidgets.QTextEdit.ExtraSelection()
             lint_selection.format.setProperty(QtGui.QTextFormat.Property.FullWidthSelection, True)
             lint_selection.cursor = self.textCursor()
             lint_selection.cursor.setPosition(self.document().findBlockByLineNumber(line).position())
             lint_selection.format.setBackground(QtGui.QColor(200, 0, 0))
-            extra_selections.append(lint_selection)
-        self.setExtraSelections(extra_selections)
+            self.lint_extra_selections.append(lint_selection)
 
     def update_cursor_extra_selections(self):
-        extra_selections = []
-
-        if not self.textCursor().selectedText():
+        self.cursor_extra_selections = []
+        
+        cursor = self.textCursor()
+        if not cursor.hasSelection():
+            cursor.select(cursor.SelectionType.WordUnderCursor)
+        
+        if cursor.selectedText().strip() == '':
+            return
+        
+        matches = re.finditer(rf'{re.escape(cursor.selectedText())}', self.toPlainText())
+        for match in matches:
+            span = match.span()
             word_under_cursor_selection = QtWidgets.QTextEdit.ExtraSelection()
             word_under_cursor_selection.cursor = self.textCursor()
-            word_under_cursor_selection.cursor.select(word_under_cursor_selection.cursor.SelectionType.WordUnderCursor)
+            word_under_cursor_selection.cursor.setPosition(span[0])
+            word_under_cursor_selection.cursor.setPosition(span[1], word_under_cursor_selection.cursor.MoveMode.KeepAnchor)
             word_under_cursor_selection.format.setBackground(QtGui.QColor(70, 70, 70))
-            extra_selections.append(word_under_cursor_selection)
+            self.cursor_extra_selections.append(word_under_cursor_selection)
 
-        self.setExtraSelections(extra_selections)
+    def update_extra_selections(self):
+        self.setExtraSelections(self.cursor_extra_selections + self.lint_extra_selections)
 
     def update_lint_tooltip(self):
         cursor = self.cursorForPosition(self.mapFromGlobal(self.cursor().pos()))
@@ -262,7 +277,7 @@ class ScriptEditor(QtWidgets.QPlainTextEdit):
 
         if self.lint_output.get(line_number) is not None and self.rect().contains(self.mapFromGlobal(self.cursor().pos())) and self.hasFocus():
             self.lint_tooltip.setText(self.lint_output[line_number]['text'])
-            self.lint_tooltip.setFont(self.font)
+            self.lint_tooltip.setFont(self.main_font)
             self.lint_tooltip.show()
         else:
             self.lint_tooltip.hide()
@@ -321,10 +336,19 @@ class ScriptEditor(QtWidgets.QPlainTextEdit):
         return line_number, column_number
 
     def show_completions(self, completions):
+        cursor = self.textCursor()
+        if cursor.atStart():
+            self.completer.popup().hide()
+            return
+        char = self.toPlainText()[cursor.position() - 1]
+        if not (char.isalnum() or char in '_.()'):
+            self.completer.popup().hide()
+            return
+
         self.completion_model.removeRows(0, self.completion_model.rowCount())
         for completion in completions:
             item = QtGui.QStandardItem(completion)
-            item.setFont(self.font)
+            item.setFont(self.main_font)
             self.completion_model.appendRow(item)
         cursor_rect = self.cursorRect()
         cursor_rect.setWidth(self.completer.popup().sizeHintForColumn(0) + self.completer.popup().verticalScrollBar().sizeHint().width())
