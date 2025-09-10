@@ -133,9 +133,12 @@ class ScriptEditor(QtWidgets.QPlainTextEdit):
         stripped_line = line.strip()
         if ':' in stripped_line:
             colon_pos = stripped_line.find(':')
-            after_colon = stripped_line[colon_pos + 1:].strip()
-            if not after_colon or after_colon.startswith('#'):
-                return True
+            cursor = self.textCursor()
+            if cursor.positionInBlock() > colon_pos:
+                after_colon = stripped_line[colon_pos + 1:].strip()
+                if not after_colon or after_colon.startswith('#'):
+                    return True
+        return False
 
     def should_decrease_indent(self, line):
         stripped_line = line.strip()
