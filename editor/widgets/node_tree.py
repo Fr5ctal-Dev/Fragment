@@ -126,6 +126,12 @@ class NodeTree(QTreeWidget):
         selection_dialog.exec()
     
     def new_node(self, name, type, parent=None, properties=None):
+        if parent is not None:
+            for sibling_index in range(parent.childCount()):
+                sibling = parent.child(sibling_index)
+                if sibling.text(0) == name:
+                    QMessageBox.warning(self, 'Invalid Name', 'Node name must be unique within the same parent.')
+                    return
         item = QTreeWidgetItem()
         item.setText(0, name)
         item.setIcon(0, QIcon(get_resource_path(f'editor/assets/node_icons/{type}.png')))
