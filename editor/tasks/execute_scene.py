@@ -25,9 +25,13 @@ class ExecuteSceneTask(BaseTask):
         self.process = subprocess.Popen([python_executable, self.file], cwd=os.path.dirname(self.file), stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
         while self.process.poll() is None:
             pass
+        
         if self.process.poll() != 0:
             self.new_error_chunk.emit(self.process.stderr.read())
         self.new_text_chunk.emit('\nExecution ended with exit code ' + str(self.process.poll()))
+
+        self.process.wait()
+        self.temp.cleanup()
 
         self.finished.emit()
 
