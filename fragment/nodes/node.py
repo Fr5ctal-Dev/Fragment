@@ -9,10 +9,9 @@ class Node(GameElement):
     Every node has a node script, which is used to define custom logic using Python.
     Each node parents to other nodes to form a scene tree.
     """
-    def __init__(self, game_manager, properties, name=None, uuid=None, parent=None):
+    def __init__(self, game_manager, properties, name=None, parent=None):
         super().__init__(game_manager)
         self.name = name
-        self.uuid = uuid
         self.parent = None
         self.children = []
         self.properties = properties

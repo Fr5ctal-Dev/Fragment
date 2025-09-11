@@ -1,3 +1,11 @@
+###### TODO (scene editing rework) ######
+"""
+1. Node tree can save and load scene, and scene is able to be executed (done)
+2. Property editing with property editor
+3. Scene importing
+"""
+#########################################
+
 from editor.widgets.node_tree import NodeTree
 from editor.widgets.property_list import PropertyList
 #from editor.widgets.viewport import Viewport
@@ -20,12 +28,6 @@ class SceneEditor(Editor):
         super().__init__(path, editor, scene)
 
         self.scene = scene
-        self.current_node = None
-
-        with open(self.scene) as f:
-            content = f.read()
-
-        self.nodes = string_to_node_data(eval(content))
 
         self.central_widget = QtWidgets.QWidget()
         self.central_widget_layout = QtWidgets.QVBoxLayout(self.central_widget)
@@ -46,14 +48,6 @@ class SceneEditor(Editor):
         self.node_tree_dock.setFeatures(QtWidgets.QDockWidget.DockWidgetFeature.DockWidgetMovable | QtWidgets.QDockWidget.DockWidgetFeature.DockWidgetFloatable | QtWidgets.QDockWidget.DockWidgetFeature.DockWidgetClosable)
         self.node_tree = NodeTree()
         self.node_tree.setExpandsOnDoubleClick(False)
-        self.node_tree.itemClicked.connect(lambda item, column: self.set_current_node(item.node_path))
-        self.node_tree.new_node_action.triggered.connect(self.gui_add_new_node)
-        self.node_tree.new_nested_scene_action.triggered.connect(self.gui_add_nested_scene)
-        self.node_tree.delete_node_action.triggered.connect(lambda: self.delete_node(self.current_node))
-        self.node_tree.set_root_action.triggered.connect(lambda: self.gui_add_new_node(True))
-        self.node_tree.rename_node_action.triggered.connect(self.gui_rename_node)
-        self.node_tree.copy_id_action.triggered.connect(lambda: self.copy_node_uuid(self.current_node))
-        self.node_tree.node_dragged_signal.connect(lambda sources, dest: self.reparent_nodes([item.node_path for item in sources], dest.node_path))
         self.node_tree_dock.setWidget(self.node_tree)
         self.addDockWidget(Qt.DockWidgetArea.LeftDockWidgetArea, self.node_tree_dock)
 
@@ -61,12 +55,9 @@ class SceneEditor(Editor):
         self.property_list_dock.setWindowTitle('Property List')
         self.property_list_dock.setAllowedAreas(Qt.DockWidgetArea.AllDockWidgetAreas)
         self.property_list_dock.setFeatures(QtWidgets.QDockWidget.DockWidgetFeature.DockWidgetMovable | QtWidgets.QDockWidget.DockWidgetFeature.DockWidgetFloatable | QtWidgets.QDockWidget.DockWidgetFeature.DockWidgetClosable)
-        self.property_list = PropertyList(self, self.nodes, self.scene_property_changed, self.path)
-        self.property_list_dock.setWidget(self.property_list)
+        #self.property_list = PropertyList(self, self.nodes, self.scene_property_changed, self.path)
+        #self.property_list_dock.setWidget(self.property_list)
         self.addDockWidget(Qt.DockWidgetArea.RightDockWidgetArea, self.property_list_dock)
-
-        if not self.nodes:
-            self.node_tree.with_root = False
 
         #self.viewport = Viewport(self)
         #self.central_widget_layout.addWidget(self.viewport)
@@ -75,7 +66,24 @@ class SceneEditor(Editor):
 
         self.load_node_tree()
 
-    def gui_add_new_node(self, ignore_parent=False):
+    def load_node_tree(self):
+        with open(self.scene) as f:
+            content = f.read()
+
+        self.node_tree.load_from_scene_data(eval(content))
+
+    def save(self):
+        data = self.node_tree.save_to_scene_data()
+        with open(self.scene, 'w') as f:
+            f.write(str(data))
+
+    def run(self):
+        self.editor.task_manager.new_task('execute_scene', [self])
+
+    def _close(self):
+        self.save()
+
+    """def gui_add_new_node(self, ignore_parent=False):
         dialog = NewNodeSelectionDialog(self, ignore_parent)
 
         if ignore_parent:
@@ -358,4 +366,4 @@ class SceneEditor(Editor):
 
     def _destroy(self):
         #self.viewport.on_destroy()
-        pass
+        pass"""
