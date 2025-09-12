@@ -82,7 +82,9 @@ class NodeTree(QtWidgets.QTreeWidget):
 
 from editor.dialogs.new_node_selection import NewNodeSelectionDialog
 from editor.utils.path import get_resource_path
-from editor.node_properties.loader import tree as node_properties
+from editor.node_properties.loader import node_properties as NODE_PROPERTIES
+from editor.node_properties.property import Property
+from editor.node_properties.nodes.base_node import BaseNodeProperties
 from PySide6.QtWidgets import QTreeWidget, QTreeWidgetItem, QAbstractItemView, QTreeWidgetItemIterator, QMessageBox, QMenu
 from PySide6.QtCore import Qt
 from PySide6.QtGui import QIcon, QAction
@@ -149,8 +151,8 @@ class NodeTree(QTreeWidget):
             parent.setExpanded(True)
         
         if properties is None:
-            properties = copy.deepcopy(node_properties[type])
-        self.node_data[item] = {'type': type, 'properties': properties}
+            properties = NODE_PROPERTIES[type](name, type)
+        self.node_data[item] = properties
 
         return item
     
@@ -264,23 +266,47 @@ class NodeTree(QTreeWidget):
             if current_item.parent(): current_item = current_item.parent()
             else: return tuple(path)
             path.insert(0, current_item.text(0))
+
+    def node_property_to_data(self, node_property: Property): # Each property of a node properties class (i.e. transform)
+        return [node_property.name, node_property.type, node_property.value]
+
+    def data_to_node_property(self, data):
+        node_property = NODE_PROPERTIES[data[1]](data[0], data[1])
+        node_property.set_property(data[0], data[2])
+        return node_property
+    
+    def node_properties_to_data(self, node_properties: BaseNodeProperties): # The node properties class
+        data = {'type': node_properties.type, 'properties': {}}
+        for name, property in node_properties.properties.items():
+            data['properties'][name] = self.node_property_to_data(property)
+        return data
+
+    def data_to_node_properties(self, data, name):
+        node_property = NODE_PROPERTIES[data['type']](name, data['type'])
+        for name, property in data['properties'].items():
+            node_property.set_property(name, property[2])
+        return node_property
     
     def load_from_scene_data(self, data):
         '''
         Reference:
         data should look like this:
         {tuple_node_path: {type, properties, ...}}
+
+        properties should look like this:
+        [[name, type, value]]
         '''
         if self.node_data:
             self.delete_node(self.topLevelItem(0))
-        
+
         temp_parent_storage = {}
         for path, node_data in data.items():
             parent = None if len(path) == 1 else temp_parent_storage[path[:-1]]
-            temp_parent_storage[path] = self.new_node(path[-1], node_data['type'], parent, node_data['properties'])
+            temp_parent_storage[path] = self.new_node(path[-1], node_data['type'], parent, self.data_to_node_properties(node_data, path[-1]))
 
     def save_to_scene_data(self):
         data = {}
         for node in self.get_all_nodes():
-            data[self.path_of_node(node)] = self.node_data[node]
+            properties = self.node_data[node]
+            data[self.path_of_node(node)] = self.node_properties_to_data(properties)
         return data

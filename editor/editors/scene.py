@@ -7,20 +7,10 @@
 #########################################
 
 from editor.widgets.node_tree import NodeTree
-from editor.widgets.property_list import PropertyList
-#from editor.widgets.viewport import Viewport
-from editor.dialogs.new_node_selection import NewNodeSelectionDialog
-from editor.dialogs.text_selection import TextSelectionDialog
-from editor.node_properties.loader import tree as node_properties
-from editor.node_properties.loader import node_types
 from .editor import Editor
-from editor.utils.node import get_node_data, string_to_node_data, node_data_to_string, generate_uuid
 from editor.utils.path import get_resource_path
 from PySide6 import QtWidgets, QtGui, QtCore
 from PySide6.QtCore import Qt
-import os
-import copy
-import pyperclip
 
 
 class SceneEditor(Editor):

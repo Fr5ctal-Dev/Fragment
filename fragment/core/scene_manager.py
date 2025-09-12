@@ -43,8 +43,8 @@ class Scene(Manager):
 
         for node_path in list(scene_content.keys()):
             properties = {}
-            for value in scene_content[node_path]['properties'].values():
-                properties = {**properties, **value}
+            for name, value in scene_content[node_path]['properties'].items():
+                properties[name] = value[2] # value of property
 
             if properties['script']:
                 path = Path(properties['script']).relative_to(self.project_path)
