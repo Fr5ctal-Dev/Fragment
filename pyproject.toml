@@ -6,7 +6,6 @@ readme = "README.md"
 requires-python = ">=3.10"
 dependencies = [
     "jedi>=0.19.2",
-    "panda3d>=1.10.15",
     "pyflakes>=3.4.0",
     "pygame-ce>=2.5.5",
     "pygame-render>=1.4.2",
