@@ -1,85 +1,3 @@
-
-"""from PySide6 import QtWidgets, QtGui, QtCore
-
-
-class NodeTree(QtWidgets.QTreeWidget):
-    node_dragged_signal = QtCore.Signal(list, QtWidgets.QTreeWidgetItem) # Sources, Dest
-    def __init__(self):
-        super().__init__()
-        self.setColumnCount(1)
-        self.setHeaderLabels(['Name'])
-
-        self.setDragEnabled(True)
-        self.setAcceptDrops(True)
-        self.setDropIndicatorShown(True)
-        self.setDragDropMode(QtWidgets.QAbstractItemView.DragDropMode.InternalMove)
-
-        self.set_root_action = QtGui.QAction('Set Root Node', self)
-        self.new_node_action = QtGui.QAction('New Node', self)
-        self.new_nested_scene_action = QtGui.QAction('New Scene', self)
-        self.delete_node_action = QtGui.QAction('Delete', self)
-        self.rename_node_action = QtGui.QAction('Rename', self)
-        self.copy_id_action = QtGui.QAction('Copy ID', self)
-
-        self.with_root = True
-
-    def contextMenuEvent(self, event):
-        if self.currentItem() is not None:
-            self.itemClicked.emit(self.currentItem(), 0)
-
-        context_menu = QtWidgets.QMenu(self)
-        if self.with_root:
-            self.set_root_action.setEnabled(False)
-            self.new_node_action.setEnabled(True)
-            self.new_nested_scene_action.setEnabled(True)
-        else:
-            self.set_root_action.setEnabled(True)
-            self.new_node_action.setEnabled(False)
-            self.new_nested_scene_action.setEnabled(False)
-
-        if self.currentItem() is not None:
-            self.delete_node_action.setEnabled(True)
-            self.rename_node_action.setEnabled(True)
-            self.copy_id_action.setEnabled(True)
-        else:
-            self.delete_node_action.setEnabled(False)
-            self.rename_node_action.setEnabled(False)
-            self.copy_id_action.setEnabled(False)
-
-        new_menu = context_menu.addMenu('New')
-        new_menu.addAction(self.new_node_action)
-        new_menu.addAction(self.new_nested_scene_action)
-
-        context_menu.addAction(self.delete_node_action)
-        context_menu.addAction(self.rename_node_action)
-        context_menu.addAction(self.set_root_action)
-        context_menu.addAction(self.copy_id_action)
-
-        context_menu.exec(self.mapToGlobal(event.pos()))
-
-    def dragEnterEvent(self, event):
-        if event.source() is self:
-            event.accept()
-        else:
-            super().dragEnterEvent(event)
-
-    def dropEvent(self, event):
-        src = event.source()
-
-        dragged_items = src.selectedItems()
-
-        drop_pos = event.position().toPoint()
-        dest_item = self.itemAt(drop_pos)
-
-        self.node_dragged_signal.emit(dragged_items, dest_item)
-
-        event.ignore()
-
-    def insertTopLevelItem(self, index, item):
-        super().insertTopLevelItem(index, item)
-        self.with_root = True
-"""
-
 from editor.dialogs.new_node_selection import NewNodeSelectionDialog
 from editor.utils.path import get_resource_path
 from editor.node_properties.loader import node_properties as NODE_PROPERTIES
@@ -88,12 +6,12 @@ from editor.node_properties.nodes.base_node import BaseNodeProperties
 from PySide6.QtWidgets import QTreeWidget, QTreeWidgetItem, QAbstractItemView, QTreeWidgetItemIterator, QMessageBox, QMenu
 from PySide6.QtCore import Qt
 from PySide6.QtGui import QIcon, QAction
-import copy
 
 
 class NodeTree(QTreeWidget):
-    def __init__(self, parent=None):
-        super().__init__(parent)
+    def __init__(self, scene_editor):
+        super().__init__()
+        self.scene_editor = scene_editor
         self.node_data = {} # {item: dict}
 
         self.setHeaderLabel('Node Tree')
@@ -107,6 +25,8 @@ class NodeTree(QTreeWidget):
         self._editing_item = None
         self._previous_name = None
         self.itemDoubleClicked.connect(self._on_item_double_clicked)
+
+        self.itemSelectionChanged.connect(lambda: self.node_selected(self.currentItem()))
 
         self.new_node_action = QAction('New Node', self)
         self.new_node_action.triggered.connect(self.new_node_selection_dialog)
@@ -151,7 +71,7 @@ class NodeTree(QTreeWidget):
             parent.setExpanded(True)
         
         if properties is None:
-            properties = NODE_PROPERTIES[type](name, type)
+            properties = NODE_PROPERTIES[type](self.scene_editor, name, type)
         self.node_data[item] = properties
 
         return item
@@ -269,11 +189,6 @@ class NodeTree(QTreeWidget):
 
     def node_property_to_data(self, node_property: Property): # Each property of a node properties class (i.e. transform)
         return [node_property.name, node_property.type, node_property.value]
-
-    def data_to_node_property(self, data):
-        node_property = NODE_PROPERTIES[data[1]](data[0], data[1])
-        node_property.set_property(data[0], data[2])
-        return node_property
     
     def node_properties_to_data(self, node_properties: BaseNodeProperties): # The node properties class
         data = {'type': node_properties.type, 'properties': {}}
@@ -282,7 +197,7 @@ class NodeTree(QTreeWidget):
         return data
 
     def data_to_node_properties(self, data, name):
-        node_property = NODE_PROPERTIES[data['type']](name, data['type'])
+        node_property = NODE_PROPERTIES[data['type']](self.scene_editor, name, data['type'])
         for name, property in data['properties'].items():
             node_property.set_property(name, property[2])
         return node_property
@@ -310,3 +225,8 @@ class NodeTree(QTreeWidget):
             properties = self.node_data[node]
             data[self.path_of_node(node)] = self.node_properties_to_data(properties)
         return data
+    
+    def node_selected(self, item):
+        inspector = self.scene_editor.inspector
+        if item in self.node_data:
+            inspector.set_inspector(self.node_data[item].property_tree)

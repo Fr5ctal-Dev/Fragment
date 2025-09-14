@@ -54,5 +54,3 @@ class Path(EditorWidget):
         self.path_display.setReadOnly(False)
         self.path_display.setText(os.path.basename(self.value))
         self.path_display.setReadOnly(True)
-        self.update_file_icon()
-        

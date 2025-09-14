@@ -1,12 +1,14 @@
 ###### TODO (scene editing rework) ######
 """
 1. Node tree can save and load scene, and scene is able to be executed (done)
-2. Property editing with property editor
-3. Scene importing
+2. Property editing with property editor (done)
+3. Properties divided into categories
+4. Scene importing
 """
 #########################################
 
 from editor.widgets.node_tree import NodeTree
+from editor.widgets.inspector import Inspector
 from .editor import Editor
 from editor.utils.path import get_resource_path
 from PySide6 import QtWidgets, QtGui, QtCore
@@ -36,18 +38,18 @@ class SceneEditor(Editor):
         self.node_tree_dock.setWindowTitle('Node Tree')
         self.node_tree_dock.setAllowedAreas(Qt.DockWidgetArea.AllDockWidgetAreas)
         self.node_tree_dock.setFeatures(QtWidgets.QDockWidget.DockWidgetFeature.DockWidgetMovable | QtWidgets.QDockWidget.DockWidgetFeature.DockWidgetFloatable | QtWidgets.QDockWidget.DockWidgetFeature.DockWidgetClosable)
-        self.node_tree = NodeTree()
+        self.node_tree = NodeTree(self)
         self.node_tree.setExpandsOnDoubleClick(False)
         self.node_tree_dock.setWidget(self.node_tree)
         self.addDockWidget(Qt.DockWidgetArea.LeftDockWidgetArea, self.node_tree_dock)
 
-        self.property_list_dock = QtWidgets.QDockWidget()
-        self.property_list_dock.setWindowTitle('Property List')
-        self.property_list_dock.setAllowedAreas(Qt.DockWidgetArea.AllDockWidgetAreas)
-        self.property_list_dock.setFeatures(QtWidgets.QDockWidget.DockWidgetFeature.DockWidgetMovable | QtWidgets.QDockWidget.DockWidgetFeature.DockWidgetFloatable | QtWidgets.QDockWidget.DockWidgetFeature.DockWidgetClosable)
-        #self.property_list = PropertyList(self, self.nodes, self.scene_property_changed, self.path)
-        #self.property_list_dock.setWidget(self.property_list)
-        self.addDockWidget(Qt.DockWidgetArea.RightDockWidgetArea, self.property_list_dock)
+        self.inspector_dock = QtWidgets.QDockWidget()
+        self.inspector_dock.setWindowTitle('Inspector')
+        self.inspector_dock.setAllowedAreas(Qt.DockWidgetArea.AllDockWidgetAreas)
+        self.inspector_dock.setFeatures(QtWidgets.QDockWidget.DockWidgetFeature.DockWidgetMovable | QtWidgets.QDockWidget.DockWidgetFeature.DockWidgetFloatable | QtWidgets.QDockWidget.DockWidgetFeature.DockWidgetClosable)
+        self.inspector = Inspector(self)
+        self.inspector_dock.setWidget(self.inspector)
+        self.addDockWidget(Qt.DockWidgetArea.RightDockWidgetArea, self.inspector_dock)
 
         #self.viewport = Viewport(self)
         #self.central_widget_layout.addWidget(self.viewport)
