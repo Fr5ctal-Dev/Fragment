@@ -1,7 +1,6 @@
 from editor.dialogs.new_node_selection import NewNodeSelectionDialog
 from editor.utils.path import get_resource_path
 from editor.node_properties.loader import node_properties as NODE_PROPERTIES
-from editor.node_properties.property import Property
 from editor.node_properties.nodes.base_node import BaseNodeProperties
 from PySide6.QtWidgets import QTreeWidget, QTreeWidgetItem, QAbstractItemView, QTreeWidgetItemIterator, QMessageBox, QMenu
 from PySide6.QtCore import Qt
