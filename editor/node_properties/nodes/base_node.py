@@ -16,8 +16,7 @@ class BaseNodeProperties:
         return properties
     
     def set_property(self, name, value):
-        self.properties[name].value = value
-        self.properties[name].update_editor_value()
+        self.properties[name].update_value(value)
 
     def setup_property_tree(self):
         self.setup_property_editors()
@@ -34,3 +33,13 @@ class BaseNodeProperties:
     def setup_property_editors(self):
         for prop in self.properties.values():
             prop.setup_property_editor(self.scene_editor, self.type)
+
+    def to_data(self):
+        data = {'type': self.type, 'properties': {}}
+        for name, property in self.properties.items():
+            data['properties'][name] = property.to_data()
+        return data
+    
+    def load_data(self, data):
+        for name, property in data['properties'].items():
+            self.set_property(name, property[2])

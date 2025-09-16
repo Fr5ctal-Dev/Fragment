@@ -186,21 +186,15 @@ class NodeTree(QTreeWidget):
             if current_item.parent(): current_item = current_item.parent()
             else: return tuple(path)
             path.insert(0, current_item.text(0))
-
-    def node_property_to_data(self, node_property: Property): # Each property of a node properties class (i.e. transform)
-        return [node_property.name, node_property.type, node_property.value]
     
     def node_properties_to_data(self, node_properties: BaseNodeProperties): # The node properties class
-        data = {'type': node_properties.type, 'properties': {}}
-        for name, property in node_properties.properties.items():
-            data['properties'][name] = self.node_property_to_data(property)
-        return data
+        return node_properties.to_data()
 
     def data_to_node_properties(self, data, name):
-        node_property = NODE_PROPERTIES[data['type']](self.scene_editor, name, data['type'])
-        for name, property in data['properties'].items():
-            node_property.set_property(name, property[2])
-        return node_property
+        type = data['type']
+        properties = NODE_PROPERTIES[type](self.scene_editor, name, type)
+        properties.load_data(data)
+        return properties
     
     def load_from_scene_data(self, data):
         '''

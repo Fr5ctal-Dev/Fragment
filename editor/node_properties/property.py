@@ -15,7 +15,14 @@ class Property:
     def on_editor_value_changed(self, new_value):
         self.value = new_value
 
+    def update_value(self, new_value):
+        self.value = new_value
+        self.update_editor_value()
+
     def update_editor_value(self):
         if self.editor_widget is not None:
             self.editor_widget.value = self.value
             self.editor_widget.update_editor()
+
+    def to_data(self):
+        return [self.name, self.type, self.value]
