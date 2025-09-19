@@ -51,7 +51,7 @@ class BaseNodeProperties:
     
     def load_data(self, data):
         for name, property in data['properties'].items():
-            self.set_property(name, property[2])
+            self.set_property(name, property['value'])
 
         if 'target_scene' in data:
             self.connect_scene(data['target_scene'], data['target_scene_node'])
@@ -70,4 +70,4 @@ class BaseNodeProperties:
                 node_data = data[self.target_scene_node]
                 for name, property in node_data['properties'].items():
                     if name in self.properties:
-                        self.set_property(name, property[2])
+                        self.set_property(name, property['value'])

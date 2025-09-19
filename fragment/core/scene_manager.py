@@ -44,7 +44,7 @@ class Scene(Manager):
         for node_path in list(scene_content.keys()):
             properties = {}
             for name, value in scene_content[node_path]['properties'].items():
-                properties[name] = value[2] # value of property
+                properties[name] = value['value'] # value of property
 
             if properties['script']:
                 path = Path(properties['script']).relative_to(self.project_path)
@@ -110,13 +110,13 @@ class SceneManager(Manager):
         super().__init__(game_manager)
         self.current_scene = None
 
-    def instantiate_scene(self, scene: str) -> None:
+    def instantiate_scene(self, scene_path: str) -> None:
         """Instantiates a scene based on scene file.
 
         Args:
-            scene (str): The scene file path.
+            scene_path (str): The scene file path.
         """
-        scene = Scene(self.game_manager, scene)
+        scene = Scene(self.game_manager, scene_path)
         if self.current_scene:
             self.current_scene.destroy()
         self.current_scene = scene

@@ -38,4 +38,8 @@ class Property(QObject):
             self.editor_widget.update_editor()
 
     def to_data(self):
-        return [self.name, self.type, self.value]
+        return {
+            'name': self.name,
+            'type': self.type,
+            'value': self.value
+        }
