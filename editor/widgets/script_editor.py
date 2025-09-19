@@ -132,7 +132,7 @@ class ScriptEditor(QtWidgets.QPlainTextEdit):
     def should_increase_indent(self, line):
         stripped_line = line.strip()
         if ':' in stripped_line:
-            colon_pos = stripped_line.find(':')
+            colon_pos = stripped_line.rfind(':')
             cursor = self.textCursor()
             if cursor.positionInBlock() > colon_pos:
                 after_colon = stripped_line[colon_pos + 1:].strip()
