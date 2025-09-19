@@ -57,7 +57,8 @@ class Scene(Manager):
                 self.game_manager,
                 self.convert_node_properties(properties),
                 uuid=node_path[-1],
-                parent=temp_node_storage[node_path[:-1]] if len(node_path) > 1 else None
+                parent=temp_node_storage[node_path[:-1]] if len(node_path) > 1 else None,
+                scene=self
             )
 
             node.initialize_properties(node.properties)
@@ -72,8 +73,10 @@ class Scene(Manager):
             node.on_start()
 
     def register_node(self, node: Node) -> None:
-        # TODO: Add unregister node
         self.node_storage.append(node)
+
+    def unregister_node(self, node: Node) -> None:
+        self.node_storage.remove(node)
 
     def convert_node_properties(self, properties: dict) -> dict:
         """Converts node property name from editor -> core
