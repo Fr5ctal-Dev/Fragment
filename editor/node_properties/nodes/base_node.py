@@ -2,10 +2,14 @@ from PySide6 import QtWidgets
 
 
 class BaseNodeProperties:
-    def __init__(self, scene_editor, name, type):
+    def __init__(self, scene_editor, uuid, type):
         self.scene_editor = scene_editor
-        self.name = name
         self.type = type
+        self.uuid = uuid
+
+        self.target_scene = None # Scene path
+        self.target_scene_node = None # Node path in target scene
+
         self.properties = self.default_properties
         self.property_tree = None
         self.setup_property_tree()
@@ -16,7 +20,7 @@ class BaseNodeProperties:
         return properties
     
     def set_property(self, name, value):
-        self.properties[name].update_value(value)
+        self.properties[name].value = value
 
     def setup_property_tree(self):
         self.setup_property_editors()
@@ -36,6 +40,11 @@ class BaseNodeProperties:
 
     def to_data(self):
         data = {'type': self.type, 'properties': {}}
+
+        if self.target_scene:
+            data['target_scene'] = self.target_scene
+            data['target_scene_node'] = self.target_scene_node
+
         for name, property in self.properties.items():
             data['properties'][name] = property.to_data()
         return data
@@ -43,3 +52,22 @@ class BaseNodeProperties:
     def load_data(self, data):
         for name, property in data['properties'].items():
             self.set_property(name, property[2])
+
+        if 'target_scene' in data:
+            self.connect_scene(data['target_scene'], data['target_scene_node'])
+
+    def connect_scene(self, scene_path, node_path):
+        self.target_scene = scene_path
+        self.target_scene_node = node_path
+
+    def update_scene_properties(self):
+        if self.target_scene and self.target_scene_node:
+            with open(self.target_scene) as f:
+                data = f.read()
+            data = eval(data)
+
+            if self.target_scene_node in data:
+                node_data = data[self.target_scene_node]
+                for name, property in node_data['properties'].items():
+                    if name in self.properties:
+                        self.set_property(name, property[2])

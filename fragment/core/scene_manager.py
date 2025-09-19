@@ -56,7 +56,7 @@ class Scene(Manager):
             node = node_class(
                 self.game_manager,
                 self.convert_node_properties(properties),
-                name=node_path[-1],
+                uuid=node_path[-1],
                 parent=temp_node_storage[node_path[:-1]] if len(node_path) > 1 else None
             )
 

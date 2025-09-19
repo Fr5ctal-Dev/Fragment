@@ -1,5 +1,6 @@
 {
   "Node": {
+    "name": "name",
     "script": null
   },
   "Node2D": {
