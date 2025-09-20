@@ -87,6 +87,8 @@ class NodeTree(QTreeWidget):
             properties.set_property('name', name)
         self.node_data[item] = properties
 
+        properties.uuid = uuid
+
         properties.properties['name'].value_changed.connect(lambda: item.setText(0, properties.properties['name'].value))
 
         return item
@@ -238,7 +240,7 @@ class NodeTree(QTreeWidget):
         temp_parent_storage = {}
         for path, node_data in data.items():
             parent = parent if len(path) == 1 else temp_parent_storage[path[:-1]]
-            node = self.new_node(node_data['type'], parent, self.data_to_node_properties(node_data, path[-1]), uuid=path[-1])
+            node = self.new_node(node_data['type'], parent, self.data_to_node_properties(node_data, path[-1]))
             temp_parent_storage[path] = node
 
             if node is not None:
@@ -288,8 +290,7 @@ class NodeTree(QTreeWidget):
 
             for node in [root_node] + self.dfs_children(root_node):
                 if self.node_data[node].target_scene == scene:
-                    root_path_len = len(self.path_of_node(root_node))
-                    current_scene_nodes[self.path_of_node(node)[root_path_len - 1:]] = node
+                    current_scene_nodes[self.node_data[node].target_scene_node] = node
             for path, node_data in data.items():
                 if path in current_scene_nodes and self.node_data[current_scene_nodes[path]].type == node_data['type']:
                     continue
