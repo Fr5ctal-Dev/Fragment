@@ -128,6 +128,10 @@ class NodeTree(QTreeWidget):
         if self.node_data[source].target_scene is not None and len(self.node_data[source].target_scene_node) > 1:
             QMessageBox.warning(self, 'Invalid Operation', 'Cannot reparent a child node of an imported scene.')
             return False
+        
+        if self.node_data[target].target_scene is not None:
+            QMessageBox.warning(self, 'Invalid Operation', 'Cannot reparent to an imported scene node.')
+            return False
 
         return True
     
