@@ -5,11 +5,12 @@ from PySide6.QtCore import Signal, QObject
 class Property(QObject):
     value_changed = Signal()
 
-    def __init__(self, name, type, value):
+    def __init__(self, name, type, value, scene_override=False):
         super().__init__()
         self.name = name
         self.type = type
         self._value = value
+        self.scene_override = scene_override
         self.editor_widget = None
 
     @property
@@ -41,5 +42,6 @@ class Property(QObject):
         return {
             'name': self.name,
             'type': self.type,
-            'value': self.value
+            'value': self.value,
+            'scene_override': self.scene_override
         }

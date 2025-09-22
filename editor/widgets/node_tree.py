@@ -243,6 +243,9 @@ class NodeTree(QTreeWidget):
 
         temp_parent_storage = {}
         for path, node_data in data.items():
+            for prop_value in node_data['properties'].values():
+                prop_value['scene_override'] = False
+
             parent = parent if len(path) == 1 else temp_parent_storage[path[:-1]]
             node = self.new_node(node_data['type'], parent, self.data_to_node_properties(node_data, path[-1]))
             temp_parent_storage[path] = node
