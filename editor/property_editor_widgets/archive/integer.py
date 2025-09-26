@@ -1,16 +1,15 @@
+from .float import DraggableSpinBox
 from .editor_widget import EditorWidget
-from ..widgets.draggable_spinbox import DraggableSpinBox
 
 
 class Integer(EditorWidget):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-
         self.spin_box = DraggableSpinBox()
         self.main_layout.addWidget(self.spin_box)
         self.spin_box.setRange(-99999, 99999)
         self.spin_box.setDecimals(0)
-        
+
         self.update_editor()
         self.spin_box.valueChanged.connect(self.change_property)
 

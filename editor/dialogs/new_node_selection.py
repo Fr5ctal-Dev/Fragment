@@ -4,11 +4,9 @@ from PySide6 import QtWidgets, QtGui
 
 
 class NewNodeSelectionDialog(SelectionDialog):
-    def __init__(self, parent, ignore_parent=False):
+    def __init__(self, parent):
         super().__init__(parent, 'New Node')
         self.resize(400, 400)
-        if ignore_parent:
-            self.title_label.setText('Set Root Node')
 
         self.node_tree = QtWidgets.QTreeWidget()
         self.node_tree.setMinimumWidth(300)
@@ -34,11 +32,17 @@ class NewNodeSelectionDialog(SelectionDialog):
             else:
                 indentation[indent - 1].addChild(widget)
 
-        if not ignore_parent:
-            self.name_edit = QtWidgets.QLineEdit()
-            self.name_edit.setPlaceholderText('Name')
-            self.central_layout.addWidget(self.name_edit)
+        self.name_edit = QtWidgets.QLineEdit()
+        self.name_edit.setPlaceholderText('Name')
+        self.central_layout.addWidget(self.name_edit)
 
-        if not ignore_parent:
-            self.info_label = QtWidgets.QLabel()
-            self.central_layout.addWidget(self.info_label)
+        self.info_label = QtWidgets.QLabel()
+        self.central_layout.addWidget(self.info_label)
+
+    @property
+    def node_name(self):
+        return self.name_edit.text() if self.name_edit.text() else self.node_type
+    
+    @property
+    def node_type(self):
+        return self.node_tree.currentItem().text(0)

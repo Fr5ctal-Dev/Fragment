@@ -43,8 +43,8 @@ class Scene(Manager):
 
         for node_path in list(scene_content.keys()):
             properties = {}
-            for value in scene_content[node_path]['properties'].values():
-                properties = {**properties, **value}
+            for name, value in scene_content[node_path]['properties'].items():
+                properties[name] = value['value'] # value of property
 
             if properties['script']:
                 path = Path(properties['script']).relative_to(self.project_path)
@@ -56,14 +56,14 @@ class Scene(Manager):
             node = node_class(
                 self.game_manager,
                 self.convert_node_properties(properties),
-                name=scene_content[node_path]['name'],
-                uuid=scene_content[node_path]['uid'],
-                parent=temp_node_storage[scene_content[node_path]['parent']] if scene_content[node_path]['parent'] else None
+                uuid=node_path[-1],
+                parent=temp_node_storage[node_path[:-1]] if len(node_path) > 1 else None,
+                scene=self
             )
 
             node.initialize_properties(node.properties)
 
-            if not scene_content[node_path]['parent']:
+            if len(node_path) == 1:
                 self.root_node = node
 
             temp_node_storage[node_path] = node
@@ -73,8 +73,10 @@ class Scene(Manager):
             node.on_start()
 
     def register_node(self, node: Node) -> None:
-        # TODO: Add unregister node
         self.node_storage.append(node)
+
+    def unregister_node(self, node: Node) -> None:
+        self.node_storage.remove(node)
 
     def convert_node_properties(self, properties: dict) -> dict:
         """Converts node property name from editor -> core
@@ -111,13 +113,13 @@ class SceneManager(Manager):
         super().__init__(game_manager)
         self.current_scene = None
 
-    def instantiate_scene(self, scene: str) -> None:
+    def instantiate_scene(self, scene_path: str) -> None:
         """Instantiates a scene based on scene file.
 
         Args:
-            scene (str): The scene file path.
+            scene_path (str): The scene file path.
         """
-        scene = Scene(self.game_manager, scene)
+        scene = Scene(self.game_manager, scene_path)
         if self.current_scene:
             self.current_scene.destroy()
         self.current_scene = scene

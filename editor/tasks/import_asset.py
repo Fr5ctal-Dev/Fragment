@@ -1,15 +1,7 @@
 from .base_task import BaseTask
-from .. import importers
+from ..importers import IMPORTERS
 from editor.utils.path import get_resource_path
 import json
-
-
-def snake_to_pascal(text):
-    words = text.split('_')
-    pascal = ''
-    for word in words:
-        pascal += word.capitalize()
-    return pascal
 
 
 def inverse_dictionary(dict):
@@ -36,7 +28,7 @@ class ImportAssetTask(BaseTask):
             importer_type = self.filetypes.get('.' + file.split('.')[-1])
             if importer_type is None:
                 importer_type = 'base_importer'
-            importer = getattr(importers, snake_to_pascal(importer_type))(self.path)
+            importer = IMPORTERS[importer_type](self.path)
             importer.import_file(file)
         self.finished.emit()
 

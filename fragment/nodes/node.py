@@ -9,11 +9,12 @@ class Node(GameElement):
     Every node has a node script, which is used to define custom logic using Python.
     Each node parents to other nodes to form a scene tree.
     """
-    def __init__(self, game_manager, properties, name=None, uuid=None, parent=None):
+    def __init__(self, game_manager, properties, uuid=None, parent=None, scene=None):
         super().__init__(game_manager)
-        self.name = name
         self.uuid = uuid
+        self.name = None
         self.parent = None
+        self.scene = scene
         self.children = []
         self.properties = properties
         self.set_parent(parent)
@@ -60,6 +61,8 @@ class Node(GameElement):
     def destroy_self(self) -> None:
         """Destroys node without destroying children."""
         self.on_destroy()
+        if self.scene is not None:
+            self.scene.unregister_node(self)
 
     def is_ancestor(self, node) -> bool:
         while True:
