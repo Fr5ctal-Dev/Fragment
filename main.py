@@ -1,6 +1,6 @@
 # Application starting point
 
-from editor import launch
+from library import launch_library
 
 if __name__ == '__main__':
-    launch()
+    launch_library()

@@ -1,1 +1,1 @@
-from editor.main import launch
+from editor.main import launch_editor

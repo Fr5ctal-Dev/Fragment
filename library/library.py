@@ -1,4 +1,4 @@
-from editor.editor import launch_editor
+from editor import launch_editor
 from editor.utils.path import get_resource_path
 from PySide6 import QtWidgets, QtCore
 from PySide6.QtWidgets import QApplication, QWidget, QStackedLayout
