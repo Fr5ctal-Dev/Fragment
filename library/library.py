@@ -1,9 +1,10 @@
-from editor import launch_editor
+from editor.editor import launch_editor
 from editor.utils.path import get_resource_path
-from PySide6 import QtWidgets, QtCore
-from PySide6.QtWidgets import QApplication, QWidget, QStackedLayout
-from PySide6 import QtGui
 from editor.splash_screen import SplashScreen
+from PySide6 import QtWidgets, QtCore, QtGui
+from PySide6.QtWidgets import QApplication, QWidget, QStackedLayout
+from PySide6.QtWebEngineWidgets import QWebEngineView
+from PySide6.QtWebChannel import QWebChannel
 from qdarktheme import setup_theme
 from pathlib import Path
 import platform
@@ -14,143 +15,141 @@ import shutil
 import tempfile
 
 
-class Library(QtWidgets.QWidget):
-    def __init__(self):
-        super().__init__()
-        self.editor_instances = []
+class Backend(QtCore.QObject):
+    projectsUpdated = QtCore.Signal('QVariant')
 
+    def __init__(self, parent=None):
+        super().__init__(parent)
+        self.editor_instances = []
         self.config_path_folder = 'fragment_library_temp'
 
-        self.check_projects_timer = QtCore.QTimer()
+        _ = self.config_path()
+
+        self.check_projects_timer = QtCore.QTimer(self)
         self.check_projects_timer.timeout.connect(self.check_for_missing_projects)
         self.check_projects_timer.start(1000)
 
-        self.main_layout = QtWidgets.QHBoxLayout(self)
+    @QtCore.Slot(result='QVariant')
+    def getProjects(self):
+        return {'projects': self._projects_list()}
 
-        self.tab_list = QtWidgets.QFrame()
-        self.tab_list_frame = QtWidgets.QVBoxLayout(self.tab_list)
-        self.project_tab_button = QtWidgets.QPushButton()
-        self.project_tab_button.setText('Projects')
-        self.project_tab_button.setFixedSize(QtCore.QSize(200, 50))
-        self.project_tab_button.clicked.connect(lambda: self.main_stacked_layout.setCurrentWidget(self.project_frame))
-        self.tab_list_frame.addWidget(self.project_tab_button)
-        self.main_layout.addWidget(self.tab_list)
-
-        self.main_stacked_layout = QtWidgets.QStackedLayout()
-        self.main_layout.addLayout(self.main_stacked_layout)
-
-        self.project_frame = QtWidgets.QFrame()
-        self.project_layout = QtWidgets.QGridLayout(self.project_frame)
-        self.project_list_frame = QtWidgets.QFrame()
-        self.project_list_layout = QtWidgets.QGridLayout(self.project_list_frame)
-        self.project_list = QtWidgets.QTreeWidget()
-        self.project_list.itemDoubleClicked.connect(lambda item, column: self.open_in_editor(item.text(1)))
-        self.project_list.setColumnCount(2)
-        self.project_list.setHeaderLabels(['Name', 'Path'])
-        self.project_list_layout.addWidget(self.project_list, 0, 0)
-        self.load_project_list()
-        self.project_layout.addWidget(self.project_list_frame, 0, 0)
-        self.button_frame = QtWidgets.QFrame()
-        self.button_frame.setFixedSize(QtCore.QSize(200, 100))
-        self.button_layout = QtWidgets.QVBoxLayout(self.button_frame)
-        self.new_project_button = QtWidgets.QPushButton()
-        self.new_project_button.setText('New')
-        self.new_project_button.clicked.connect(self.new_project)
-        self.open_project_button = QtWidgets.QPushButton()
-        self.open_project_button.setText('Open')
-        self.open_project_button.clicked.connect(self.open_project)
-        self.button_layout.addWidget(self.new_project_button)
-        self.button_layout.addWidget(self.open_project_button)
-        self.project_layout.addWidget(self.button_frame, 0, 1)
-        self.main_stacked_layout.addWidget(self.project_frame)
-
-    def open_in_editor(self, path):
-        self.editor_instances.append(launch_editor(path))
-
-    def add_to_project_list(self, path):
-        with open(self.config_path() + '/projects.json') as f:
-            projects = json.loads(f.read())
-        projects[os.path.basename(path)] = path
-        with open(self.config_path() + '/projects.json', 'w') as f:
-            f.write(json.dumps(projects))
-        self.load_project_list()
-
-    def new_project(self):
-        path = QtWidgets.QFileDialog.getSaveFileName(self, 'New Project', '/')[0]
+    @QtCore.Slot()
+    def newProject(self):
+        path, _ = QtWidgets.QFileDialog.getSaveFileName(None, 'New Project', '/')
         if not path:
             return
-
         try:
             os.mkdir(path)
-        except:
+        except Exception:
             return
+        try:
+            with open(os.path.join(path, 'main.fragment'), 'w') as f:
+                f.write('{\'reopen\': {\'tabs\': [], \'last_tab\': None}}')
+            shutil.copytree(get_resource_path('fragment'), os.path.join(path, 'fragment'))
+            os.mkdir(os.path.join(path, 'scenes'))
+            os.mkdir(os.path.join(path, 'scripts'))
+            os.mkdir(os.path.join(path, 'assets'))
+            self._add_to_project_list(path)
+            self.openInEditor(path)
+        finally:
+            self._emit_projects()
 
-        with open(path + '/main.fragment', 'w') as f:
-            f.write("{'reopen': {'tabs': [], 'last_tab': None}}")
-
-        shutil.copytree(get_resource_path('fragment'), path + '/fragment')
-
-        os.mkdir(path + '/scenes')
-        os.mkdir(path + '/scripts')
-        os.mkdir(path + '/assets')
-
-        self.add_to_project_list(path)
-        self.open_in_editor(path)
-
-    def open_project(self):
-        path = QtWidgets.QFileDialog.getOpenFileName(self, 'Open Project', '/', 'Fragment Projects (*.fragment)')[0]
+    @QtCore.Slot()
+    def openProject(self):
+        path, _ = QtWidgets.QFileDialog.getOpenFileName(None, 'Open Project', '/', 'Fragment Projects (*.fragment)')
         if not path:
             return
-        path = os.path.dirname(path)
+        project_root = os.path.dirname(path)
+        self._add_to_project_list(project_root)
+        self.openInEditor(project_root)
+        self._emit_projects()
 
-        self.add_to_project_list(path)
-        self.open_in_editor(path)
+    @QtCore.Slot(str)
+    def openInEditor(self, path: str):
+        if not path:
+            return
+        self.editor_instances.append(launch_editor(path))
 
-    def load_project_list(self):
-        self.project_list.clear()
-        with open(self.config_path() + '/projects.json') as f:
-            projects = json.loads(f.read())
-        delete = []
-        for project in projects.keys():
-            if not os.path.exists(projects[project]):
-                delete.append(project)
-                continue
-            item = QtWidgets.QTreeWidgetItem([project, projects[project]])
-            item.setSizeHint(0, QtCore.QSize(1, 40))
-            self.project_list.addTopLevelItem(item)
+    def _emit_projects(self):
+        self.projectsUpdated.emit({'projects': self._projects_list()})
 
-        for key in delete:
-            projects.pop(key)
+    def _projects_list(self):
+        projects = self._read_projects()
+        items = [{'name': name, 'path': p} for name, p in projects.items() if os.path.exists(p)]
+        items.sort(key=lambda x: x['name'].lower())
+        return items
 
-        with open(self.config_path() + '/projects.json', 'w') as f:
-            f.write(json.dumps(projects))
+    def _add_to_project_list(self, path: str):
+        projects = self._read_projects()
+        projects[os.path.basename(path)] = path
+        self._write_projects(projects)
 
     def check_for_missing_projects(self):
-        with open(self.config_path() + '/projects.json') as f:
-            projects = json.loads(f.read())
-
-        for project in projects.values():
-            if not os.path.exists(project):
-                self.load_project_list()
-                return
+        changed = False
+        projects = self._read_projects()
+        pruned = {k: v for k, v in projects.items() if os.path.exists(v)}
+        if len(pruned) != len(projects):
+            changed = True
+            self._write_projects(pruned)
+        if changed:
+            self._emit_projects()
 
     def config_path(self):
         base_temp = Path(tempfile.gettempdir())
         target = base_temp / self.config_path_folder
         if not os.path.exists(target):
-            self.create_config_folder(target)
-
+            self._create_config_folder(target)
         return str(target)
 
-    def create_config_folder(self, path: Path):
-        path.mkdir(parents=True)
-        with open(path / 'projects.json', 'w') as f:
-            f.write('{}')
+    def _create_config_folder(self, path: Path):
+        path.mkdir(parents=True, exist_ok=True)
+        cfg = path / 'projects.json'
+        if not cfg.exists():
+            with open(cfg, 'w') as f:
+                f.write('{}')
+
+    def _read_projects(self):
+        cfg = Path(self.config_path()) / 'projects.json'
+        try:
+            with open(cfg, 'r') as f:
+                return json.loads(f.read() or '{}')
+        except Exception:
+            return {}
+
+    def _write_projects(self, projects: dict):
+        cfg = Path(self.config_path()) / 'projects.json'
+        with open(cfg, 'w') as f:
+            f.write(json.dumps(projects))
+
+
+class Library(QtWidgets.QWidget):
+    def __init__(self):
+        super().__init__()
+        self.main_layout = QtWidgets.QVBoxLayout()
+        self.setLayout(self.main_layout)
+        self.main_layout.setContentsMargins(0, 0, 0, 0)
+
+        self.view = QWebEngineView(self)
+        self.main_layout.addWidget(self.view)
+
+        self.backend = Backend(self)
+
+        self.channel = QWebChannel(self.view.page())
+        self.channel.registerObject('backend', self.backend)
+        self.view.page().setWebChannel(self.channel)
+
+        with open(get_resource_path('library/library.html'), 'r') as f:
+            html = f.read()
+
+        self.view.setHtml(html, QtCore.QUrl('qrc:///'))
+        self.view.setFocusPolicy(QtCore.Qt.FocusPolicy.StrongFocus)
 
 
 def launch_library():
     app = QApplication([])
+
     setup_theme()
+
     if platform.system() == 'Windows':
         app.setWindowIcon(QtGui.QIcon(get_resource_path('fragment/icon/icon_win.ico')))
     else:
@@ -167,7 +166,8 @@ def launch_library():
     window_layout.addWidget(splash)
 
     window_layout.setCurrentWidget(splash)
-    window.showMaximized()
+    window.resize(1000, 600)
+    window.show()
 
     timer = QtCore.QTimer()
     timer.setSingleShot(True)

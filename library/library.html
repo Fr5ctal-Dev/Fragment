@@ -1,0 +1,566 @@
+<!doctype html>
+<html lang='en'>
+<head>
+    <meta charset='utf-8'>
+    <meta name='viewport' content='width=device-width, initial-scale=1, viewport-fit=cover'>
+    <title>Fragment Library</title>
+    <style>
+        :root {
+            /* Background Colors */
+            --bg-primary: #0d0d0d;
+            --bg-secondary: #121212;
+            --bg-tertiary: #1a1a1a;
+            --bg-quaternary: #1f1f1f;
+            --bg-hover: #222;
+            --bg-active: #0f0f0f;
+
+            /* Border Colors */
+            --border-primary: #2a2a2a;
+            --border-secondary: #333;
+            --border-hover: #3a3a3a;
+            --border-accent: #404040;
+            --border-focus: #555;
+
+            /* Text Colors */
+            --text-primary: #ffffff;
+            --text-secondary: #e0e0e0;
+            --text-tertiary: #ccc;
+            --text-quaternary: #999;
+            --text-muted: #666;
+
+            /* Button Colors */
+            --btn-primary-bg: #ffffff;
+            --btn-primary-text: #000;
+            --btn-primary-hover: #f0f0f0;
+            --btn-secondary-bg: transparent;
+            --btn-secondary-text: #e0e0e0;
+            --btn-secondary-hover-bg: #1a1a1a;
+            --btn-secondary-hover-text: #fff;
+
+            /* Accent Colors */
+            --accent-light: rgba(255, 255, 255, 0.1);
+            --accent-glow: rgba(255, 255, 255, 0.2);
+            
+            /* Shadow Colors */
+            --shadow-light: rgba(0, 0, 0, 0.3);
+            --shadow-medium: rgba(0, 0, 0, 0.4);
+
+            /* Scrollbar Colors */
+            --scrollbar-track: #1a1a1a;
+            --scrollbar-thumb: #404040;
+            --scrollbar-thumb-hover: #555;
+            --scrollbar-track-main: #0d0d0d;
+            --scrollbar-thumb-main: #333;
+            --scrollbar-thumb-main-hover: #444;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-secondary);
+            font-size: 14px;
+            line-height: 1.5;
+            overflow-x: hidden;
+        }
+
+        .app {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            opacity: 0;
+            animation: fadeIn 0.8s ease-out forwards;
+        }
+
+        @keyframes fadeIn {
+            to { opacity: 1; }
+        }
+
+        .main {
+            flex: 1;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+            width: 100%;
+        }
+
+        .header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 2rem;
+            gap: 2rem;
+        }
+
+        .title {
+            font-size: 2rem;
+            font-weight: 300;
+            color: var(--text-primary);
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            transform: translateY(20px);
+            opacity: 0;
+            animation: slideUp 0.6s ease-out 0.2s forwards;
+        }
+
+        @keyframes slideUp {
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        .pill {
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border-secondary);
+            color: var(--text-quaternary);
+            padding: 0.25rem 0.75rem;
+            border-radius: 12px;
+            font-size: 0.75rem;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+
+        .pill:not(:empty) {
+            background: var(--bg-quaternary);
+            color: var(--text-tertiary);
+            border-color: var(--border-accent);
+        }
+
+        #searchInput {
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border-secondary);
+            color: var(--text-secondary);
+            padding: 0.75rem 1rem;
+            border-radius: 8px;
+            font-size: 14px;
+            min-width: 280px;
+            transition: all 0.3s ease;
+            transform: translateY(20px);
+            opacity: 0;
+            animation: slideUp 0.6s ease-out 0.4s forwards;
+        }
+
+        #searchInput:focus {
+            outline: none;
+            border-color: var(--border-focus);
+            background: var(--bg-hover);
+            box-shadow: 0 0 0 2px var(--accent-light);
+        }
+
+        #searchInput::placeholder {
+            color: var(--text-muted);
+        }
+
+        .content {
+            display: flex;
+            gap: 2rem;
+            transform: translateY(20px);
+            opacity: 0;
+            animation: slideUp 0.6s ease-out 0.6s forwards;
+            height: calc(100vh - 200px);
+            min-height: 400px;
+        }
+
+        .panel {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-primary);
+            border-radius: 12px;
+            overflow: hidden;
+            transition: all 0.3s ease;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .panel:hover {
+            border-color: var(--border-hover);
+            box-shadow: 0 4px 20px var(--shadow-light);
+        }
+
+        #projectPanel {
+            overflow: hidden;
+        }
+
+        .table-container {
+            flex: 1;
+            overflow-y: auto;
+            overflow-x: hidden;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        thead {
+            background: var(--bg-tertiary);
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+
+        th {
+            padding: 1rem 1.5rem;
+            text-align: left;
+            font-weight: 500;
+            color: var(--text-tertiary);
+            font-size: 13px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            border-bottom: 1px solid var(--border-primary);
+            background: var(--bg-tertiary);
+        }
+
+        tbody tr {
+            border-bottom: 1px solid var(--bg-quaternary);
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        tbody tr:hover {
+            background: var(--bg-tertiary);
+            transform: translateX(4px);
+        }
+
+        tbody tr:active {
+            background: var(--bg-active);
+            transform: scale(0.995);
+        }
+
+        td {
+            padding: 1rem 1.5rem;
+            color: var(--text-secondary);
+            transition: color 0.2s ease;
+        }
+
+        td.name {
+            font-weight: 500;
+            color: var(--text-primary);
+        }
+
+        td.path {
+            color: var(--text-quaternary);
+            font-family: 'SF Mono', Monaco, 'Cascadia Code', monospace;
+            font-size: 13px;
+        }
+
+        tbody tr:hover td.path {
+            color: var(--text-tertiary);
+        }
+
+        td.empty {
+            text-align: center;
+            color: var(--text-muted);
+            font-style: italic;
+            padding: 3rem;
+        }
+
+        .controls {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+            width: 160px;
+            flex-shrink: 0;
+        }
+
+        .button-card {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-primary);
+            border-radius: 12px;
+            padding: 1.5rem;
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        .button-card:hover {
+            border-color: var(--border-hover);
+            box-shadow: 0 4px 20px var(--shadow-light);
+        }
+
+        .btn {
+            padding: 0.75rem 1rem;
+            border: none;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            position: relative;
+            overflow: hidden;
+            width: 100%;
+        }
+
+        .btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, var(--accent-light), transparent);
+            transition: left 0.5s;
+        }
+
+        .btn:hover::before {
+            left: 100%;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px var(--shadow-medium);
+        }
+
+        .btn:active {
+            transform: translateY(0);
+            box-shadow: 0 2px 10px var(--shadow-light);
+        }
+
+        .btn.primary {
+            background: var(--btn-primary-bg);
+            color: var(--btn-primary-text);
+            border: 1px solid var(--btn-primary-bg);
+        }
+
+        .btn.primary:hover {
+            background: var(--btn-primary-hover);
+            box-shadow: 0 6px 20px var(--accent-glow);
+        }
+
+        .btn.secondary {
+            background: var(--btn-secondary-bg);
+            color: var(--btn-secondary-text);
+            border: 1px solid var(--border-accent);
+        }
+
+        .btn.secondary:hover {
+            background: var(--btn-secondary-hover-bg);
+            border-color: var(--border-focus);
+            color: var(--btn-secondary-hover-text);
+        }
+
+        /* Responsive design */
+        @media (max-width: 768px) {
+            .main {
+                padding: 1rem;
+            }
+
+            .header {
+                flex-direction: column;
+                gap: 1rem;
+                align-items: stretch;
+            }
+
+            .title {
+                font-size: 1.5rem;
+                justify-content: center;
+            }
+
+            #searchInput {
+                min-width: auto;
+            }
+
+            .content {
+                flex-direction: column;
+                height: calc(100vh - 250px);
+            }
+
+            .controls {
+                flex-direction: row;
+                width: auto;
+                justify-content: center;
+            }
+
+            .button-card {
+                flex-direction: row;
+                padding: 1rem;
+            }
+
+            th, td {
+                padding: 0.75rem 1rem;
+            }
+
+            .btn {
+                padding: 1rem;
+            }
+        }
+
+        /* Scrollbar styling for table container */
+        .table-container::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .table-container::-webkit-scrollbar-track {
+            background: var(--scrollbar-track);
+        }
+
+        .table-container::-webkit-scrollbar-thumb {
+            background: var(--scrollbar-thumb);
+            border-radius: 3px;
+        }
+
+        .table-container::-webkit-scrollbar-thumb:hover {
+            background: var(--scrollbar-thumb-hover);
+        }
+
+        /* Scrollbar styling */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: var(--scrollbar-track-main);
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: var(--scrollbar-thumb-main);
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--scrollbar-thumb-main-hover);
+        }
+
+        /* Focus states for accessibility */
+        .btn:focus-visible {
+            outline: 2px solid var(--text-primary);
+            outline-offset: 2px;
+        }
+
+        tbody tr:focus-visible {
+            outline: 2px solid var(--text-primary);
+            outline-offset: -2px;
+        }
+    </style>
+</head>
+<body>
+    <div class='app'>
+        <main class='main'>
+            <div class='header'>
+                <div class='title'>Projects <span class='pill' id='countPill'>0</span></div>
+                <input type='text' id='searchInput' placeholder='Search projects...' />
+            </div>
+
+            <div class='content'>
+                <div class='panel' id='projectPanel'>
+                    <div class='table-container'>
+                        <table aria-label='Projects'>
+                            <thead><tr><th style='width: 30%;'>Name</th><th>Path</th></tr></thead>
+                            <tbody id='projectTbody'><tr><td colspan='2' class='empty'>No projects yet</td></tr></tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div class='controls'>
+                    <div class='button-card'>
+                        <button class='btn primary' id='newBtn' type='button'>New</button>
+                        <button class='btn secondary' id='openBtn' type='button'>Open</button>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script src='qrc:///qtwebchannel/qwebchannel.js'></script>
+    <script>
+        let backend = null;
+        let allProjects = [];
+
+        function filterProjects(searchTerm) {
+            const filtered = allProjects.filter(project => 
+                project.name.toLowerCase().startsWith(searchTerm.toLowerCase())
+            );
+            renderProjectsFromList(filtered);
+        }
+
+        function renderProjectsFromList(list) {
+            const tbody = document.getElementById('projectTbody');
+            tbody.innerHTML = '';
+            if(!list.length){
+                const searchInput = document.getElementById('searchInput');
+                const isEmpty = !allProjects.length;
+                const message = isEmpty ? 'No projects yet' : 'No projects match your search';
+                tbody.innerHTML = `<tr><td class="empty" colspan="2">${message}</td></tr>`;
+                document.getElementById('countPill').textContent = isEmpty ? '0' : `${list.length}/${allProjects.length}`;
+                return;
+            }
+            list.forEach((p, i) => {
+                const tr = document.createElement('tr');
+                tr.dataset.path = p.path;
+
+                const tdName = document.createElement('td');
+                tdName.className = 'name';
+                tdName.textContent = p.name;
+
+                const tdPath = document.createElement('td');
+                tdPath.className = 'path';
+                tdPath.textContent = p.path;
+
+                tr.appendChild(tdName);
+                tr.appendChild(tdPath);
+
+                tr.addEventListener('click', () => {
+                    if (backend && backend.openInEditor) {
+                        backend.openInEditor(p.path);
+                    }
+                });
+
+                tbody.appendChild(tr);
+            });
+            document.getElementById('countPill').textContent = allProjects.length ? `${list.length}/${allProjects.length}` : '0';
+        }
+
+        function renderProjects(payload){
+            const list = (payload && payload.projects) ? payload.projects : [];
+            allProjects = list;
+            const searchInput = document.getElementById('searchInput');
+            const currentSearch = searchInput ? searchInput.value : '';
+            
+            if (currentSearch) {
+                filterProjects(currentSearch);
+            } else {
+                renderProjectsFromList(list);
+            }
+        }
+
+        document.getElementById('newBtn').addEventListener('click', () => {
+            if(backend && backend.newProject){ backend.newProject(); }
+        });
+        document.getElementById('openBtn').addEventListener('click', () => {
+            if(backend && backend.openProject){ backend.openProject(); }
+        });
+
+        // Add search functionality
+        document.addEventListener('DOMContentLoaded', () => {
+            const searchInput = document.getElementById('searchInput');
+            if (searchInput) {
+                searchInput.addEventListener('input', (e) => {
+                    filterProjects(e.target.value);
+                });
+            }
+        });
+
+        new QWebChannel(qt.webChannelTransport, function(channel){
+            backend = channel.objects.backend;
+            if(backend && backend.projectsUpdated){
+                backend.projectsUpdated.connect(function(payload){
+                    renderProjects(payload);
+                });
+            }
+            if(backend && backend.getProjects){
+                backend.getProjects(function(payload){
+                    renderProjects(payload);
+                });
+            }
+        });
+    </script>
+</body>
+</html>
