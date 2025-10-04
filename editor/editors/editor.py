@@ -8,11 +8,8 @@ class Editor(QtWidgets.QMainWindow):
         self.editor = editor
         self.file = file
 
-    def _close(self):
+    def save(self):
         pass
 
-    def _reload(self):
-        pass
-
-    def _destroy(self):
-        pass
+    def delete(self):
+        self.save()

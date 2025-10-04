@@ -70,7 +70,7 @@ class Editor(QtWidgets.QMainWindow):
         self.tab_view.setUsesScrollButtons(True)
         self.tab_view.setDocumentMode(True)
         self.tab_view.tabCloseRequested.connect(self.delete_tab)
-        self.tab_view.currentChanged.connect(lambda index: (self.save_tabs(), self.reload_tab(index)))
+        self.tab_view.currentChanged.connect(self.save_tabs)
 
         self.file_system_dock = QtWidgets.QDockWidget()
         self.file_system_dock.setWindowTitle('Files')
@@ -127,18 +127,13 @@ class Editor(QtWidgets.QMainWindow):
 
     def save_tabs(self):
         for i in range(self.tab_view.count()):
-            self.tab_view.widget(i)._close()
-
-    def reload_tab(self, index):
-        if self.tab_view.widget(index) is not None:
-            self.tab_view.widget(index)._reload()
+            self.tab_view.widget(i).save()
 
     def new_tab(self, editor, name):
         self.tab_view.setCurrentIndex(self.tab_view.addTab(editor(self.path), QtGui.QIcon(get_resource_path(f'editor/assets/file_icons/{get_filetype(name).lower()}.png')), name))
 
     def delete_tab(self, index):
-        self.tab_view.widget(index)._close()
-        self.tab_view.widget(index)._destroy()
+        self.tab_view.widget(index).delete()
         self.tab_view.removeTab(index)
 
     def open(self, path):

@@ -56,12 +56,10 @@ class SceneEditor(Editor):
         self.node_tree.load_from_scene_data(eval(content))
 
     def save(self):
+        super().save()
         data = self.node_tree.save_to_scene_data()
         with open(self.scene, 'w') as f:
             f.write(str(data))
 
     def run(self):
         self.editor.task_manager.new_task('execute_scene', [self])
-
-    def _close(self):
-        self.save()

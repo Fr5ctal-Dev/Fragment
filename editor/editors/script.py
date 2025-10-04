@@ -24,10 +24,9 @@ class ScriptEditor(Editor):
         self.setCentralWidget(self.central_widget)
 
     def save(self):
+        super().save()
         self.script_editor.save()
 
-    def _close(self):
-        self.save()
-
-    def _destroy(self):
+    def delete(self):
+        super().delete()
         self.script_editor.update_timer.stop()
