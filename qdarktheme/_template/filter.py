@@ -7,8 +7,9 @@ from qdarktheme import __version__
 from qdarktheme._color import Color
 from qdarktheme._icon.svg import Svg
 from qdarktheme._util import analyze_version_str, get_cash_root_path, get_logger
-from qdarktheme.qtpy import __version__ as qt_version
-from qdarktheme.qtpy.qt_compat import QT_API
+from PySide6 import __version__ as qt_version
+#from PySide6.qt_compat import QT_API
+QT_API = "PySide6"
 
 _logger = get_logger(__name__)
 

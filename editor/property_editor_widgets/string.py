@@ -14,7 +14,7 @@ class String(EditorWidget):
         try:
             self.value = eval(self.line_edit.text())
 
-        except:
+        except Exception:
             self.value = self.line_edit.text()
 
     def update_editor(self):

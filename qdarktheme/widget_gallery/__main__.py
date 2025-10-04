@@ -2,7 +2,7 @@
 import sys
 
 import qdarktheme
-from qdarktheme.qtpy.QtWidgets import QApplication
+from PySide6.QtWidgets import QApplication
 from qdarktheme.widget_gallery.main_window import WidgetGallery
 
 if __name__ == "__main__":

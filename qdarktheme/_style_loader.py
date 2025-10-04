@@ -186,7 +186,7 @@ def load_stylesheet(
 
     stylesheet = _resources.stylesheets.TEMPLATE_STYLESHEET
     try:
-        from qdarktheme.qtpy.QtCore import QCoreApplication
+        from PySide6.QtCore import QCoreApplication
 
         app = QCoreApplication.instance()
         if app is not None and not app.property("_qdarktheme_use_setup_style"):

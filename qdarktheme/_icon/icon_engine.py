@@ -1,7 +1,7 @@
 from qdarktheme._color import Color
 from qdarktheme._icon.svg import Svg
-from qdarktheme.qtpy.QtCore import QPoint, QRect, QRectF, QSize, Qt
-from qdarktheme.qtpy.QtGui import (
+from PySide6.QtCore import QPoint, QRect, QRectF, QSize, Qt
+from PySide6.QtGui import (
     QGuiApplication,
     QIcon,
     QIconEngine,
@@ -10,7 +10,7 @@ from qdarktheme.qtpy.QtGui import (
     QPalette,
     QPixmap,
 )
-from qdarktheme.qtpy.QtSvg import QSvgRenderer
+from PySide6.QtSvg import QSvgRenderer
 
 
 class SvgIconEngine(QIconEngine):

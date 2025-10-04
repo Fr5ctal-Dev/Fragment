@@ -11,8 +11,10 @@ class WindowManager(Manager):
         super().__init__(game_manager)
         pygame.init()
 
-        if window_size[0] == 0: window_size[0] = pygame.display.Info().current_w
-        if window_size[1] == 0: window_size[1] = pygame.display.Info().current_h
+        if window_size[0] == 0:
+            window_size[0] = pygame.display.Info().current_w
+        if window_size[1] == 0:
+            window_size[1] = pygame.display.Info().current_h
 
         self.window = RenderEngine(int(window_size[0]), int(window_size[1]))
 

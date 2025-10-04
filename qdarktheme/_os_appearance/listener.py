@@ -3,7 +3,7 @@ from __future__ import annotations
 import darkdetect
 
 from qdarktheme import _os_appearance
-from qdarktheme.qtpy.QtCore import QCoreApplication, QEvent, QObject, QThread, Signal
+from PySide6.QtCore import QCoreApplication, QEvent, QObject, QThread, Signal
 
 
 class OSThemeSwitchListener(QThread):

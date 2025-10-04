@@ -15,7 +15,7 @@ class ExecuteSceneTask(BaseTask):
         self.file = self.temp.name + '/runner/main.py'
 
     def run(self):
-        self.scene_editor._close()
+        self.scene_editor.save()
         code = f'import fragment.main\nfragment.main.setup("{self.scene_editor.scene}", "{self.scene_editor.path}")'
         shutil.copytree(self.scene_editor.path, os.path.dirname(self.file))
 

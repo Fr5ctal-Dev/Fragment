@@ -7,6 +7,7 @@ Created by the `PyQtDarkTheme/tools/build_styles`.
 
 """
 
+__all__ = ['colors', 'palette', 'stylesheets', 'svg']
 from qdarktheme._resources import colors, palette, stylesheets, svg
 
 THEMES = ("dark", "light", "auto")

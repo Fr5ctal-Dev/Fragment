@@ -1,5 +1,5 @@
 """Module setting up ui of mdi window."""
-from qdarktheme.qtpy.QtWidgets import (
+from PySide6.QtWidgets import (
     QHBoxLayout,
     QLabel,
     QMdiArea,

@@ -1,9 +1,9 @@
 """Main module of widget gallery."""
 import qdarktheme
 from qdarktheme._util import get_qdarktheme_root_path
-from qdarktheme.qtpy.QtCore import QDir, Qt, Slot
-from qdarktheme.qtpy.QtGui import QAction, QActionGroup, QFont, QIcon
-from qdarktheme.qtpy.QtWidgets import (
+from PySide6.QtCore import QDir, Qt, Slot
+from PySide6.QtGui import QAction, QActionGroup, QFont, QIcon
+from PySide6.QtWidgets import (
     QColorDialog,
     QFileDialog,
     QFontDialog,

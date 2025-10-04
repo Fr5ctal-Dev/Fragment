@@ -3,9 +3,9 @@ from __future__ import annotations
 
 from typing import Any
 
-from qdarktheme.qtpy.QtCore import QAbstractTableModel, QModelIndex, Qt
-from qdarktheme.qtpy.QtGui import QIcon, QStandardItem, QStandardItemModel, QTextOption
-from qdarktheme.qtpy.QtWidgets import (
+from PySide6.QtCore import QAbstractTableModel, QModelIndex, Qt
+from PySide6.QtGui import QIcon, QStandardItem, QStandardItemModel, QTextOption
+from PySide6.QtWidgets import (
     QCheckBox,
     QColumnView,
     QComboBox,

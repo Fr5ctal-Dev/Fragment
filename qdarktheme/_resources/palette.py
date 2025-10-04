@@ -8,7 +8,7 @@ from qdarktheme._template.engine import Template
 
 def q_palette(mk_template: partial[Template], color_map: dict[str, str | dict], for_stylesheet: bool):
     """Generate QPalette."""
-    from qdarktheme.qtpy.QtGui import QColor, QPalette
+    from PySide6.QtGui import QColor, QPalette
 
     def _mk_q_color(text: str):
         template = mk_template(text)

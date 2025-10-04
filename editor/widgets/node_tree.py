@@ -111,7 +111,8 @@ class NodeTree(QTreeWidget):
             parent.removeChild(item)
 
     def dfs_children(self, item, items=None):
-        if items is None: items = []
+        if items is None:
+            items = []
         for child_index in range(item.childCount()):
             child = item.child(child_index)
             items.append(child)
@@ -197,8 +198,10 @@ class NodeTree(QTreeWidget):
         path = [self.node_data[item].uuid]
         current_item = item
         while True:
-            if current_item.parent(): current_item = current_item.parent()
-            else: return tuple(path)
+            if current_item.parent():
+                current_item = current_item.parent()
+            else:
+                return tuple(path)
             path.insert(0, self.node_data[current_item].uuid)
     
     def node_properties_to_data(self, node_properties: BaseNodeProperties): # The node properties class

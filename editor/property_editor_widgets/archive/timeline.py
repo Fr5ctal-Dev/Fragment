@@ -627,7 +627,6 @@ class TimelineEditorDialog(QDialog):
         L = max(len(data) for data in channel_exports)
         for i, data in enumerate(channel_exports):
             if len(data) < L:
-                last_val = data[-1] if data else None
                 channel_exports[i] = data + [None] * (L - len(data))
         combined = []
         for t in range(L):

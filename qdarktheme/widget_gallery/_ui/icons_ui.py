@@ -1,8 +1,8 @@
 """The ui to show Qt standard icons."""
 from __future__ import annotations
 
-from qdarktheme.qtpy.QtCore import Qt
-from qdarktheme.qtpy.QtWidgets import (
+from PySide6.QtCore import Qt
+from PySide6.QtWidgets import (
     QGridLayout,
     QScrollArea,
     QStyle,

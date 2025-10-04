@@ -1,5 +1,5 @@
 """Icon map that overrides standard icons."""
-from qdarktheme.qtpy.QtWidgets import QStyle
+from PySide6.QtWidgets import QStyle
 
 NEW_STANDARD_ICON_MAP = {
     QStyle.StandardPixmap.SP_ArrowBack: {"id": "arrow_upward", "rotate": 270},

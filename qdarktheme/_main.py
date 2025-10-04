@@ -58,8 +58,8 @@ def enable_hi_dpi() -> None:
     This function must be set before instantiation of QApplication..
     For Qt6 bindings, HiDPI “just works” without using this function.
     """
-    from qdarktheme.qtpy.QtCore import Qt
-    from qdarktheme.qtpy.QtGui import QGuiApplication
+    from PySide6.QtCore import Qt
+    from PySide6.QtGui import QGuiApplication
 
     if hasattr(Qt.ApplicationAttribute, "AA_UseHighDpiPixmaps"):
         QGuiApplication.setAttribute(Qt.ApplicationAttribute.AA_UseHighDpiPixmaps)  # type: ignore
@@ -74,7 +74,7 @@ def enable_hi_dpi() -> None:
 
 def stop_sync() -> None:
     """Stop sync with system theme."""
-    from qdarktheme.qtpy.QtCore import QCoreApplication
+    from PySide6.QtCore import QCoreApplication
 
     app = QCoreApplication.instance()
     global _listener
@@ -153,7 +153,7 @@ def setup_theme(
                 },
             )
     """
-    from qdarktheme.qtpy.QtCore import QCoreApplication
+    from PySide6.QtCore import QCoreApplication
 
     app = QCoreApplication.instance()
     if not app:
@@ -174,5 +174,5 @@ def setup_theme(
 
     callback()
 
-    if theme == "auto" and darkdetect.theme() is not None:
-        _sync_theme_with_system(app, callback)
+    #if theme == "auto" and darkdetect.theme() is not None:
+    #    _sync_theme_with_system(app, callback)
