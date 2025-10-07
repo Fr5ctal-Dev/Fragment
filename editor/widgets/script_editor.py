@@ -256,6 +256,8 @@ class ScriptEditor(QtWidgets.QPlainTextEdit):
         cursor = self.textCursor()
         if not cursor.hasSelection():
             cursor.select(cursor.SelectionType.WordUnderCursor)
+            if not cursor.selectedText().isidentifier():
+                return
         
         if cursor.selectedText().strip() == '':
             return
@@ -344,7 +346,7 @@ class ScriptEditor(QtWidgets.QPlainTextEdit):
             self.completer.popup().hide()
             return
         char = self.toPlainText()[cursor.position() - 1]
-        if not (char.isalnum() or char in '_.()'):
+        if not (char.isidentifier() or char == '.'):
             self.completer.popup().hide()
             return
 
@@ -358,6 +360,7 @@ class ScriptEditor(QtWidgets.QPlainTextEdit):
         self.completer.complete(cursor_rect)
         self.completer.popup().scrollToTop()
         self.completer.popup().setAlternatingRowColors(True)
+        self.completer.popup().setCurrentIndex(self.completion_model.index(0, 0))
         self.set_highlight_completion(self.completer.currentCompletion())
 
     def insert_completion(self, completion):
