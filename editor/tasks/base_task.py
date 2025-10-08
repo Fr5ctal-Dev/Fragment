@@ -13,3 +13,6 @@ class BaseTask(QObject):
 
     def run(self):
         pass
+
+    def terminate(self):
+        pass

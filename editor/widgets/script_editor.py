@@ -323,7 +323,6 @@ class ScriptEditor(QtWidgets.QPlainTextEdit):
     def completion_worker_finished(self, output):
         self.completion_worker_thread.quit()
         self.completion_worker_thread.wait()
-        self.completion_worker_thread.deleteLater()
         self.completion_worker = None
         self.completion_worker_thread = None
 

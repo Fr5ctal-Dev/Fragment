@@ -15,6 +15,7 @@ def inverse_dictionary(dict):
 class ImportAssetTask(BaseTask):
     def __init__(self, path, files):
         super().__init__('Import Assets', False)
+        self.is_terminating = False
         self.files = files
         self.path = path
 
@@ -25,12 +26,17 @@ class ImportAssetTask(BaseTask):
 
     def run(self):
         for file in self.files:
+            if self.is_terminating:
+                break
             importer_type = self.filetypes.get('.' + file.split('.')[-1])
             if importer_type is None:
                 importer_type = 'base_importer'
             importer = IMPORTERS[importer_type](self.path)
             importer.import_file(file)
         self.finished.emit()
+
+    def terminate(self):
+        self.is_terminating = True
 
 
 def import_asset(path, files):

@@ -35,6 +35,10 @@ class ExecuteSceneTask(BaseTask):
 
         self.finished.emit()
 
+    def terminate(self):
+        if self.process is not None:
+            self.process.terminate()
+
 
 def execute_scene(editor):
     return ExecuteSceneTask(editor)

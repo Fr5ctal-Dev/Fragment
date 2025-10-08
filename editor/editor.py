@@ -41,7 +41,7 @@ def launch_editor(path):
     window_layout.addWidget(editor)
     window_layout.setCurrentWidget(editor)
 
-    window.closed.connect(editor.save_settings)
+    window.closed.connect(editor.cleanup)
     return window
 
 
@@ -110,9 +110,6 @@ class Editor(QtWidgets.QMainWindow):
         with open(self.path + '/main.fragment', 'w') as f:
             f.write(str(content))
 
-        for i in range(self.tab_view.count()):
-            self.delete_tab(0)
-
     def reopen_last(self):
         with open(self.path + '/main.fragment') as f:
             content = eval(f.read())
@@ -154,3 +151,10 @@ class Editor(QtWidgets.QMainWindow):
 
         if filetype == 'script':
             self.new_tab(lambda _path: ScriptEditor(_path, self, path), os.path.basename(path))
+
+    def cleanup(self):
+        self.save_tabs()
+        self.save_settings()
+        for i in range(self.tab_view.count()):
+            self.delete_tab(0)
+        self.task_manager.cleanup()
