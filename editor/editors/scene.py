@@ -63,3 +63,7 @@ class SceneEditor(Editor):
 
     def run(self):
         self.editor.task_manager.new_task('execute_scene', [self])
+
+    def cleanup(self):
+        super().cleanup()
+        self.node_tree.cleanup()

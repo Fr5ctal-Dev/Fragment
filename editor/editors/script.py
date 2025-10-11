@@ -27,6 +27,6 @@ class ScriptEditor(Editor):
         super().save()
         self.script_editor.save()
 
-    def delete(self):
-        super().delete()
+    def cleanup(self):
+        super().cleanup()
         self.script_editor.update_timer.stop()

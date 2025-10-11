@@ -130,7 +130,7 @@ class Editor(QtWidgets.QMainWindow):
         self.tab_view.setCurrentIndex(self.tab_view.addTab(editor(self.path), QtGui.QIcon(get_resource_path(f'editor/assets/file_icons/{get_filetype(name).lower()}.png')), name))
 
     def delete_tab(self, index):
-        self.tab_view.widget(index).delete()
+        self.tab_view.widget(index).cleanup()
         self.tab_view.removeTab(index)
 
     def open(self, path):

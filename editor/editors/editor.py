@@ -11,5 +11,5 @@ class Editor(QtWidgets.QMainWindow):
     def save(self):
         pass
 
-    def delete(self):
+    def cleanup(self):
         self.save()

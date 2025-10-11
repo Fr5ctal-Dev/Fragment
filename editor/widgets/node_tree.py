@@ -316,3 +316,6 @@ class NodeTree(QTreeWidget):
         for node in self.get_all_nodes():
             properties = self.node_data[node]
             properties.update_scene_properties()
+
+    def cleanup(self):
+        self.update_timer.stop()
