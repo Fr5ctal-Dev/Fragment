@@ -26,7 +26,7 @@ class Camera(Node2D):
                 draw_layer = node.render()
                 if draw_layer is None:
                     continue
-                position = node.world_position - self.world_position # TODO: Adjust based on anchor and offset when it is added
+                position = node.world_position - self.world_position - (node.world_scale[0] * draw_layer.width / 2, node.world_scale[1] * draw_layer.height / 2) # TODO: Adjust based on anchor (default is center) and offset when it is added
                 self.game_manager.window_manager.renderer.engine.render(draw_layer, self.render_layer, position, angle=node.world_rotation, scale=node.world_scale)
 
         return self.render_layer
