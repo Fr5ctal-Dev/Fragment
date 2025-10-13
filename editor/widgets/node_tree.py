@@ -65,7 +65,7 @@ class NodeTree(QTreeWidget):
         if name is not None:
             item.setText(0, name)
         elif properties is not None:
-            item.setText(0, properties.properties['name'].value)
+            item.setText(0, properties.properties['Node/Name'].value)
         else:
             item.setText(0, 'New Node')
         item.setIcon(0, QIcon(get_resource_path(f'editor/assets/node_icons/{type}.png')))
@@ -84,12 +84,12 @@ class NodeTree(QTreeWidget):
         
         if properties is None:
             properties = NODE_PROPERTIES[type](self.scene_editor, uuid, type)
-            properties.set_property('name', name)
+            properties.set_property('Node/Name', name)
         self.node_data[item] = properties
 
         properties.uuid = uuid
 
-        properties.properties['name'].value_changed.connect(lambda: item.setText(0, properties.properties['name'].value))
+        properties.properties['Node/Name'].value_changed.connect(lambda: item.setText(0, properties.properties['Node/Name'].value))
 
         return item
     
@@ -182,7 +182,7 @@ class NodeTree(QTreeWidget):
 
     def rename_node(self, item, new_name):
         item.setText(0, new_name)
-        self.node_data[item].set_property('name', new_name)
+        self.node_data[item].set_property('Node/Name', new_name)
 
     def get_all_nodes(self):
         nodes = []
