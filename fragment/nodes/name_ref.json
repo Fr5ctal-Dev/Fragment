@@ -1,21 +1,21 @@
 {
   "Node": {
-    "name": "name",
-    "script": null
+    "Node/Name": "name",
+    "Node/Script": null
   },
   "Node2D": {
-    "position": "position",
-    "rotation": "rotation",
-    "scale": "scale"
+    "Node2D/Position": "position",
+    "Node2D/Rotation": "rotation",
+    "Node2D/Scale": "scale"
   },
   "Canvas": {},
   "Drawable": {
-    "draw_priority": "draw_priority"
+    "Drawable/Draw Priority": "draw_priority"
   },
   "Camera": {
-    "zoom": "zoom"
+    "Camera/Zoom": "zoom"
   },
   "Sprite": {
-    "image_source": "image_source"
+    "Sprite/Image Source": "image_source"
   }
 }

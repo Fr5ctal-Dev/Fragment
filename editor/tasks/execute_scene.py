@@ -27,7 +27,8 @@ class ExecuteSceneTask(BaseTask):
             pass
         
         if self.process.poll() != 0:
-            self.new_error_chunk.emit(self.process.stderr.read())
+            #self.new_error_chunk.emit(self.process.stderr.read())
+            print(self.process.stderr.read())
         self.new_text_chunk.emit('\nExecution ended with exit code ' + str(self.process.poll()))
 
         self.process.wait()

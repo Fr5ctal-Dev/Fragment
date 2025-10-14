@@ -12,6 +12,7 @@ class PropertyNameWidget(QtWidgets.QWidget):
         super().__init__()
         self.node_properties = properties
         self.text = text
+        self.display_text = text.split('/')[-1]
         self.overridden = False
         if overridden:
             self.override()
@@ -24,7 +25,7 @@ class PropertyNameWidget(QtWidgets.QWidget):
         self.stripe.setFixedWidth(5)
         self.main_layout.addWidget(self.stripe)
 
-        self.label = QtWidgets.QLabel(text)
+        self.label = QtWidgets.QLabel(self.display_text)
         self.main_layout.addWidget(self.label)
 
         self.override_action = QAction('Enable Override', self)
@@ -105,11 +106,27 @@ class BaseNodeProperties:
         self.property_tree = QtWidgets.QTreeWidget()
         self.property_tree.setColumnCount(2)
         self.property_tree.setHeaderLabels(['Name', 'Value'])
-        self.property_tree.setIndentation(15)
+        self.property_tree.setIndentation(10)
+
+        property_groups = {}
 
         for prop in self.properties.values():
+            prefix = ''
+            for group in prop.name.split('/')[:-1]:
+                prefix += group
+                if prefix not in property_groups:
+                    group_item = QtWidgets.QTreeWidgetItem([group, ''])
+                    parent_item = property_groups[prefix.rsplit('/', 1)[0]] if '/' in prefix else None
+                    if parent_item:
+                        parent_item.addChild(group_item)
+                    else:
+                        self.property_tree.addTopLevelItem(group_item)
+                    group_item.setExpanded(True)
+                    property_groups[prefix] = group_item
+                prefix += '/'
+
             item = QtWidgets.QTreeWidgetItem(['', ''])
-            self.property_tree.addTopLevelItem(item)
+            property_groups[prop.name.rsplit('/', 1)[0]].addChild(item) if '/' in prop.name else self.property_tree.addTopLevelItem(item)
             self.property_tree.setItemWidget(item, 1, prop.editor_widget)
             name_widget = PropertyNameWidget(self, prop.name, prop.scene_override)
             name_widget.override_changed.connect(lambda overridden, name: self.override_property(name) if overridden else self.unoverride_property(name))
@@ -119,7 +136,7 @@ class BaseNodeProperties:
 
     def setup_property_editors(self):
         for prop in self.properties.values():
-            prop.setup_property_editor(self.scene_editor, self.type)
+            prop.setup_property_editor(self.scene_editor)
 
     def to_data(self):
         data = {'type': self.type, 'properties': {}}

@@ -6,6 +6,6 @@ class DrawableProperties(Node2DProperties):
     @property
     def default_properties(self):
         properties = {
-            'draw_priority': Property('draw_priority', 'integer', 0)
+            'Drawable/Draw Priority': Property('Drawable/Draw Priority', 'integer', 0, 'Drawable')
         }
         return {**properties, **super().default_properties}

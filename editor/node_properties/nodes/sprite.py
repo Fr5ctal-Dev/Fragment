@@ -6,6 +6,6 @@ class SpriteProperties(DrawableProperties):
     @property
     def default_properties(self):
         properties = {
-            'image_source': Property('image_source', 'path', '')
+            'Sprite/Image Source': Property('Sprite/Image Source', 'path', '', 'Sprite'),
         }
         return {**properties, **super().default_properties}

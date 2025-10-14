@@ -6,7 +6,7 @@ class NodeProperties(BaseNodeProperties):
     @property
     def default_properties(self):
         properties = {
-            'name': Property('name', 'string', ''),
-            'script': Property('script', 'path_node_script', '')
+            'Node/Name': Property('Node/Name', 'string', '', 'Node'),
+            'Node/Script': Property('Node/Script', 'path_node_script', '', 'Node')
         }
         return {**properties, **super().default_properties}
