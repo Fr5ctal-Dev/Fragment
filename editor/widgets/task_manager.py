@@ -1,5 +1,5 @@
 from editor.tasks import TASKS
-from PySide6 import QtWidgets, QtCore
+from PySide6 import QtWidgets, QtCore, QtGui
 from PySide6.QtCore import Signal
 
 
@@ -39,6 +39,12 @@ class TaskManager(QtWidgets.QWidget):
         self.task_list.setColumnCount(1)
         self.task_list.setHeaderLabels([''])
         self.main_layout.addWidget(self.task_list)
+
+        self.terminate_task_action = QtGui.QAction('Terminate', self)
+        self.terminate_task_action.triggered.connect(lambda: self.terminate_task(self.task_list.itemWidget(self.task_list.currentItem(), 0)))
+
+        self.task_list.addAction(self.terminate_task_action)
+        self.task_list.setContextMenuPolicy(QtCore.Qt.ContextMenuPolicy.ActionsContextMenu)
 
     def new_task(self, name, args):
         task = TASKS[name](*args)
