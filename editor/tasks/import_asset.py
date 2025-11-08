@@ -1,6 +1,7 @@
 from .base_task import BaseTask
 from ..importers import IMPORTERS
 from editor.utils.path import get_resource_path
+from PySide6 import QtCore
 import json
 
 
@@ -12,16 +13,15 @@ def inverse_dictionary(dict):
     return inverse_dict
 
 
-class ImportAssetTask(BaseTask):
+class ImportAssetWorker(QtCore.QObject):
+    finished = QtCore.Signal()
     def __init__(self, path, files):
-        super().__init__('Import Assets', False)
-        self.is_terminating = False
-        self.files = files
+        super().__init__()
         self.path = path
-
+        self.files = files
+        self.is_terminating = False
         with open(get_resource_path('editor/importers/filetypes.json')) as fp:
             filetypes = json.loads(fp.read())
-
         self.filetypes = inverse_dictionary(filetypes)
 
     def run(self):
@@ -37,6 +37,37 @@ class ImportAssetTask(BaseTask):
 
     def terminate(self):
         self.is_terminating = True
+
+
+class ImportAssetTask(BaseTask):
+    def __init__(self, path, files):
+        super().__init__('Import Assets', False)
+        self.path = path
+        self.files = files
+
+        self.worker = None
+        self.worker_thread = None
+
+    def run(self):
+        self.worker = ImportAssetWorker(self.path, self.files)
+        self.worker_thread = QtCore.QThread()
+        self.worker.moveToThread(self.worker_thread)
+        self.worker_thread.started.connect(self.worker.run)
+        self.worker.finished.connect(self.on_finished)
+        self.worker_thread.start()
+
+    def on_finished(self):
+        if self.worker_thread:
+            self.worker_thread.quit()
+            self.worker_thread.wait()
+        self.finished.emit()
+
+    def terminate(self):
+        if self.worker:
+            self.worker.terminate()
+        if self.worker_thread:
+            self.worker_thread.quit()
+            self.worker_thread.wait()
 
 
 def import_asset(path, files):

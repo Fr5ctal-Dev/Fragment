@@ -1,5 +1,5 @@
 from editor.tasks import TASKS
-from PySide6 import QtWidgets, QtCore
+from PySide6 import QtWidgets, QtCore, QtGui
 from PySide6.QtCore import Signal
 
 
@@ -9,10 +9,6 @@ class TaskListWidget(QtWidgets.QWidget):
         super().__init__()
         self.tree_widget_item = None
         self.task = task
-        self.task_thread = QtCore.QThread()
-        self.task.moveToThread(self.task_thread)
-        self.task_thread.started.connect(self.task.run)
-        self.task_thread.start()
 
         self.main_layout = QtWidgets.QHBoxLayout(self)
         self.label = QtWidgets.QLabel()
@@ -25,16 +21,13 @@ class TaskListWidget(QtWidgets.QWidget):
         self.main_layout.addWidget(self.progress_bar)
 
         self.task.finished.connect(self.finish)
+        QtCore.QTimer.singleShot(0, self.task.run)
 
     def finish(self):
-        self.task_thread.quit()
-        self.task_thread.wait()
         self.delete_task.emit(self)
 
     def terminate(self):
         self.task.terminate()
-        self.task_thread.quit()
-        self.task_thread.wait()
 
 
 class TaskManager(QtWidgets.QWidget):
@@ -46,6 +39,12 @@ class TaskManager(QtWidgets.QWidget):
         self.task_list.setColumnCount(1)
         self.task_list.setHeaderLabels([''])
         self.main_layout.addWidget(self.task_list)
+
+        self.terminate_task_action = QtGui.QAction('Terminate', self)
+        self.terminate_task_action.triggered.connect(lambda: self.terminate_task(self.task_list.itemWidget(self.task_list.currentItem(), 0)))
+
+        self.task_list.addAction(self.terminate_task_action)
+        self.task_list.setContextMenuPolicy(QtCore.Qt.ContextMenuPolicy.ActionsContextMenu)
 
     def new_task(self, name, args):
         task = TASKS[name](*args)
@@ -73,9 +72,9 @@ class TaskManager(QtWidgets.QWidget):
 
     def terminate_all_tasks(self):
         for i in range(self.task_list.topLevelItemCount()):
-            item = self.task_list.topLevelItem(i)
+            item = self.task_list.topLevelItem(0)
             task_list_widget = self.task_list.itemWidget(item, 0)
-            task_list_widget.terminate()
+            self.terminate_task(task_list_widget)
 
     def cleanup(self):
         self.terminate_all_tasks()

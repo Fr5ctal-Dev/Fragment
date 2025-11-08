@@ -1,3 +1,3 @@
 import shutil
 
-python_executable = shutil.which('pythonw')
+python_executable = shutil.which('pythonw') or 'pythonw'
