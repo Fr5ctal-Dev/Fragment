@@ -11,13 +11,13 @@ class Drawable(Node2D):
     """
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.renderer = self.game_manager.window_manager.renderer
-        self.target_canvas = self.find_ancestor_of_type(Canvas) or self.renderer.global_canvas
+        self.window_manager = self.game_manager.window_manager
+        self.target_canvas = self.find_ancestor_of_type(Canvas) or self.window_manager.global_canvas
         self.target_canvas.register_drawable(self)
 
     def render(self) -> Texture:
         """Renders the drawable onto render layer."""
-        texture = self.renderer.placeholder_layer.texture
+        texture = self.window_manager.placeholder_layer.texture
         return texture
 
     def destroy_self(self) -> None:

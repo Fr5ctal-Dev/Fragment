@@ -13,9 +13,9 @@ class Camera(Node2D):
     """
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.target_canvas = self.find_ancestor_of_type(Canvas) or self.game_manager.window_manager.renderer.global_canvas
+        self.target_canvas = self.find_ancestor_of_type(Canvas) or self.game_manager.window_manager.global_canvas
         self.target_canvas.register_camera(self)
-        self.render_layer = self.game_manager.window_manager.renderer.engine.make_layer((int(self.view_size[0]), int(self.view_size[1])))
+        self.render_layer = self.game_manager.window_manager.renderer.make_layer((int(self.view_size[0]), int(self.view_size[1])))
 
     def render(self) -> Layer:
         """Render onto its target canvas."""
@@ -27,7 +27,7 @@ class Camera(Node2D):
                 if draw_layer is None:
                     continue
                 position = node.world_position - self.world_position - (node.world_scale[0] * draw_layer.width / 2, node.world_scale[1] * draw_layer.height / 2) # TODO: Adjust based on anchor (default is center) and offset when it is added
-                self.game_manager.window_manager.renderer.engine.render(draw_layer, self.render_layer, position, angle=node.world_rotation, scale=node.world_scale)
+                self.game_manager.window_manager.renderer.render(draw_layer, self.render_layer, position, angle=node.world_rotation, scale=node.world_scale)
 
         return self.render_layer
 

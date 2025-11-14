@@ -15,7 +15,7 @@ class Sprite(Drawable):
     @image_source.setter
     def image_source(self, source: str) -> None:
         self.properties['image_source'] = source
-        self.sprite_image = self.renderer.engine.load_texture(self.properties['image_source'])
+        self.sprite_image = self.window_manager.renderer.load_texture(self.properties['image_source'])
 
     def render(self) -> Texture:
         return self.sprite_image
