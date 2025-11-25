@@ -14,7 +14,8 @@ class Renderer(Manager):
         self.window_manager = window_manager
         self.engine: RenderEngine = self.window_manager.window
         self.canvases = []
-        self.surface = self.engine.make_layer((int(size[0]), int(size[1])))
+        self.engine.resize(int(size[0]), int(size[1]))
+
 
         self.placeholder_layer = self.engine.make_layer((1, 1))
 
