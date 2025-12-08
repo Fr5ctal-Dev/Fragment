@@ -1,5 +1,6 @@
 from editor.widgets.node_tree import NodeTree
 from editor.widgets.inspector import Inspector
+from editor.viewport import Viewport
 from .editor import Editor
 from editor.utils.path import get_resource_path
 from PySide6 import QtWidgets, QtGui, QtCore
@@ -42,8 +43,10 @@ class SceneEditor(Editor):
         self.inspector_dock.setWidget(self.inspector)
         self.addDockWidget(Qt.DockWidgetArea.RightDockWidgetArea, self.inspector_dock)
 
-        #self.viewport = Viewport(self)
-        #self.central_widget_layout.addWidget(self.viewport)
+        self.viewport = Viewport(self.path)
+        self.central_widget_layout.addWidget(self.viewport)
+        self.viewport.setFocusPolicy(Qt.FocusPolicy.StrongFocus)
+        QtCore.QTimer.singleShot(0, lambda: self.viewport.load_scene(self.scene))
 
         self.setCentralWidget(self.central_widget)
 
@@ -66,4 +69,5 @@ class SceneEditor(Editor):
 
     def cleanup(self):
         super().cleanup()
+        self.viewport.destroy_()
         self.node_tree.cleanup()

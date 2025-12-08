@@ -11,6 +11,7 @@ from editor.utils.path import get_resource_path
 
 from PySide6 import QtWidgets, QtGui, QtCore
 from PySide6.QtCore import Qt
+from PySide6.QtOpenGLWidgets import QOpenGLWidget
 
 import os
 import json
@@ -45,7 +46,7 @@ def launch_editor(path):
     return window
 
 
-class EditorWindow(QtWidgets.QWidget):
+class EditorWindow(QOpenGLWidget):
     closed = QtCore.Signal()
     def __init__(self):
         super().__init__()

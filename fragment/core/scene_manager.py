@@ -19,13 +19,14 @@ class Scene(Manager):
     The scene manager takes in a scene file and instantiates nodes accordingly.
     Scenes are often stored in the scene manager.
     """
-    def __init__(self, game_manager, scene: str):
+    def __init__(self, game_manager, scene: str, _view_mode: bool = False):
         super().__init__(game_manager)
         self.project_path = self.game_manager.project_path
         self.scene = scene
         self.root_node = None
+        self._view_mode = _view_mode
 
-        self.node_storage = [] # So you don't need to DFS the node tree every frame
+        self.node_storage = {} # So you don't need to DFS the node tree every frame
         self.init()
 
     def init(self) -> None:
@@ -45,13 +46,16 @@ class Scene(Manager):
             properties = {}
             for name, value in scene_content[node_path]['properties'].items():
                 properties[name] = value['value'] # value of property
-
-            if properties['Node/Script']:
-                path = Path(properties['Node/Script']).relative_to(self.project_path)
-                module = '.'.join(path.with_suffix('').parts)
-                node_class = getattr(importlib.import_module(module), 'Node')
+                
+            if self._view_mode:
+                node_class = NODES[scene_content[node_path]['type']].view_mode
             else:
-                node_class = NODES[scene_content[node_path]['type']]
+                if properties['Node/Script']:
+                    path = Path(properties['Node/Script']).relative_to(self.project_path)
+                    module = '.'.join(path.with_suffix('').parts)
+                    node_class = getattr(importlib.import_module(module), 'Node')
+                else:
+                    node_class = NODES[scene_content[node_path]['type']]
 
             node = node_class(
                 self.game_manager,
@@ -73,10 +77,10 @@ class Scene(Manager):
             node.on_start()
 
     def register_node(self, node: Node) -> None:
-        self.node_storage.append(node)
+        self.node_storage[node.uuid] = node
 
     def unregister_node(self, node: Node) -> None:
-        self.node_storage.remove(node)
+        del self.node_storage[node.uuid]
 
     def convert_node_properties(self, properties: dict) -> dict:
         """Converts node property name from editor -> core
@@ -98,7 +102,7 @@ class Scene(Manager):
 
     def update(self, dt: float) -> None:
         super().update(dt)
-        for node in self.node_storage:
+        for node in self.node_storage.values():
             node.on_update()
 
     def destroy(self) -> None:
@@ -109,9 +113,10 @@ class Scene(Manager):
 
 class SceneManager(Manager):
     """The manager that manages scene objects."""
-    def __init__(self, game_manager):
+    def __init__(self, game_manager, _view_mode: bool = False):
         super().__init__(game_manager)
         self.current_scene = None
+        self._view_mode = _view_mode
 
     def instantiate_scene(self, scene_path: str) -> None:
         """Instantiates a scene based on scene file.
@@ -119,15 +124,17 @@ class SceneManager(Manager):
         Args:
             scene_path (str): The scene file path.
         """
-        scene = Scene(self.game_manager, scene_path)
+        scene = Scene(self.game_manager, scene_path, self._view_mode)
         if self.current_scene:
             self.current_scene.destroy()
         self.current_scene = scene
 
     def update(self, dt: float) -> None:
         super().update(dt)
-        self.current_scene.update(dt)
+        if self.current_scene is not None:
+            self.current_scene.update(dt)
 
     def destroy(self) -> None:
         super().destroy()
-        self.current_scene.destroy()
+        if self.current_scene is not None:
+            self.current_scene.destroy()

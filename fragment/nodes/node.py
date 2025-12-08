@@ -89,3 +89,8 @@ class Node(GameElement):
 
     def on_destroy(self):
         pass
+
+    @classmethod
+    def view_mode(cls, *args, **kwargs):
+        """Creates an instance of the node in view mode."""
+        return cls(*args, **kwargs)

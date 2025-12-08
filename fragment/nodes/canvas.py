@@ -54,3 +54,11 @@ class Canvas(Node):
             self.game_manager.window_manager.renderer.render(layer.texture, self.render_layer, (0, 0), camera.zoom)
 
         return self.render_layer
+    
+    def update_size(self) -> None:
+        """Updates the render layer size according to the window size."""
+        self.render_layer = self.game_manager.window_manager.renderer.make_layer((int(self.size[0]), int(self.size[1])))
+    
+    @classmethod
+    def view_mode(cls, *args, **kwargs):
+        return Node(*args, **kwargs)

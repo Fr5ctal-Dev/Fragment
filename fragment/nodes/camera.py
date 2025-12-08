@@ -43,3 +43,11 @@ class Camera(Node2D):
     @zoom.setter
     def zoom(self, zoom: float):
         self.properties['zoom'] = float(zoom)
+
+    def update_size(self) -> None:
+        """Updates the render layer size according to the view size."""
+        self.render_layer = self.game_manager.window_manager.renderer.make_layer((int(self.view_size[0]), int(self.view_size[1])))
+
+    @classmethod
+    def view_mode(cls, *args, **kwargs):
+        return Node2D(*args, **kwargs)
