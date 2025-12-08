@@ -8,7 +8,7 @@ class Integer(EditorWidget):
 
         self.spin_box = DraggableSpinBox()
         self.main_layout.addWidget(self.spin_box)
-        self.spin_box.setRange(-99999, 99999)
+        self.spin_box.setRange(-99999999999999999999, 99999999999999999999)
         self.spin_box.setDecimals(0)
         
         self.update_editor()
@@ -18,4 +18,6 @@ class Integer(EditorWidget):
         self.value = self.spin_box.value()
 
     def update_editor(self):
+        self.spin_box.blockSignals(True)
         self.spin_box.setValue(self.value)
+        self.spin_box.blockSignals(False)

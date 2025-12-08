@@ -13,14 +13,14 @@ class Canvas(Node):
         self.drawables = {} # dict([drawable1, drawable2...])
         self.cameras = []
 
-        self.render_layer = self.game_manager.window_manager.renderer.engine.make_layer((int(self.size[0]), int(self.size[1])))
+        self.render_layer = self.game_manager.window_manager.renderer.make_layer((int(self.size[0]), int(self.size[1])))
 
         if not is_global_canvas:
-            self.game_manager.window_manager.renderer.register_canvas(self)
+            self.game_manager.window_manager.register_canvas(self)
 
     @property
     def size(self) -> Vector2:
-        return self.game_manager.window_manager.renderer.size
+        return self.game_manager.window_manager.window_size
 
     def register_camera(self, camera) -> None:
         self.cameras.append(camera)
@@ -51,6 +51,6 @@ class Canvas(Node):
         self.render_layer.clear(0, 0, 0, 0)
         for camera in self.cameras:
             layer = camera.render()
-            self.game_manager.window_manager.renderer.engine.render(layer.texture, self.render_layer, (0, 0), camera.zoom)
+            self.game_manager.window_manager.renderer.render(layer.texture, self.render_layer, (0, 0), camera.zoom)
 
         return self.render_layer

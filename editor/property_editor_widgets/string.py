@@ -18,4 +18,6 @@ class String(EditorWidget):
             self.value = self.line_edit.text()
 
     def update_editor(self):
+        self.line_edit.blockSignals(True)
         self.line_edit.setText(str(self.value))
+        self.line_edit.blockSignals(False)
