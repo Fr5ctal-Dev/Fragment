@@ -34,8 +34,12 @@ class Scene(Manager):
         It creates, initializes and configures nodes based on its scene file.
         """
         with open(self.scene) as f:
-            scene_content = f.read()
-        scene_content = eval(scene_content)
+            content = json.load(f)
+
+        scene_content = {}
+        for json_key, node_data in content.items():
+            path_list = json.loads(json_key)
+            scene_content[tuple(path_list)] = node_data
         if not scene_content:
             return
 
