@@ -4,6 +4,7 @@ from .editor import Editor
 from editor.utils.path import get_resource_path
 from PySide6 import QtWidgets, QtGui, QtCore
 from PySide6.QtCore import Qt
+import json
 
 
 class SceneEditor(Editor):
@@ -51,15 +52,25 @@ class SceneEditor(Editor):
 
     def load_node_tree(self):
         with open(self.scene) as f:
-            content = f.read()
+            content = json.load(f)
 
-        self.node_tree.load_from_scene_data(eval(content))
+        scene_data = {}
+        for json_key, node_data in content.items():
+            path_list = json.loads(json_key)
+            scene_data[tuple(path_list)] = node_data
+
+        self.node_tree.load_from_scene_data(scene_data)
 
     def save(self):
         super().save()
         data = self.node_tree.save_to_scene_data()
+        json_data = {}
+        for node_path, node_data in data.items():
+            json_key = json.dumps(list(node_path))
+            json_data[json_key] = node_data
+
         with open(self.scene, 'w') as f:
-            f.write(str(data))
+            json.dump(json_data, f, indent=2)
 
     def run(self):
         self.editor.task_manager.new_task('execute_scene', [self])
