@@ -1,5 +1,4 @@
 import shutil
-import os
 
 
 class BaseImporter:
@@ -7,7 +6,7 @@ class BaseImporter:
         self.path = project_path
 
     def import_file(self, file):
-        if os.path.isdir(file):
-            shutil.copytree(file, self.path + '/' + os.path.basename(file))
+        if file.is_dir():
+            shutil.copytree(file, self.path / file.name)
         else:
-            shutil.copy(file, self.path + '/' + os.path.basename(file))
+            shutil.copy(file, self.path / file.name)

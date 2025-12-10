@@ -2,6 +2,7 @@ from .base_task import BaseTask
 from ..importers import IMPORTERS
 from editor.utils.path import get_resource_path
 from PySide6 import QtCore
+from pathlib import Path
 import json
 
 
@@ -20,15 +21,15 @@ class ImportAssetWorker(QtCore.QObject):
         self.path = path
         self.files = files
         self.is_terminating = False
-        with open(get_resource_path('editor/importers/filetypes.json')) as fp:
-            filetypes = json.loads(fp.read())
+        with open(get_resource_path(Path('editor') / 'importers' / 'filetypes.json')) as f:
+            filetypes = json.loads(f.read())
         self.filetypes = inverse_dictionary(filetypes)
 
     def run(self):
         for file in self.files:
             if self.is_terminating:
                 break
-            importer_type = self.filetypes.get('.' + file.split('.')[-1])
+            importer_type = self.filetypes.get(file.suffix)
             if importer_type is None:
                 importer_type = 'base_importer'
             importer = IMPORTERS[importer_type](self.path)

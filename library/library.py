@@ -45,7 +45,7 @@ class Backend(QtCore.QObject):
         try:
             with open(path / 'main.fragment', 'w') as f:
                 f.write('{\'reopen\': {\'tabs\': [], \'last_tab\': None}}')
-            shutil.copytree(get_resource_path('fragment'), path / 'fragment')
+            shutil.copytree(str(get_resource_path(Path('fragment'))), str(path / 'fragment'))
             (path / 'scenes').mkdir()
             (path / 'scripts').mkdir()
             (path / 'assets').mkdir()
@@ -71,7 +71,7 @@ class Backend(QtCore.QObject):
             return
         if isinstance(path, str):
             path = Path(path)
-        self.editor_instances.append(launch_editor(str(path))) # modify this when editor uses Path
+        self.editor_instances.append(launch_editor(path))
 
     def _emit_projects(self):
         self.projectsUpdated.emit({'projects': self._string_project_list()})
@@ -153,7 +153,7 @@ class Library(QtWidgets.QWidget):
         self.channel.registerObject('backend', self.backend)
         self.view.page().setWebChannel(self.channel)
 
-        with open(get_resource_path('library/library.html'), 'r') as f:
+        with open(get_resource_path(Path('library') / 'library.html'), 'r') as f:
             html = f.read()
 
         self.view.setHtml(html, QtCore.QUrl('qrc:///'))
@@ -166,9 +166,9 @@ def launch_library():
     setup_theme()
 
     if platform.system() == 'Windows':
-        app.setWindowIcon(QtGui.QIcon(get_resource_path('fragment/icon/icon_win.ico')))
+        app.setWindowIcon(QtGui.QIcon(str(get_resource_path(Path('fragment') / 'icon' / 'icon_win.ico'))))
     else:
-        app.setWindowIcon(QtGui.QIcon(get_resource_path('fragment/icon/icon.png')))
+        app.setWindowIcon(QtGui.QIcon(str(get_resource_path(Path('fragment') / 'icon' / 'icon.png'))))
 
     window = QWidget()
     window.setWindowTitle('Fragment Library')

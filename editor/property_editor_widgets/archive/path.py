@@ -32,7 +32,7 @@ class Path(EditorWidget):
         self.update_editor()
 
     def select_path(self, filter=FILE_FILTER):
-        path = QFileDialog.getOpenFileName(self, 'Select Path', self.path, filter)[0]
+        path = QFileDialog.getOpenFileName(self, 'Select Path', str(self.path), filter)[0]
         if not path:
             return
         self.value = path

@@ -6,6 +6,8 @@ from PySide6.QtWidgets import QTreeWidget, QTreeWidgetItem, QAbstractItemView, Q
 from PySide6.QtCore import Qt, QTimer
 from PySide6.QtGui import QIcon, QAction
 from uuid import uuid4
+from pathlib import Path
+import json
 
 
 class NodeTree(QTreeWidget):
@@ -55,9 +57,9 @@ class NodeTree(QTreeWidget):
         selection_dialog.exec()
 
     def new_scene_selection(self):
-        path = QFileDialog.getOpenFileName(self, 'Open Scene', self.scene_editor.path, 'Fragment Scenes (*.fscene)')[0]
+        path = QFileDialog.getOpenFileName(self, 'Open Scene', str(self.scene_editor.path), 'Fragment Scenes (*.fscene)')[0]
         if path:
-            self.load_scene(path, self.currentItem())
+            self.load_scene(Path(path), self.currentItem())
 
     def new_node(self, type, parent=None, properties=None, uuid=None, name=None):
         uuid = uuid or str(uuid4())
@@ -68,7 +70,7 @@ class NodeTree(QTreeWidget):
             item.setText(0, properties.properties['Node/Name'].value)
         else:
             item.setText(0, 'New Node')
-        item.setIcon(0, QIcon(get_resource_path(f'editor/assets/node_icons/{type}.png')))
+        item.setIcon(0, QIcon(str(get_resource_path(Path('editor') / 'assets' / 'node_icons' / f'{type}.png'))))
         item.setFlags(item.flags() | Qt.ItemFlag.ItemIsEditable)
         
         if parent is None:
@@ -240,9 +242,12 @@ class NodeTree(QTreeWidget):
             return
 
         with open(scene_path) as f:
-            data = f.read()
+            content = json.load(f)
 
-        data = eval(data)
+        data = {}
+        for json_key, node_data in content.items():
+            path_list = json.loads(json_key)
+            data[tuple(path_list)] = node_data
 
         temp_parent_storage = {}
         for path, node_data in data.items():
@@ -268,9 +273,12 @@ class NodeTree(QTreeWidget):
     
     def handle_scene_change(self, scene, root_node):
         with open(scene) as f:
-            data = f.read()
+            content = json.load(f)
 
-        data = eval(data)
+        data = {}
+        for json_key, node_data in content.items():
+            path_list = json.loads(json_key)
+            data[tuple(path_list)] = node_data
 
         root_deleted = False
         root_parent = root_node.parent()

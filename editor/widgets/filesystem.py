@@ -5,29 +5,34 @@ from editor.utils.path import get_resource_path
 
 from PySide6 import QtWidgets, QtCore, QtGui
 
+from pathlib import Path
+
 import json
 import shutil
-import os
 
 
-with open(get_resource_path('editor/filetypes/filetypes.json')) as f:
+with open(get_resource_path(Path('editor') / 'filetypes' / 'filetypes.json')) as f:
     filetypes = json.loads(f.read())
+    for name, ext in filetypes.items():
+        filetypes[name] = Path(ext)
 
-with open(get_resource_path('editor/filetypes/uncreatable.json')) as f:
+with open(get_resource_path(Path('editor') / 'filetypes' / 'uncreatable.json')) as f:
     uncreatable_filetypes = json.loads(f.read())
+    for name, ext in uncreatable_filetypes.items():
+        uncreatable_filetypes[name] = Path(ext)
 
 
 class FileIconProvider(QtWidgets.QFileIconProvider):
     def icon(self, file_info):
         if not hasattr(file_info, 'suffix'):
-            return QtGui.QIcon(get_resource_path('editor/assets/file_icons/folder.png'))
+            return QtGui.QIcon(str(get_resource_path(Path('editor') / 'assets' / 'file_icons' / 'folder.png')))
         if file_info.suffix() == '':
-            return QtGui.QIcon(get_resource_path('editor/assets/file_icons/folder.png'))
+            return QtGui.QIcon(str(get_resource_path(Path('editor') / 'assets' / 'file_icons' / 'folder.png')))
         else:
             for key, item in {**filetypes, **uncreatable_filetypes}.items():
-                if file_info.suffix() == item.split('.')[-1]:
-                    return QtGui.QIcon(get_resource_path('editor/assets/file_icons/' + key + '.png'))
-            return QtGui.QIcon(get_resource_path('editor/assets/file_icons/file.png'))
+                if file_info.suffix() == item.suffix:
+                    return QtGui.QIcon(str(get_resource_path(Path('editor') / 'assets' / 'file_icons' / (key + '.png'))))
+            return QtGui.QIcon(str(get_resource_path(Path('editor') / 'assets' / 'file_icons' / 'file.png')))
 
 
 class FileSystem(QtWidgets.QTreeView):
@@ -38,7 +43,7 @@ class FileSystem(QtWidgets.QTreeView):
         self.directory_model = QtWidgets.QFileSystemModel(self)
         self.directory_model.setRootPath('')
         self.directory_model.setIconProvider(FileIconProvider())
-        self.root_index = self.directory_model.index(QtCore.QDir.cleanPath(self.path))
+        self.root_index = self.directory_model.index(QtCore.QDir.cleanPath(str(self.path)))
 
         self.setModel(self.directory_model)
         self.setIndentation(20)
@@ -82,9 +87,9 @@ class FileSystem(QtWidgets.QTreeView):
 
     def get_append_path(self):
         if self.currentIndex():
-            path = self.directory_model.filePath(self.currentIndex())
-            if os.path.isfile(path):
-                path = os.path.dirname(path)
+            path = Path(self.directory_model.filePath(self.currentIndex()))
+            if path.is_file():
+                path = path.parent
 
         else:
             path = self.path
@@ -92,9 +97,9 @@ class FileSystem(QtWidgets.QTreeView):
         return path
 
     def delete(self):
-        path = self.directory_model.filePath(self.currentIndex())
-        if os.path.isfile(path):
-            os.remove(path)
+        path = Path(self.directory_model.filePath(self.currentIndex()))
+        if path.is_file():
+            path.unlink()
         else:
             shutil.rmtree(path)
 
@@ -111,9 +116,9 @@ class FileSystem(QtWidgets.QTreeView):
         if not name:
             return
 
-        path += '/' + name + '.' + filepath.split('.')[1]
-        if not os.path.exists(path):
-            shutil.copy(get_resource_path(f'editor/filetypes/{filepath}'), path)
+        path = path / (name + filepath.suffix)
+        if not path.exists():
+            shutil.copy(str(get_resource_path(Path('editor') / 'filetypes' / filepath)), path)
 
     def create_folder(self):
         dialog = TextSelectionDialog(self, 'Name of Directory', 'Name')
@@ -123,21 +128,22 @@ class FileSystem(QtWidgets.QTreeView):
     def mkdir(self, name):
         path = self.get_append_path()
 
-        path += '/' + name
+        path = path / name
 
-        if not os.path.exists(path):
-            os.mkdir(path)
+        if not path.exists():
+            path.mkdir()
 
     def import_asset(self, dir=False):
         path = self.get_append_path()
         if dir:
-            files = QtWidgets.QFileDialog.getExistingDirectory(None, "Select a directory", self.path, QtWidgets.QFileDialog.Option.ShowDirsOnly)
+            files = QtWidgets.QFileDialog.getExistingDirectory(None, "Select a directory", str(self.path), QtWidgets.QFileDialog.Option.ShowDirsOnly)
             if not files:
                 return
-            files = [files]
+            files = [Path(files)]
         else:
-            files, _ = QtWidgets.QFileDialog.getOpenFileNames(None, "Select one or more files", self.path, "All Files (*)")
+            files, _ = QtWidgets.QFileDialog.getOpenFileNames(None, "Select one or more files", str(self.path), "All Files (*)")
             if not files:
                 return
+            files = [Path(f) for f in files]
 
         self.editor.task_manager.new_task('import_asset', [path, files])

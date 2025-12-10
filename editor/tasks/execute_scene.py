@@ -1,7 +1,7 @@
 from .base_task import BaseTask
 from PySide6 import QtCore, QtWidgets, QtGui
 from editor.utils.python import python_executable
-import os
+from pathlib import Path
 import shutil
 import tempfile
 
@@ -15,7 +15,7 @@ class PythonRunner(QtWidgets.QWidget):
         self.init_process()
         
     def init_ui(self):
-        self.setWindowTitle(f'Running: {self.script_file}')
+        self.setWindowTitle(f'Running: {str(self.script_file)}')
         self.setGeometry(100, 100, 800, 600)
 
         layout = QtWidgets.QVBoxLayout()
@@ -42,8 +42,8 @@ class PythonRunner(QtWidgets.QWidget):
         self.process.readyReadStandardError.connect(self.handle_stderr)
         self.process.finished.connect(self.process_finished)
 
-        self.append_text(f'Running: {python_executable} {self.script_file}\n', self.info_format)
-        self.process.start(python_executable, ['-u', self.script_file])
+        self.append_text(f'Running: {python_executable} {str(self.script_file)}\n', self.info_format)
+        self.process.start(python_executable, ['-u', str(self.script_file)])
 
     def append_text(self, text, text_format):
         cursor = self.output.textCursor()
@@ -84,12 +84,12 @@ class ExecuteSceneTask(BaseTask):
         self.scene_editor = scene_editor
         self.python_runner = None
         self.temp = tempfile.TemporaryDirectory()
-        self.file = self.temp.name + '/runner/main.py'
+        self.file = Path(self.temp.name) / 'runner' / 'main.py'
 
     def run(self):
         self.scene_editor.save()
-        code = f'import fragment.main\nfragment.main.setup("{self.scene_editor.scene}", "{self.scene_editor.path}")'
-        shutil.copytree(self.scene_editor.path, os.path.dirname(self.file))
+        code = f'import fragment.main\nfragment.main.setup("{self.scene_editor.scene.as_posix()}", "{self.scene_editor.path.as_posix()}")'
+        shutil.copytree(self.scene_editor.path, self.file.parent)
 
         with open(self.file, 'w') as f:
             f.write(code)

@@ -1,6 +1,8 @@
 from PySide6 import QtWidgets
 from PySide6.QtGui import QAction
 from PySide6.QtCore import Signal
+from pathlib import Path
+import json
 
 
 class PropertyNameWidget(QtWidgets.QWidget):
@@ -141,7 +143,7 @@ class BaseNodeProperties:
     def to_data(self):
         data = {'type': self.type, 'properties': {}}
 
-        data['target_scene'] = self.target_scene
+        data['target_scene'] = str(self.target_scene) if self.target_scene else None
         data['target_scene_node'] = self.target_scene_node
 
         for name, property in self.properties.items():
@@ -154,18 +156,22 @@ class BaseNodeProperties:
             if property['scene_override']:
                 self.override_property(name)
 
-        if 'target_scene' in data:
-            self.connect_scene(data['target_scene'], data['target_scene_node'])
+        if 'target_scene' in data and data['target_scene'] is not None:
+            self.connect_scene(Path(data['target_scene']), data['target_scene_node'])
 
     def connect_scene(self, scene_path, node_path):
         self.target_scene = scene_path
-        self.target_scene_node = node_path
+        self.target_scene_node = tuple(node_path)
 
     def update_scene_properties(self):
         if self.target_scene and self.target_scene_node:
             with open(self.target_scene) as f:
-                data = f.read()
-            data = eval(data)
+                content = json.load(f)
+
+            data = {}
+            for json_key, node_data in content.items():
+                path_list = json.loads(json_key)
+                data[tuple(path_list)] = node_data
 
             if self.target_scene_node in data:
                 node_data = data[self.target_scene_node]
