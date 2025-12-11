@@ -24,3 +24,11 @@ class FiletypeSelectionDialog(SelectionDialog):
         self.name_edit.setPlaceholderText('Name')
         self.name_edit.textChanged.connect(self.enable_continue)
         self.central_layout.addWidget(self.name_edit)
+
+    @property
+    def filetype(self):
+        return self.filelist.currentItem().text()
+    
+    @property
+    def filename(self):
+        return self.name_edit.text()

@@ -105,8 +105,9 @@ class FileSystem(QtWidgets.QTreeView):
 
     def create_new(self):
         dialog = FiletypeSelectionDialog(self)
-        dialog.accept_button.clicked.connect(lambda: (self.create_file(filetypes[dialog.filelist.currentItem().text()], dialog.name_edit.text()), dialog.accept()))
-        dialog.exec()
+        code = dialog.exec()
+        if code == QtWidgets.QDialog.DialogCode.Accepted:
+            self.create_file(filetypes[dialog.filetype], dialog.filename)
 
     def create_file(self, filepath, name):
         path = self.get_append_path()
@@ -122,8 +123,9 @@ class FileSystem(QtWidgets.QTreeView):
 
     def create_folder(self):
         dialog = TextSelectionDialog(self, 'Name of Directory', 'Name')
-        dialog.accept_button.clicked.connect(lambda: (self.mkdir(dialog.line_edit.text()), dialog.accept()))
-        dialog.exec()
+        code = dialog.exec()
+        if code == QtWidgets.QDialog.DialogCode.Accepted:
+            self.mkdir(dialog.input_text)
 
     def mkdir(self, name):
         path = self.get_append_path()

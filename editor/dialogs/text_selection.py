@@ -16,3 +16,7 @@ class TextSelectionDialog(SelectionDialog):
             self.enable_continue()
         else:
             self.disable_continue()
+
+    @property
+    def input_text(self):
+        return self.line_edit.text()

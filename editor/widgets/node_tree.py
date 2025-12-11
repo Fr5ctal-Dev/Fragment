@@ -2,23 +2,22 @@ from editor.dialogs.new_node_selection import NewNodeSelectionDialog
 from editor.utils.path import get_resource_path
 from editor.node_properties.loader import node_properties as NODE_PROPERTIES
 from editor.node_properties.nodes.base_node import BaseNodeProperties
-from PySide6.QtWidgets import QTreeWidget, QTreeWidgetItem, QAbstractItemView, QTreeWidgetItemIterator, QMessageBox, QMenu, QFileDialog
-from PySide6.QtCore import Qt, QTimer
-from PySide6.QtGui import QIcon, QAction
+from PySide6 import QtWidgets, QtGui, QtCore
+from PySide6.QtCore import Qt
 from uuid import uuid4
 from pathlib import Path
 import json
 
 
-class NodeTree(QTreeWidget):
+class NodeTree(QtWidgets.QTreeWidget):
     def __init__(self, scene_editor):
         super().__init__()
         self.scene_editor = scene_editor
         self.node_data = {} # {item: dict}
 
         self.setHeaderLabel('Node Tree')
-        self.setEditTriggers(QAbstractItemView.EditTrigger.DoubleClicked)
-        self.setDragDropMode(QAbstractItemView.DragDropMode.InternalMove)
+        self.setEditTriggers(QtWidgets.QAbstractItemView.EditTrigger.DoubleClicked)
+        self.setDragDropMode(QtWidgets.QAbstractItemView.DragDropMode.InternalMove)
         self.setDefaultDropAction(Qt.DropAction.MoveAction)
         self.setDragEnabled(True)
         self.setAcceptDrops(True)
@@ -30,19 +29,19 @@ class NodeTree(QTreeWidget):
 
         self.itemSelectionChanged.connect(lambda: self.node_selected(self.currentItem()))
 
-        self.new_node_action = QAction('New Node', self)
+        self.new_node_action = QtGui.QAction('New Node', self)
         self.new_node_action.triggered.connect(self.new_node_selection_dialog)
-        self.new_scene_action = QAction('New Scene', self)
+        self.new_scene_action = QtGui.QAction('New Scene', self)
         self.new_scene_action.triggered.connect(self.new_scene_selection)
-        self.delete_node_action = QAction('Delete Node', self)
+        self.delete_node_action = QtGui.QAction('Delete Node', self)
         self.delete_node_action.triggered.connect(lambda: self.delete_node(self.currentItem()))
 
-        self.update_timer = QTimer(self)
+        self.update_timer = QtCore.QTimer(self)
         self.update_timer.timeout.connect(self.update_scene_nodes)
         self.update_timer.start(10)
 
     def contextMenuEvent(self, event):
-        context_menu = QMenu(self)
+        context_menu = QtWidgets.QMenu(self)
         new_menu = context_menu.addMenu('New')
         new_menu.addAction(self.new_node_action)
         new_menu.addAction(self.new_scene_action)
@@ -53,24 +52,25 @@ class NodeTree(QTreeWidget):
     
     def new_node_selection_dialog(self):
         selection_dialog = NewNodeSelectionDialog(self)
-        selection_dialog.accepted.connect(lambda: self.new_node(selection_dialog.node_type, self.currentItem(), name=selection_dialog.node_name))
-        selection_dialog.exec()
+        code = selection_dialog.exec()
+        if code == QtWidgets.QDialog.DialogCode.Accepted:
+            self.new_node(selection_dialog.node_type, self.currentItem(), name=selection_dialog.node_name)
 
     def new_scene_selection(self):
-        path = QFileDialog.getOpenFileName(self, 'Open Scene', str(self.scene_editor.path), 'Fragment Scenes (*.fscene)')[0]
+        path = QtWidgets.QFileDialog.getOpenFileName(self, 'Open Scene', str(self.scene_editor.path), 'Fragment Scenes (*.fscene)')[0]
         if path:
             self.load_scene(Path(path), self.currentItem())
 
     def new_node(self, type, parent=None, properties=None, uuid=None, name=None):
         uuid = uuid or str(uuid4())
-        item = QTreeWidgetItem()
+        item = QtWidgets.QTreeWidgetItem()
         if name is not None:
             item.setText(0, name)
         elif properties is not None:
             item.setText(0, properties.properties['Node/Name'].value)
         else:
             item.setText(0, 'New Node')
-        item.setIcon(0, QIcon(str(get_resource_path(Path('editor') / 'assets' / 'node_icons' / f'{type}.png'))))
+        item.setIcon(0, QtGui.QIcon(str(get_resource_path(Path('editor') / 'assets' / 'node_icons' / f'{type}.png'))))
         item.setFlags(item.flags() | Qt.ItemFlag.ItemIsEditable)
         
         if parent is None:
@@ -129,11 +129,11 @@ class NodeTree(QTreeWidget):
             return False
         
         if self.node_data[source].target_scene is not None and len(self.node_data[source].target_scene_node) > 1:
-            QMessageBox.warning(self, 'Invalid Operation', 'Cannot reparent a child node of an imported scene.')
+            QtWidgets.QMessageBox.warning(self, 'Invalid Operation', 'Cannot reparent a child node of an imported scene.')
             return False
         
         if self.node_data[target].target_scene is not None:
-            QMessageBox.warning(self, 'Invalid Operation', 'Cannot reparent to an imported scene node.')
+            QtWidgets.QMessageBox.warning(self, 'Invalid Operation', 'Cannot reparent to an imported scene node.')
             return False
 
         return True
@@ -151,10 +151,10 @@ class NodeTree(QTreeWidget):
         
         if target_item is None:
             target_parent = None
-        elif drop_indicator == QAbstractItemView.DropIndicatorPosition.OnItem:
+        elif drop_indicator == QtWidgets.QAbstractItemView.DropIndicatorPosition.OnItem:
             target_parent = target_item
-        elif drop_indicator == QAbstractItemView.DropIndicatorPosition.AboveItem or \
-             drop_indicator == QAbstractItemView.DropIndicatorPosition.BelowItem:
+        elif drop_indicator == QtWidgets.QAbstractItemView.DropIndicatorPosition.AboveItem or \
+             drop_indicator == QtWidgets.QAbstractItemView.DropIndicatorPosition.BelowItem:
             target_parent = target_item.parent()
         else:
             target_parent = None
@@ -188,7 +188,7 @@ class NodeTree(QTreeWidget):
 
     def get_all_nodes(self):
         nodes = []
-        iterator = QTreeWidgetItemIterator(self)
+        iterator = QtWidgets.QTreeWidgetItemIterator(self)
         
         while iterator.value():
             nodes.append(iterator.value())
@@ -238,7 +238,7 @@ class NodeTree(QTreeWidget):
 
     def load_scene(self, scene_path, parent=None):
         if scene_path == self.scene_editor.scene:
-            QMessageBox.warning(self, 'Invalid Operation', 'Cannot import the current scene into itself.')
+            QtWidgets.QMessageBox.warning(self, 'Invalid Operation', 'Cannot import the current scene into itself.')
             return
 
         with open(scene_path) as f:
