@@ -8,9 +8,10 @@ import tempfile
 
 class PythonRunner(QtWidgets.QWidget):
     terminated = QtCore.Signal()
-    def __init__(self, script_file):
+    def __init__(self, script_file, project_path):
         super().__init__()
         self.script_file = script_file
+        self.project_path = project_path
         self.init_ui()
         self.init_process()
         
@@ -38,6 +39,7 @@ class PythonRunner(QtWidgets.QWidget):
 
     def init_process(self):
         self.process = QtCore.QProcess(self)
+        self.process.setWorkingDirectory(self.project_path)
         self.process.readyReadStandardOutput.connect(self.handle_stdout)
         self.process.readyReadStandardError.connect(self.handle_stderr)
         self.process.finished.connect(self.process_finished)
@@ -94,7 +96,7 @@ class ExecuteSceneTask(BaseTask):
         with open(self.file, 'w') as f:
             f.write(code)
 
-        self.python_runner = PythonRunner(self.file)
+        self.python_runner = PythonRunner(self.file, str(self.scene_editor.path))
         self.python_runner.show()
         self.python_runner.terminated.connect(self.terminate)
 

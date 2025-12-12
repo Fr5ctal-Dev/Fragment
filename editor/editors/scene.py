@@ -52,7 +52,7 @@ class SceneEditor(Editor):
         self.load_node_tree()
 
     def load_node_tree(self):
-        with open(self.scene) as f:
+        with open(self.path / self.scene) as f:
             content = json.load(f)
 
         scene_data = {}
@@ -70,7 +70,7 @@ class SceneEditor(Editor):
             json_key = json.dumps(list(node_path))
             json_data[json_key] = node_data
 
-        with open(self.scene, 'w') as f:
+        with open(self.path / self.scene, 'w') as f:
             json.dump(json_data, f, indent=2)
 
     def run(self):

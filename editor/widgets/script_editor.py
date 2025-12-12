@@ -62,7 +62,7 @@ class CompletionWorker(QtCore.QObject):
         self.finished.emit(results)
 
     def get_completions(self):
-        script = jedi.Script(path=self.script, project=jedi.Project(self.project_path))
+        script = jedi.Script(path=self.project_path / self.script, project=jedi.Project(self.project_path))
         try:
             completions = script.complete(line=self.line, column=self.column)
         except ValueError:
@@ -82,7 +82,7 @@ class ScriptEditor(QtWidgets.QPlainTextEdit):
 
         self.indent_spacing = 4
 
-        with open(self.script) as fp:
+        with open(self.path / self.script) as fp:
             self.insertPlainText(fp.read())
 
         self.update_timer = QtCore.QTimer()
@@ -399,5 +399,5 @@ class ScriptEditor(QtWidgets.QPlainTextEdit):
         self.completer.popup().hide()
 
     def save(self):
-        with open(self.script, 'w') as fp:
+        with open(self.path / self.script, 'w') as fp:
             fp.write(self.toPlainText())

@@ -1,5 +1,6 @@
 from .path_script import PathScript
 from editor.utils.path import get_resource_path
+from editor.dialogs.file_selection import get_save_relative_file_name
 from PySide6.QtWidgets import QPushButton, QFileDialog
 from PySide6.QtGui import QIcon
 from pathlib import Path
@@ -15,12 +16,12 @@ class PathNodeScript(PathScript):
 
     def create_node_script(self):
         code = f'# Node Script\nimport fragment.nodes.{self.node_type.lower()}\n\n\nclass Node(fragment.nodes.{self.node_type.lower()}.{self.node_type}):\n    pass\n'
-        path = QFileDialog.getSaveFileName(self, 'New Script', str(self.path))[0]
+        path = get_save_relative_file_name(self, self.path, 'New Script')
         if not path:
             return
 
-        path += '.py'
-        with open(path, 'w') as f:
+        path = str(path.with_suffix('.py'))
+        with open(self.scene_editor.path / path, 'w') as f:
             f.write(code)
 
         self.value = path

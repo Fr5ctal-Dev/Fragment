@@ -51,7 +51,7 @@ class Scene(Manager):
                 properties[name] = value['value'] # value of property
 
             if properties['Node/Script']:
-                path = Path(properties['Node/Script']).relative_to(self.project_path)
+                path = Path(properties['Node/Script'])
                 module = '.'.join(path.with_suffix('').parts)
                 node_class = getattr(importlib.import_module(module), 'Node')
             else:

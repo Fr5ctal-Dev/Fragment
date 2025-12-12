@@ -79,7 +79,7 @@ class Editor(QtWidgets.QMainWindow):
         self.file_system_dock.setWindowTitle('Files')
         self.file_system_dock.setAllowedAreas(Qt.DockWidgetArea.AllDockWidgetAreas)
         self.file_system = FileSystem(self, self.path)
-        self.file_system.doubleClicked.connect(lambda index: self.open(Path(self.file_system.directory_model.filePath(index))))
+        self.file_system.doubleClicked.connect(lambda index: self.open(Path(self.file_system.directory_model.filePath(index)).relative_to(self.path)))
         self.file_system_dock.setWidget(self.file_system)
         self.file_system_dock.setFeatures(QtWidgets.QDockWidget.DockWidgetFeature.DockWidgetMovable | QtWidgets.QDockWidget.DockWidgetFeature.DockWidgetFloatable | QtWidgets.QDockWidget.DockWidgetFeature.DockWidgetClosable)
         self.addDockWidget(Qt.DockWidgetArea.LeftDockWidgetArea, self.file_system_dock)
@@ -137,7 +137,7 @@ class Editor(QtWidgets.QMainWindow):
         self.tab_view.removeTab(index)
 
     def open(self, path):
-        if not path.exists():
+        if not (self.path / path).exists():
             return
 
         for i in range(self.tab_view.count()):

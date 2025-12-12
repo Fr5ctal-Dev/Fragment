@@ -1,4 +1,5 @@
 from editor.dialogs.new_node_selection import NewNodeSelectionDialog
+from editor.dialogs.file_selection import get_open_relative_file_name
 from editor.utils.path import get_resource_path
 from editor.node_properties.loader import node_properties as NODE_PROPERTIES
 from editor.node_properties.nodes.base_node import BaseNodeProperties
@@ -57,7 +58,7 @@ class NodeTree(QtWidgets.QTreeWidget):
             self.new_node(selection_dialog.node_type, self.currentItem(), name=selection_dialog.node_name)
 
     def new_scene_selection(self):
-        path = QtWidgets.QFileDialog.getOpenFileName(self, 'Open Scene', str(self.scene_editor.path), 'Fragment Scenes (*.fscene)')[0]
+        path = get_open_relative_file_name(self, self.scene_editor.path, 'Open Scene', 'Fragment Scenes (*.fscene)')
         if path:
             self.load_scene(Path(path), self.currentItem())
 
@@ -241,7 +242,7 @@ class NodeTree(QtWidgets.QTreeWidget):
             QtWidgets.QMessageBox.warning(self, 'Invalid Operation', 'Cannot import the current scene into itself.')
             return
 
-        with open(scene_path) as f:
+        with open(self.scene_editor.path / scene_path) as f:
             content = json.load(f)
 
         data = {}
@@ -272,7 +273,7 @@ class NodeTree(QtWidgets.QTreeWidget):
         return root_nodes
     
     def handle_scene_change(self, scene, root_node):
-        with open(scene) as f:
+        with open(self.scene_editor.path / scene) as f:
             content = json.load(f)
 
         data = {}

@@ -165,7 +165,7 @@ class BaseNodeProperties:
 
     def update_scene_properties(self):
         if self.target_scene and self.target_scene_node:
-            with open(self.target_scene) as f:
+            with open(self.scene_editor.path / self.target_scene) as f:
                 content = json.load(f)
 
             data = {}

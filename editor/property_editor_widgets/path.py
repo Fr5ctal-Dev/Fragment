@@ -1,6 +1,7 @@
 from .editor_widget import EditorWidget
 from editor.utils.path import extract_extensions_from_filter, get_resource_path
 from editor.widgets.filesystem import FileIconProvider
+from editor.dialogs.file_selection import get_open_relative_file_name
 from PySide6.QtWidgets import QPushButton, QLineEdit, QFileDialog, QLabel, QSpacerItem
 from PySide6.QtGui import QIcon
 from PySide6.QtCore import QFileInfo
@@ -33,10 +34,10 @@ class Path(EditorWidget):
         self.update_editor()
 
     def select_path(self, filter=FILE_FILTER):
-        path = QFileDialog.getOpenFileName(self, 'Select Path', str(self.path), filter)[0]
+        path = get_open_relative_file_name(self, self.path, 'Select Path', filter)
         if not path:
             return
-        self.value = path
+        self.value = str(path)
 
         self.update_editor()
         self.change_property()

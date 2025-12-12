@@ -89,10 +89,10 @@ class FileSystem(QtWidgets.QTreeView):
         if self.currentIndex():
             path = Path(self.directory_model.filePath(self.currentIndex()))
             if path.is_file():
-                path = path.parent
+                path = path.parent.relative_to(self.path)
 
         else:
-            path = self.path
+            path = ''
 
         return path
 
@@ -118,8 +118,8 @@ class FileSystem(QtWidgets.QTreeView):
             return
 
         path = path / (name + filepath.suffix)
-        if not path.exists():
-            shutil.copy(str(get_resource_path(Path('editor') / 'filetypes' / filepath)), path)
+        if not (self.path / path).exists():
+            shutil.copy(str(get_resource_path(Path('editor') / 'filetypes' / filepath)), self.path / path)
 
     def create_folder(self):
         dialog = TextSelectionDialog(self, 'Name of Directory', 'Name')
@@ -132,8 +132,8 @@ class FileSystem(QtWidgets.QTreeView):
 
         path = path / name
 
-        if not path.exists():
-            path.mkdir()
+        if not (self.path / path).exists():
+            (self.path / path).mkdir()
 
     def import_asset(self, dir=False):
         path = self.get_append_path()
@@ -148,4 +148,4 @@ class FileSystem(QtWidgets.QTreeView):
                 return
             files = [Path(f) for f in files]
 
-        self.editor.task_manager.new_task('import_asset', [path, files])
+        self.editor.task_manager.new_task('import_asset', [self.path / path, files])
