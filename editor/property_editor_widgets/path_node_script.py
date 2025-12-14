@@ -20,7 +20,7 @@ class PathNodeScript(PathScript):
         if not path:
             return
 
-        path = str(path.with_suffix('.py'))
+        path = path.with_suffix('.py').as_posix()
         with open(self.scene_editor.path / path, 'w') as f:
             f.write(code)
 

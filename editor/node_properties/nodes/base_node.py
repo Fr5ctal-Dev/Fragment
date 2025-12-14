@@ -143,7 +143,7 @@ class BaseNodeProperties:
     def to_data(self):
         data = {'type': self.type, 'properties': {}}
 
-        data['target_scene'] = str(self.target_scene) if self.target_scene else None
+        data['target_scene'] = self.target_scene.as_posix() if self.target_scene else None
         data['target_scene_node'] = self.target_scene_node
 
         for name, property in self.properties.items():

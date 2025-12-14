@@ -84,7 +84,7 @@ class Backend(QtCore.QObject):
     
     def _string_project_list(self):
         project_list = self._projects_list()
-        return [{'name': item['name'], 'path': str(item['path'])} for item in project_list]
+        return [{'name': item['name'], 'path': item['path'].as_posix()} for item in project_list]
 
     def _add_to_project_list(self, path):
         projects = self._read_projects()
@@ -132,7 +132,7 @@ class Backend(QtCore.QObject):
         cfg = self.config_path() / 'projects.json'
         json_projects = {}
         for name, path in projects.items():
-            json_projects[name] = str(path)
+            json_projects[name] = path.as_posix()
 
         with open(cfg, 'w') as f:
             f.write(json.dumps(json_projects))

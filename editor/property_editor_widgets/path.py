@@ -37,7 +37,7 @@ class Path(EditorWidget):
         path = get_open_relative_file_name(self, self.path, 'Select Path', filter)
         if not path:
             return
-        self.value = str(path)
+        self.value = path.as_posix()
 
         self.update_editor()
         self.change_property()

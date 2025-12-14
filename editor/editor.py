@@ -107,7 +107,7 @@ class Editor(QtWidgets.QMainWindow):
         with open(self.path / 'main.fragment') as f:
             content = eval(f.read())
 
-        content['reopen']['tabs'] = list([str(self.tab_view.widget(e).file) for e in range(self.tab_view.count())])
+        content['reopen']['tabs'] = list([self.tab_view.widget(e).file.as_posix() for e in range(self.tab_view.count())])
         content['reopen']['last_tab'] = self.tab_view.currentIndex()
 
         with open(self.path / 'main.fragment', 'w') as f:
