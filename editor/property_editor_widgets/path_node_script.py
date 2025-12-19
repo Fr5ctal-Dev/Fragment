@@ -1,7 +1,7 @@
 from .path_script import PathScript
 from editor.utils.path import get_resource_path
 from editor.dialogs.file_selection import get_save_relative_file_name
-from PySide6.QtWidgets import QPushButton, QFileDialog
+from PySide6.QtWidgets import QPushButton
 from PySide6.QtGui import QIcon
 from pathlib import Path
 

@@ -5,11 +5,9 @@ from editor.widgets.filesystem import FileSystem
 from editor.widgets.task_manager import TaskManager
 from editor.widgets.notifications import Notifications
 
-from editor.splash_screen import SplashScreen
-
 from editor.utils.path import get_resource_path
 
-from PySide6 import QtWidgets, QtGui, QtCore
+from PySide6 import QtWidgets, QtGui, QtCore, QtWebEngineWidgets
 from PySide6.QtCore import Qt
 
 from pathlib import Path
@@ -34,17 +32,16 @@ def launch_editor(path: Path):
     window = EditorWindow()
     window_layout = QtWidgets.QStackedLayout(window)
 
-    splash = SplashScreen()
-    window_layout.addWidget(splash)
-
-    window_layout.setCurrentWidget(splash)
-    window.showMaximized()
-
     editor = Editor(path)
     window_layout.addWidget(editor)
-    window_layout.setCurrentWidget(editor)
+    dummy_widget = QtWebEngineWidgets.QWebEngineView()
+    window_layout.addWidget(dummy_widget)
+
+    window_layout.setCurrentWidget(dummy_widget)
+    QtCore.QTimer.singleShot(10, lambda: window_layout.setCurrentWidget(editor))
 
     window.closed.connect(editor.cleanup)
+    window.showMaximized()
     return window
 
 

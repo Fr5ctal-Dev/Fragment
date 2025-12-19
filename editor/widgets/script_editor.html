@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
+		<style>
+			body {
+				margin: 0px;
+			}
+			#editor-frame {
+				position: fixed;
+				width: 100%;
+				height: 100%;
+				left: 0;
+				top: 0;
+			}
+		</style>
+	</head>
+	<body>
+		<div id="editor-frame"></div>
+		<script src="qrc:///qtwebchannel/qwebchannel.js"></script>
+		<script src="https://cdn.jsdelivr.net/npm/monaco-editor/min/vs/loader.js"></script>
+		<script>
+			require.config({ paths: { vs: 'https://cdn.jsdelivr.net/npm/monaco-editor/min/vs' } });
+
+			require(['vs/editor/editor.main'], function () {
+				var editor = monaco.editor.create(document.getElementById('editor-frame'), {
+					language: 'python',
+					automaticLayout: true,
+
+					acceptSuggestionOnEnter: 'off',
+
+					smoothScrolling: true,
+					cursorSmoothCaretAnimation: 'on',
+					
+					fontFamily: 'JetBrains Mono',
+					fontLigatures: true
+				});
+				monaco.editor.setTheme('vs-dark');
+				let backend = null;
+    
+				new QWebChannel(qt.webChannelTransport, function(channel) {
+					backend = channel.objects.backend;
+
+					backend.setCode.connect(function(code) {
+						editor.setValue(code);
+					});
+
+					backend.requestCodeFromEditor();
+					
+					backend.requestCode.connect(function() {
+						backend.receiveCode(editor.getValue());
+					});
+				});
+			});
+		</script>
+	</body>
+</html>
