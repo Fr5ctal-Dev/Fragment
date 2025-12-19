@@ -40,7 +40,7 @@ class ScriptEditor(QtWebEngineWidgets.QWebEngineView):
         self.page().setWebChannel(self.channel)
 
         with open(get_resource_path(Path('editor') / 'widgets' / 'script_editor.html')) as f:
-            self.setHtml(f.read(), 'qrc:///')
+            self.setHtml(f.read())
 
     def save(self):
         self.backend.requestCode.emit()
