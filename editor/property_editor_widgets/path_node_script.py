@@ -15,13 +15,10 @@ class PathNodeScript(PathScript):
         self.create_script_button.clicked.connect(self.create_node_script)
 
     def create_node_script(self):
-        code = '''
-// Node Script
-import { ''' + self.node_type + ''' } from '/fragment/nodes/''' + self.node_type.lower() + '''.js';
+        code = '''// Node Script
+import { ''' + self.node_type + ''' as ParentNodeType } from '/fragment/nodes/''' + self.node_type.lower() + '''.js';
 
-export class Node extends ''' + self.node_type + ''' {}
-
-        '''.strip()
+export class Node extends ParentNodeType { }'''
         path = get_save_relative_file_name(self, self.path, 'New Script')
         if not path:
             return
