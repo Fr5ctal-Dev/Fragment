@@ -15,12 +15,18 @@ class PathNodeScript(PathScript):
         self.create_script_button.clicked.connect(self.create_node_script)
 
     def create_node_script(self):
-        code = f'# Node Script\nimport fragment.nodes.{self.node_type.lower()}\n\n\nclass Node(fragment.nodes.{self.node_type.lower()}.{self.node_type}):\n    pass\n'
+        code = '''
+// Node Script
+import { ''' + self.node_type + ''' } from '/fragment/nodes/''' + self.node_type.lower() + '''.js';
+
+export class Node extends ''' + self.node_type + ''' {}
+
+        '''.strip()
         path = get_save_relative_file_name(self, self.path, 'New Script')
         if not path:
             return
 
-        path = path.with_suffix('.py').as_posix()
+        path = path.with_suffix('.js').as_posix()
         with open(self.scene_editor.path / path, 'w') as f:
             f.write(code)
 

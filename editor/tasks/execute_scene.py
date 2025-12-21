@@ -1,83 +1,66 @@
 from .base_task import BaseTask
-from PySide6 import QtCore, QtWidgets, QtGui
+from PySide6 import QtCore
 from editor.utils.python import python_executable
+from editor.utils.path import get_resource_path
 from pathlib import Path
 import shutil
 import tempfile
 
 
-class PythonRunner(QtWidgets.QWidget):
-    terminated = QtCore.Signal()
+class GameView(QtCore.QObject):
+    window_closed = QtCore.Signal()
+    def __init__(self, port):
+        super().__init__()
+        self.port = port
+        self.terminated = False
+        self.process = QtCore.QProcess()
+        self.process.finished.connect(self.on_process_finished)
+        self.process.start(python_executable, [str(get_resource_path(Path('editor') / 'http_server' / 'view.py')), str(self.port)])
+
+    def on_process_finished(self):
+        self.process.waitForFinished()
+        self.terminated = True
+        self.window_closed.emit()
+
+    def terminate(self):
+        if self.process is not None:
+            self.process.kill()
+            self.process.waitForFinished()
+        self.terminated = True
+
+
+class HTTPServer(QtCore.QObject):
+    server_started = QtCore.Signal()
     def __init__(self, script_file, project_path):
         super().__init__()
         self.script_file = script_file
         self.project_path = project_path
-        self.init_ui()
-        self.init_process()
+
+        self.process = QtCore.QProcess()
+        self.process.readyReadStandardError.connect(self.check_port)
+        self.process.start(python_executable, ['-u', str(get_resource_path(Path('editor') / 'http_server' / 'main.py')), str(self.project_path)])
+        self.port = None
+
+    def check_port(self):
+        if self.process is None:
+            return
         
-    def init_ui(self):
-        self.setWindowTitle(f'Running: {str(self.script_file)}')
-        self.setGeometry(100, 100, 800, 600)
+        if self.port is not None:
+            return
 
-        layout = QtWidgets.QVBoxLayout()
-
-        self.output = QtWidgets.QTextEdit()
-        self.output.setReadOnly(True)
-        self.output.setFont(QtGui.QFont('Consolas', 10))
-        layout.addWidget(self.output)
-        
-        self.setLayout(layout)
-
-        self.normal_format = QtGui.QTextCharFormat()
-        self.normal_format.setForeground(QtGui.QColor(255, 255, 255))
-
-        self.error_format = QtGui.QTextCharFormat()
-        self.error_format.setForeground(QtGui.QColor(255, 20, 20))
-
-        self.info_format = QtGui.QTextCharFormat()
-        self.info_format.setForeground(QtGui.QColor(150, 150, 255))
-
-    def init_process(self):
-        self.process = QtCore.QProcess(self)
-        self.process.setWorkingDirectory(self.project_path)
-        self.process.readyReadStandardOutput.connect(self.handle_stdout)
-        self.process.readyReadStandardError.connect(self.handle_stderr)
-        self.process.finished.connect(self.process_finished)
-
-        self.append_text(f'Running: {python_executable} {str(self.script_file)}\n', self.info_format)
-        self.process.start(python_executable, ['-u', str(self.script_file)])
-
-    def append_text(self, text, text_format):
-        cursor = self.output.textCursor()
-        cursor.movePosition(QtGui.QTextCursor.MoveOperation.End)
-        cursor.insertText(text, text_format)
-        self.output.setTextCursor(cursor)
-        self.output.ensureCursorVisible()
-
-    @QtCore.Slot()
-    def handle_stdout(self):
-        data = self.process.readAllStandardOutput()
-        text = data.data().decode('utf-8', errors='replace')
-        self.append_text(text, self.normal_format)
-
-    @QtCore.Slot()
-    def handle_stderr(self):
-        data = self.process.readAllStandardError()
-        text = data.data().decode('utf-8', errors='replace')
-        self.append_text(text, self.error_format)
-
-    @QtCore.Slot()
-    def process_finished(self, exit_code, exit_status):
-        self.append_text(f'\n[Process finished with exit code: {exit_code}]', self.info_format)
+        port_text = self.process.readAllStandardError().data().decode('utf-8')
+        if port_text:
+            try:
+                self.port = int(port_text.strip())
+                self.server_started.emit()
+            except ValueError:
+                pass
 
     def terminate(self):
-        if self.process.state() == QtCore.QProcess.ProcessState.Running:
+        if self.process is not None:
             self.process.kill()
             self.process.waitForFinished()
-        
-    def closeEvent(self, event):
-        self.terminated.emit()
-        return super().closeEvent(event)
+            self.process = None
 
 
 class ExecuteSceneTask(BaseTask):
@@ -86,24 +69,55 @@ class ExecuteSceneTask(BaseTask):
         self.scene_editor = scene_editor
         self.python_runner = None
         self.temp = tempfile.TemporaryDirectory()
-        self.file = Path(self.temp.name) / 'runner' / 'main.py'
+        self.file = Path(self.temp.name) / 'runner' / 'index.html'
+        self.http_server = None
+        self.game_view = None
 
     def run(self):
         self.scene_editor.save()
-        code = f'import fragment.main\nfragment.main.setup("{self.scene_editor.scene.as_posix()}", "{self.scene_editor.path.as_posix()}")'
+        code = '''
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Fragment Engine</title>
+  <style>
+    body {
+      margin: 0;
+    }
+  </style>
+</head>
+<body>
+  <script src="https://cdn.jsdelivr.net/npm/pixi.js@8.14.3/dist/pixi.min.js"></script>
+
+  <script type="module">
+    import { setup } from '/fragment/main.js';
+
+    setup('${}', '');
+  </script>
+</body>
+</html>
+
+        '''.replace('${}', str(self.scene_editor.scene.as_posix())).strip()
         shutil.copytree(self.scene_editor.path, self.file.parent)
 
         with open(self.file, 'w') as f:
             f.write(code)
 
-        self.python_runner = PythonRunner(self.file, str(self.scene_editor.path))
-        self.python_runner.show()
-        self.python_runner.terminated.connect(self.terminate)
+        self.http_server = HTTPServer(self.file, self.file.parent)
+        self.http_server.server_started.connect(self.create_game_view)
+
+    def create_game_view(self):
+        if self.http_server is not None and self.http_server.port is not None:
+            self.game_view = GameView(self.http_server.port)
+            self.game_view.window_closed.connect(self.terminate)
 
     def terminate(self):
-        if self.python_runner is not None:
-            self.python_runner.terminate()
-            self.python_runner.close()
+        if self.game_view is not None and not self.game_view.terminated:
+            self.game_view.terminate()
+        if self.http_server is not None:
+            self.http_server.terminate()
         self.temp.cleanup()
         self.finished.emit()
 

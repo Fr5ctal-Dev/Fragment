@@ -7,7 +7,7 @@ from editor.widgets.notifications import Notifications
 
 from editor.utils.path import get_resource_path
 
-from PySide6 import QtWidgets, QtGui, QtCore, QtWebEngineWidgets
+from PySide6 import QtWidgets, QtGui, QtCore, QtQuickWidgets
 from PySide6.QtCore import Qt
 
 from pathlib import Path
@@ -34,7 +34,7 @@ def launch_editor(path: Path):
 
     editor = Editor(path)
     window_layout.addWidget(editor)
-    dummy_widget = QtWebEngineWidgets.QWebEngineView()
+    dummy_widget = QtQuickWidgets.QQuickWidget()
     window_layout.addWidget(dummy_widget)
 
     window_layout.setCurrentWidget(dummy_widget)

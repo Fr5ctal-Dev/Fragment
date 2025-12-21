@@ -25,13 +25,10 @@
 
 			require(['vs/editor/editor.main'], function () {
 				var editor = monaco.editor.create(document.getElementById('editor-frame'), {
-					language: 'python',
+					language: 'javascript',
 					automaticLayout: true,
 
 					acceptSuggestionOnEnter: 'off',
-
-					smoothScrolling: true,
-					cursorSmoothCaretAnimation: 'on',
 					
 					fontFamily: 'JetBrains Mono',
 					fontLigatures: true,
