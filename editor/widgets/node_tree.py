@@ -229,7 +229,12 @@ class NodeTree(QtWidgets.QTreeWidget):
         data = {}
         for node in self.get_all_nodes():
             properties = self.node_data[node]
-            data[self.path_of_node(node)] = self.node_properties_to_data(properties)
+            path = self.path_of_node(node)
+            data[path] = self.node_properties_to_data(properties)
+
+            # Store parent and uuid for js runtime
+            data[path]['parent'] = json.dumps(self.path_of_node(node.parent())) if node.parent() else None
+            data[path]['uuid'] = properties.uuid
         return data
     
     def node_selected(self, item):

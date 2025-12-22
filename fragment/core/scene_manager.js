@@ -1,7 +1,7 @@
 import { Manager } from '/fragment/core/manager.js';
 import { NODES } from '/fragment/nodes/index.js';
 
-const nameRefResponse = await fetch('fragment/nodes/name_ref.json');
+const nameRefResponse = await fetch('/fragment/nodes/name_ref.json');
 const nameRefContent = await nameRefResponse.json();
 
 const PROPERTY_NAME_REFERENCE = {};
@@ -28,16 +28,7 @@ export class Scene extends Manager {
      * It creates, initializes and configures nodes based on its scene file.
      */
     const response = await fetch(this.scene);
-    const content = await response.json();
-
-    // Parse node paths from JSON string keys
-    const sceneContent = {};
-    for (const [jsonKey, nodeData] of Object.entries(content)) {
-      const pathList = JSON.parse(jsonKey);
-      // Use JSON.stringify to create a consistent key for lookups
-      const pathKey = JSON.stringify(pathList);
-      sceneContent[pathKey] = nodeData;
-    }
+    const sceneContent = await response.json();
 
     if (Object.keys(sceneContent).length === 0) {
       return;
@@ -46,7 +37,6 @@ export class Scene extends Manager {
     const tempNodeStorage = {};
 
     for (const pathKey in sceneContent) {
-      const pathList = JSON.parse(pathKey);
       const properties = {};
 
       for (const [name, value] of Object.entries(sceneContent[pathKey]['properties'])) {
@@ -56,27 +46,26 @@ export class Scene extends Manager {
       let nodeClass;
       if (properties['Node/Script']) {
         const scriptPath = properties['Node/Script'];
-        const module = await import(`../../${scriptPath}`);
+        const module = await import(`/${scriptPath}`);
         nodeClass = module.Node;
       } else {
         nodeClass = NODES[sceneContent[pathKey]['type']];
       }
 
       // Find parent node
-      const parentKey = JSON.stringify(pathList.slice(0, -1));
-      const parent = pathList.length > 1 ? tempNodeStorage[parentKey] : null;
+      const parent = sceneContent[pathKey]['parent'] ? tempNodeStorage[sceneContent[pathKey]['parent']] : null;
 
       const node = new nodeClass(
         this.gameManager,
         this.convertNodeProperties(properties),
-        pathList[pathList.length - 1], // uuid
+        sceneContent[pathKey]['uuid'],
         parent,
         this
       );
 
       node.initializeProperties(node.properties);
 
-      if (pathList.length === 1) {
+      if (parent === null) {
         this.rootNode = node;
       }
 
