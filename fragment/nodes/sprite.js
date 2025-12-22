@@ -6,13 +6,13 @@ export class Sprite extends Drawable {
     this.spriteTexture = null;
   }
 
-  get image_source() {
-    return this._properties['image_source'];
+  get imageSource() {
+    return this._properties['imageSource'];
   }
 
-  set image_source(source) {
-    this._properties['image_source'] = source;
-    this.loadTexture(this._properties['image_source']);
+  set imageSource(source) {
+    this._properties['imageSource'] = source;
+    this.loadTexture(this._properties['imageSource']);
   }
 
   /**

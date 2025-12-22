@@ -58,7 +58,7 @@ export class Node extends GameElement {
    * Finds nearest ancestor with a type satisfying nodeType.
    * @param {Function} nodeType - Node class/constructor to match
    */
-  find_ancestor_of_type(nodeType) {
+  findAncestorOfType(nodeType) {
     if (!this.parent) {
       return null;
     }
@@ -77,21 +77,21 @@ export class Node extends GameElement {
   }
 
   update(dt) {
-    this.on_update();
+    this.onUpdate();
   }
 
   /**
    * Destroys node and children.
    */
   destroy() {
-    this.traverse(node => node.destroy_self());
+    this.traverse(node => node.destroySelf());
   }
 
   /**
    * Destroys node without destroying children.
    */
-  destroy_self() {
-    this.on_destroy();
+  destroySelf() {
+    this.onDestroy();
     if (this.scene !== null) {
       this.scene.unregisterNode(this);
     }
@@ -112,7 +112,7 @@ export class Node extends GameElement {
   /**
    * Get the root node of the node tree the node is in.
    */
-  get top_node() {
+  get topNode() {
     let currentNode = this;
     while (true) {
       if (!currentNode.parent) {
@@ -123,7 +123,7 @@ export class Node extends GameElement {
   }
 
   // Lifecycle hooks - override in subclasses
-  on_start() {}
-  on_update() {}
-  on_destroy() {}
+  onStart() {}
+  onUpdate() {}
+  onDestroy() {}
 }

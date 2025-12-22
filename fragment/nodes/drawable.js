@@ -13,7 +13,7 @@ export class Drawable extends Node2D {
   }
 
   fullInit() {
-    this.targetCanvas = this.find_ancestor_of_type(Canvas) ||
+    this.targetCanvas = this.findAncestorOfType(Canvas) ||
                         this.gameManager.windowManager.globalCanvas;
     this.targetCanvas.registerDrawable(this);
   }
@@ -25,24 +25,24 @@ export class Drawable extends Node2D {
 
   updatePixiTransform() {
     if (!this.pixiSprite) return;
-    this.pixiSprite.position.set(this.world_position.x, this.world_position.y);
-    this.pixiSprite.rotation = this.world_rotation * Math.PI / 180;
-    this.pixiSprite.scale.set(this.world_scale.x, this.world_scale.y);
+    this.pixiSprite.position.set(this.worldPosition.x, this.worldPosition.y);
+    this.pixiSprite.rotation = this.worldRotation * Math.PI / 180;
+    this.pixiSprite.scale.set(this.worldScale.x, this.worldScale.y);
   }
 
-  destroy_self() {
+  destroySelf() {
     this.targetCanvas.unregisterDrawable(this);
-    super.destroy_self();
+    super.destroySelf();
   }
 
-  get draw_priority() {
-    return this._properties['draw_priority'] || 0;
+  get drawPriority() {
+    return this._properties['drawPriority'] || 0;
   }
 
-  set draw_priority(priority) {
-    this._properties['draw_priority'] = parseInt(priority);
+  set drawPriority(priority) {
+    this._properties['drawPriority'] = parseInt(priority);
     if (this.pixiSprite) {
-      this.pixiSprite.zIndex = this._properties['draw_priority'];
+      this.pixiSprite.zIndex = this._properties['drawPriority'];
     }
   }
 }

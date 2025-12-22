@@ -1,4 +1,4 @@
-import { GameManager } from '/fragment/core/game_manager.js';
+import { GameManager } from '/fragment/core/game-manager.js';
 
 /**
  * Starts an application.

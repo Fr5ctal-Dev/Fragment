@@ -76,9 +76,9 @@ export class Scene extends Manager {
     for (const node of Object.values(tempNodeStorage)) {
       node.fullInit();
     }
-    // Call on_start on all nodes
+    // Call onStart on all nodes
     for (const node of Object.values(tempNodeStorage)) {
-      node.on_start();
+      node.onStart();
     }
   }
 

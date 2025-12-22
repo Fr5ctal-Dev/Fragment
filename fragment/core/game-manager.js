@@ -1,7 +1,7 @@
 import { Manager } from '/fragment/core/manager.js';
 import { WindowManager } from '/fragment/core/window.js';
 import { Clock } from '/fragment/core/clock.js';
-import { SceneManager } from '/fragment/core/scene_manager.js';
+import { SceneManager } from '/fragment/core/scene-manager.js';
 
 export class GameManager extends Manager {
   /**

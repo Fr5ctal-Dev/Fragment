@@ -17,7 +17,7 @@ export class Camera extends Node2D {
   }
 
   fullInit() {
-    this.targetCanvas = this.find_ancestor_of_type(Canvas) ||
+    this.targetCanvas = this.findAncestorOfType(Canvas) ||
                         this.gameManager.windowManager.globalCanvas;
     this.targetCanvas.registerCamera(this);
   }
@@ -29,12 +29,12 @@ export class Camera extends Node2D {
 
   updatePixiTransform() {
     if (!this.pixiContainer) return;
-    this.pixiContainer.position.set(-this.world_position.x, -this.world_position.y);
-    this.pixiContainer.rotation = -this.world_rotation * Math.PI / 180;
+    this.pixiContainer.position.set(-this.worldPosition.x, -this.worldPosition.y);
+    this.pixiContainer.rotation = -this.worldRotation * Math.PI / 180;
     this.pixiContainer.scale.set(this.zoom, this.zoom);
   }
 
-  get view_size() {
+  get viewSize() {
     /**
      * The view size of the camera, calculated by dividing its target canvas size with the zoom.
      */

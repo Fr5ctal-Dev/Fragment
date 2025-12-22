@@ -13,13 +13,13 @@ export class Node2D extends Node {
   /**
    * The global position of node.
    */
-  get world_position() {
-    if (!this.parent || !this.parent.world_position) {
+  get worldPosition() {
+    if (!this.parent || !this.parent.worldPosition) {
       return this.position;
     }
 
-    const worldOffset = this.position.rotate(this.parent.world_rotation);
-    return this.parent.world_position.add(worldOffset);
+    const worldOffset = this.position.rotate(this.parent.worldRotation);
+    return this.parent.worldPosition.add(worldOffset);
   }
 
   get rotation() {
@@ -33,12 +33,12 @@ export class Node2D extends Node {
   /**
    * The global rotation of node.
    */
-  get world_rotation() {
-    if (!this.parent || this.parent.world_rotation === undefined) {
+  get worldRotation() {
+    if (!this.parent || this.parent.worldRotation === undefined) {
       return this.rotation;
     }
 
-    return this.rotation + this.parent.world_rotation;
+    return this.rotation + this.parent.worldRotation;
   }
 
   get scale() {
@@ -52,14 +52,14 @@ export class Node2D extends Node {
   /**
    * The global scale of node.
    */
-  get world_scale() {
-    if (!this.parent || !this.parent.world_scale) {
+  get worldScale() {
+    if (!this.parent || !this.parent.worldScale) {
       return this.scale;
     }
 
     return new Vector2(
-      this.parent.world_scale.x * this.scale.x,
-      this.parent.world_scale.y * this.scale.y
+      this.parent.worldScale.x * this.scale.x,
+      this.parent.worldScale.y * this.scale.y
     );
   }
 }

@@ -10,12 +10,12 @@
   },
   "Canvas": {},
   "Drawable": {
-    "Drawable/Draw Priority": "draw_priority"
+    "Drawable/Draw Priority": "drawPriority"
   },
   "Camera": {
     "Camera/Zoom": "zoom"
   },
   "Sprite": {
-    "Sprite/Image Source": "image_source"
+    "Sprite/Image Source": "imageSource"
   }
 }
