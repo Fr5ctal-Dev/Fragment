@@ -7,7 +7,7 @@ export class Node2D extends Node {
   }
 
   set position(position) {
-    this._properties['position'] = new Vector2(position);
+    this._properties['position'] = Vector2.toVector2(position);
   }
 
   /**
@@ -46,7 +46,7 @@ export class Node2D extends Node {
   }
 
   set scale(scale) {
-    this._properties['scale'] = new Vector2(scale);
+    this._properties['scale'] = Vector2.toVector2(scale);
   }
 
   /**
