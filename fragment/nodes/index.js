@@ -8,12 +8,12 @@ import { Camera } from '/fragment/nodes/camera.js';
 import { Sprite } from '/fragment/nodes/sprite.js';
 
 export const NODES = {
-  'Node': Node,
-  'Node2D': Node2D,
-  'Canvas': Canvas,
-  'Drawable': Drawable,
-  'Camera': Camera,
-  'Sprite': Sprite
+    'Node': Node,
+    'Node2D': Node2D,
+    'Canvas': Canvas,
+    'Drawable': Drawable,
+    'Camera': Camera,
+    'Sprite': Sprite
 };
 
 export { Node, Node2D, Canvas, Drawable, Camera, Sprite };

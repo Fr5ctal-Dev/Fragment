@@ -1,5 +1,5 @@
 export class GameElement {
-  constructor(gameManager) {
-    this.gameManager = gameManager;
-  }
+    constructor(gameManager) {
+        this.gameManager = gameManager;
+    }
 }
