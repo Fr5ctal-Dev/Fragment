@@ -14,8 +14,8 @@ export class GameManager extends Manager {
     super(null);
     this.gameManager = this;
     this.projectPath = projectPath;
-    this.windowManager = new WindowManager(this);
     this.clock = new Clock(this);
+    this.windowManager = new WindowManager(this);
     this.sceneManager = new SceneManager(this);
 
     this.ticker = new PIXI.Ticker();
@@ -33,16 +33,16 @@ export class GameManager extends Manager {
 
   update(dt) {
     super.update(dt);
-    this.sceneManager.update(dt);
     this.clock.update(dt);
+    this.sceneManager.update(dt);
     this.windowManager.update(dt);
   }
 
   destroy() {
     super.destroy();
     this.ticker.stop();
-    this.sceneManager.destroy();
     this.clock.destroy();
+    this.sceneManager.destroy();
     this.windowManager.destroy();
   }
 

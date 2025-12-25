@@ -10,7 +10,6 @@ export class WindowManager extends Manager {
     this.windowTitle = windowTitle;
     this.canvases = [];
     this.globalCanvas = null;
-    this._initialized = false;
   }
 
   async init() {
@@ -21,8 +20,6 @@ export class WindowManager extends Manager {
     this.app.canvas.style.position = 'absolute';
 
     document.body.appendChild(this.app.canvas);
-
-    this._initialized = true;
   }
 
   get windowSize() {

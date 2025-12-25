@@ -33,7 +33,7 @@ export class Clock extends Manager {
    * @returns {number} Frames per second (fps)
    */
   get fps() {
-    return 1 / this.dt;
+    return this.dt > 0 ? 1 / this.dt : 0;
   }
 
   update(dt) {
