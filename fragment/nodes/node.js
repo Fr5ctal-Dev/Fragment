@@ -22,6 +22,12 @@ export class Node extends GameElement {
     }
 
     setParent(node) {
+        if (node !== null && this.isAncestorOf(node)) {
+            throw new Error('Circular parent-child relationship detected.');
+        }
+        if (this === node) {
+            throw new Error('A node cannot be its own parent.');
+        }
         if (this.parent) {
             const index = this.parent.children.indexOf(this);
             this.parent.children.splice(index, 1);
@@ -99,7 +105,10 @@ export class Node extends GameElement {
         this.destroyed = true;
     }
 
-    isAncestor(node) {
+    isAncestorOf(node) {
+        if (this === node) {
+            return false;
+        }
         while (true) {
             if (node === this) {
                 return true;
