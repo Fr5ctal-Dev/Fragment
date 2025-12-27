@@ -9,6 +9,7 @@ export class Node extends GameElement {
         this.scene = scene;
         this.children = [];
         this._properties = properties;
+        this.destroyed = false;
         this.setParent(parent);
     }
 
@@ -23,9 +24,7 @@ export class Node extends GameElement {
     setParent(node) {
         if (this.parent) {
             const index = this.parent.children.indexOf(this);
-            if (index > -1) {
-                this.parent.children.splice(index, 1);
-            }
+            this.parent.children.splice(index, 1);
         }
         this.parent = node;
         if (node) {
@@ -49,7 +48,7 @@ export class Node extends GameElement {
      */
     traverse(action) {
         action(this);
-        for (const child of this.children) {
+        for (const child of [...this.children]) {
             child.traverse(action);
         }
     }
@@ -59,7 +58,7 @@ export class Node extends GameElement {
      * @param {Function} nodeType - Node class/constructor to match
      */
     findAncestorOfType(nodeType) {
-        if (!this.parent) {
+        if (this.parent === null) {
             return null;
         }
 
@@ -69,7 +68,7 @@ export class Node extends GameElement {
                 return currentNode;
             }
 
-            if (!currentNode.parent) {
+            if (currentNode.parent === null) {
                 return null;
             }
             currentNode = currentNode.parent;
@@ -88,13 +87,16 @@ export class Node extends GameElement {
     }
 
     /**
-     * Destroys node without destroying children.
+     * Destroys node without destroying children (or detaching them).
+     * Avoid using this method. Please use destroy() instead as it is safer.
      */
     destroySelf() {
         this.onDestroy();
+        this.setParent(null);
         if (this.scene !== null) {
             this.scene.unregisterNode(this);
         }
+        this.destroyed = true;
     }
 
     isAncestor(node) {

@@ -9,7 +9,7 @@ export class WindowManager extends Manager {
         this.app = new PIXI.Application();
         this.windowTitle = windowTitle;
         this.canvases = [];
-        this.globalCanvas = null;
+        this.globalCanvas = new Canvas(this.gameManager, {}, null, null, null, true); // isGlobalCanvas = true;
     }
 
     async init() {
@@ -30,11 +30,24 @@ export class WindowManager extends Manager {
         this.app.renderer.resize(size.x, size.y);
     }
 
-    setupCanvas() {
-        this.globalCanvas = new Canvas(this.gameManager, {}, null, null, null, true); // isGlobalCanvas = true
+    registerCanvas(canvas) {
+        if (this.canvases.includes(canvas)) {
+            throw new Error('Canvas is already registered to the WindowManager.');
+        }
+        this.canvases.push(canvas);
     }
 
-    registerCanvas(canvas) {
-        this.canvases.push(canvas);
+    unregisterCanvas(canvas) {
+        const index = this.canvases.indexOf(canvas);
+        if (index === -1) {
+            throw new Error('Canvas is not registered to the WindowManager.');
+        }
+        this.canvases.splice(index, 1);
+    }
+
+    destroy() {
+        super.destroy();
+        this.globalCanvas.destroy();
+        this.app.destroy(true, true);
     }
 }

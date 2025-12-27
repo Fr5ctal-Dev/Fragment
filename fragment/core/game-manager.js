@@ -28,7 +28,6 @@ export class GameManager extends Manager {
 
     async init() {
         await this.windowManager.init();
-        this.windowManager.setupCanvas();
     }
 
     update(dt) {
@@ -41,6 +40,7 @@ export class GameManager extends Manager {
     destroy() {
         super.destroy();
         this.ticker.stop();
+        this.ticker.destroy();
         this.clock.destroy();
         this.sceneManager.destroy();
         this.windowManager.destroy();

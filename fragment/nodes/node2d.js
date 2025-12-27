@@ -14,7 +14,7 @@ export class Node2D extends Node {
      * The global position of node.
      */
     get worldPosition() {
-        if (!this.parent || !this.parent.worldPosition) {
+        if (!this.parent || this.parent.worldPosition === undefined) {
             return this.position;
         }
 
@@ -53,7 +53,7 @@ export class Node2D extends Node {
      * The global scale of node.
      */
     get worldScale() {
-        if (!this.parent || !this.parent.worldScale) {
+        if (!this.parent || this.parent.worldScale === undefined) {
             return this.scale;
         }
 

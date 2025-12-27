@@ -74,23 +74,31 @@ export class Scene extends Manager {
         }
         // Call fullInit after all nodes are created
         for (const node of Object.values(tempNodeStorage)) {
-            node.fullInit();
+            if (!node.destroyed) {
+                node.fullInit();
+            }
         }
         // Call onStart on all nodes
         for (const node of Object.values(tempNodeStorage)) {
-            node.onStart();
+            if (!node.destroyed) {
+                node.onStart();
+            }
         }
     }
 
     registerNode(node) {
+        if (this.nodeStorage.includes(node)) {
+            throw new Error('Node already registered in scene.');
+        }
         this.nodeStorage.push(node);
     }
 
     unregisterNode(node) {
         const index = this.nodeStorage.indexOf(node);
-        if (index > -1) {
-            this.nodeStorage.splice(index, 1);
+        if (index === -1) {
+            throw new Error('Node not registered in scene.');
         }
+        this.nodeStorage.splice(index, 1);
     }
 
     /**
@@ -102,7 +110,7 @@ export class Scene extends Manager {
     convertNodeProperties(properties) {
         const newProperties = {};
         for (const key in properties) {
-            if (PROPERTY_NAME_REFERENCE[key] !== undefined) {
+            if (PROPERTY_NAME_REFERENCE[key] !== null) {
                 newProperties[PROPERTY_NAME_REFERENCE[key]] = properties[key];
             }
         }
@@ -111,16 +119,20 @@ export class Scene extends Manager {
 
     update(dt) {
         super.update(dt);
-        for (const node of this.nodeStorage) {
-            node.update(dt);
+        const nodesToUpdate = [...this.nodeStorage];
+        for (const node of nodesToUpdate) {
+            if (!node.destroyed) {
+                node.update(dt);
+            }
         }
     }
 
     destroy() {
         super.destroy();
-        if (this.rootNode !== null) {
+        if (this.rootNode !== null && !this.rootNode.destroyed) {
             this.rootNode.destroy();
         }
+        this.nodeStorage = [];
     }
 }
 
@@ -138,12 +150,13 @@ export class SceneManager extends Manager {
          * Instantiates a scene based on scene file.
          * @param {string} scenePath - The scene file path
          */
-        const scene = new Scene(this.gameManager, scenePath);
-        await scene.init();
-
         if (this.currentScene) {
             this.currentScene.destroy();
         }
+
+        const scene = new Scene(this.gameManager, scenePath);
+        await scene.init();
+
         this.currentScene = scene;
     }
 

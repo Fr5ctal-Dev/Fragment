@@ -17,9 +17,9 @@ export class Camera extends Node2D {
     }
 
     fullInit() {
-        this.targetCanvas = this.findAncestorOfType(Canvas) ||
-            this.gameManager.windowManager.globalCanvas;
-        this.targetCanvas.registerCamera(this);
+        super.fullInit();
+        this.targetCanvas = null;
+        this.updateTargetCanvas();
     }
 
     update(dt) {
@@ -28,10 +28,33 @@ export class Camera extends Node2D {
     }
 
     updatePixiTransform() {
-        if (!this.pixiContainer) return;
+        if (this.destroyed) return;
         this.pixiContainer.position.set(-this.worldPosition.x, -this.worldPosition.y);
         this.pixiContainer.rotation = -this.worldRotation * Math.PI / 180;
         this.pixiContainer.scale.set(this.zoom, this.zoom);
+    }
+
+    updateTargetCanvas() {
+        let target = this.findAncestorOfType(Canvas)
+        if (target === null || target.destroyed) {
+            target = this.gameManager.windowManager.globalCanvas;
+        }
+        if (this.targetCanvas === target) {
+            return;
+        }
+        if (this.targetCanvas !== null && !this.targetCanvas.destroyed) {
+            this.targetCanvas.unregisterActiveCamera();
+        }
+        this.targetCanvas = target;
+        this.targetCanvas.registerCamera(this);
+    }
+
+    destroySelf() {
+        if (!this.targetCanvas.destroyed && this.targetCanvas.activeCamera === this) {
+            this.targetCanvas.unregisterActiveCamera();
+        }
+        this.pixiContainer.destroy();
+        super.destroySelf();
     }
 
     get viewSize() {
@@ -42,7 +65,7 @@ export class Camera extends Node2D {
     }
 
     get zoom() {
-        return this._properties['zoom'] || 1.0;
+        return this._properties['zoom'];
     }
 
     set zoom(zoom) {
