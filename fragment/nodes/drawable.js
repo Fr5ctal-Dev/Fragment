@@ -1,3 +1,5 @@
+import * as PIXI from 'pixi.js';
+
 import { Node2D } from '/fragment/nodes/node2d.js';
 import { Canvas } from '/fragment/nodes/canvas.js';
 

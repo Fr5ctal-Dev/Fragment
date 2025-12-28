@@ -89,7 +89,13 @@ class ExecuteSceneTask(BaseTask):
   </style>
 </head>
 <body>
-  <script src="https://cdn.jsdelivr.net/npm/pixi.js@8.14.3/dist/pixi.min.js"></script>
+  <script type="importmap">
+    {
+      "imports": {
+        "pixi.js": "https://cdn.jsdelivr.net/npm/pixi.js@latest/dist/pixi.min.mjs"
+      }
+    }
+  </script>
 
   <script type="module">
     import { setup } from '/fragment/main.js';

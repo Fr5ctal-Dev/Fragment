@@ -1,3 +1,5 @@
+import * as PIXI from 'pixi.js';
+
 import { Manager } from '/fragment/core/manager.js';
 import { WindowManager } from '/fragment/core/window.js';
 import { Clock } from '/fragment/core/clock.js';

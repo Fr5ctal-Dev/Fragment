@@ -1,3 +1,5 @@
+import * as PIXI from 'pixi.js';
+
 import { Drawable } from '/fragment/nodes/drawable.js';
 
 export class Sprite extends Drawable {

@@ -1,3 +1,5 @@
+import * as PIXI from 'pixi.js';
+
 import { Manager } from '/fragment/core/manager.js';
 import { Vector2 } from '/fragment/types/vector.js';
 import { Canvas } from '/fragment/nodes/canvas.js';
