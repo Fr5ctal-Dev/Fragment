@@ -9,7 +9,6 @@ from qdarktheme import setup_theme
 from pathlib import Path
 import platform
 import sys
-import os
 import json
 import shutil
 import tempfile
@@ -31,24 +30,25 @@ class Backend(QtCore.QObject):
 
     @QtCore.Slot(result='QVariant')
     def getProjects(self):
-        return {'projects': self._projects_list()}
+        return {'projects': self._string_project_list()}
 
     @QtCore.Slot()
     def newProject(self):
         path, _ = QtWidgets.QFileDialog.getSaveFileName(None, 'New Project', '/')
         if not path:
             return
+        path = Path(path)
         try:
-            os.mkdir(path)
+            path.mkdir()
         except Exception:
             return
         try:
-            with open(os.path.join(path, 'main.fragment'), 'w') as f:
+            with open(path / 'main.fragment', 'w') as f:
                 f.write('{\'reopen\': {\'tabs\': [], \'last_tab\': None}}')
-            shutil.copytree(get_resource_path('fragment'), os.path.join(path, 'fragment'))
-            os.mkdir(os.path.join(path, 'scenes'))
-            os.mkdir(os.path.join(path, 'scripts'))
-            os.mkdir(os.path.join(path, 'assets'))
+            shutil.copytree(str(get_resource_path(Path('fragment'))), str(path / 'fragment'))
+            (path / 'scenes').mkdir()
+            (path / 'scripts').mkdir()
+            (path / 'assets').mkdir()
             self._add_to_project_list(path)
             self.openInEditor(path)
         finally:
@@ -59,35 +59,42 @@ class Backend(QtCore.QObject):
         path, _ = QtWidgets.QFileDialog.getOpenFileName(None, 'Open Project', '/', 'Fragment Projects (*.fragment)')
         if not path:
             return
-        project_root = os.path.dirname(path)
+        path = Path(path)
+        project_root = path.parent
         self._add_to_project_list(project_root)
         self.openInEditor(project_root)
         self._emit_projects()
 
     @QtCore.Slot(str)
-    def openInEditor(self, path: str):
+    def openInEditor(self, path: str | Path):
         if not path:
             return
+        if isinstance(path, str):
+            path = Path(path)
         self.editor_instances.append(launch_editor(path))
 
     def _emit_projects(self):
-        self.projectsUpdated.emit({'projects': self._projects_list()})
+        self.projectsUpdated.emit({'projects': self._string_project_list()})
 
     def _projects_list(self):
         projects = self._read_projects()
-        items = [{'name': name, 'path': p} for name, p in projects.items() if os.path.exists(p)]
+        items = [{'name': name, 'path': p} for name, p in projects.items() if p.exists()]
         items.sort(key=lambda x: x['name'].lower())
         return items
+    
+    def _string_project_list(self):
+        project_list = self._projects_list()
+        return [{'name': item['name'], 'path': item['path'].as_posix()} for item in project_list]
 
-    def _add_to_project_list(self, path: str):
+    def _add_to_project_list(self, path):
         projects = self._read_projects()
-        projects[os.path.basename(path)] = path
+        projects[path.name] = path
         self._write_projects(projects)
 
     def check_for_missing_projects(self):
         changed = False
         projects = self._read_projects()
-        pruned = {k: v for k, v in projects.items() if os.path.exists(v)}
+        pruned = {k: v for k, v in projects.items() if v.exists()}
         if len(pruned) != len(projects):
             changed = True
             self._write_projects(pruned)
@@ -97,9 +104,9 @@ class Backend(QtCore.QObject):
     def config_path(self):
         base_temp = Path(tempfile.gettempdir())
         target = base_temp / self.config_path_folder
-        if not os.path.exists(target):
+        if not target.exists():
             self._create_config_folder(target)
-        return str(target)
+        return target
 
     def _create_config_folder(self, path: Path):
         path.mkdir(parents=True, exist_ok=True)
@@ -109,18 +116,26 @@ class Backend(QtCore.QObject):
                 f.write('{}')
 
     def _read_projects(self):
-        cfg = Path(self.config_path()) / 'projects.json'
+        cfg = self.config_path() / 'projects.json'
         try:
             with open(cfg, 'r') as f:
-                return json.loads(f.read() or '{}')
+                json_projects = json.loads(f.read() or '{}')
         except Exception:
             return {}
+        
+        projects = {}
+        for name, path in json_projects.items():
+            projects[name] = Path(path)
+        return projects
 
     def _write_projects(self, projects: dict):
-        cfg = Path(self.config_path()) / 'projects.json'
-        with open(cfg, 'w') as f:
-            f.write(json.dumps(projects))
+        cfg = self.config_path() / 'projects.json'
+        json_projects = {}
+        for name, path in projects.items():
+            json_projects[name] = path.as_posix()
 
+        with open(cfg, 'w') as f:
+            f.write(json.dumps(json_projects))
 
 class Library(QtWidgets.QWidget):
     def __init__(self):
@@ -138,7 +153,7 @@ class Library(QtWidgets.QWidget):
         self.channel.registerObject('backend', self.backend)
         self.view.page().setWebChannel(self.channel)
 
-        with open(get_resource_path('library/library.html'), 'r') as f:
+        with open(get_resource_path(Path('library') / 'library.html'), 'r') as f:
             html = f.read()
 
         self.view.setHtml(html, QtCore.QUrl('qrc:///'))
@@ -151,9 +166,9 @@ def launch_library():
     setup_theme()
 
     if platform.system() == 'Windows':
-        app.setWindowIcon(QtGui.QIcon(get_resource_path('fragment/icon/icon_win.ico')))
+        app.setWindowIcon(QtGui.QIcon(str(get_resource_path(Path('fragment') / 'icon' / 'icon_win.ico'))))
     else:
-        app.setWindowIcon(QtGui.QIcon(get_resource_path('fragment/icon/icon.png')))
+        app.setWindowIcon(QtGui.QIcon(str(get_resource_path(Path('fragment') / 'icon' / 'icon.png'))))
 
     window = QWidget()
     window.setWindowTitle('Fragment Library')

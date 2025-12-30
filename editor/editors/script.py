@@ -1,5 +1,4 @@
 from editor.widgets.script_editor import ScriptEditor as ScriptEditor_
-from editor.widgets.line_numbers import LineNumberWidget
 from .editor import Editor
 from PySide6 import QtWidgets
 
@@ -10,23 +9,34 @@ class ScriptEditor(Editor):
         self.script = script
 
         self.central_widget = QtWidgets.QWidget()
-        self.central_widget_layout = QtWidgets.QHBoxLayout(self.central_widget)
+        self.central_widget_layout = QtWidgets.QStackedLayout(self.central_widget)
         self.central_widget_layout.setSpacing(0)
         self.central_widget_layout.setContentsMargins(0, 0, 0, 0)
 
         self.script_editor = ScriptEditor_(script, path)
 
-        self.line_numbers = LineNumberWidget(self.script_editor)
-        self.script_editor.update_timer.timeout.connect(self.line_numbers.repaint)
+        self.loading_screen = QtWidgets.QWidget()
+        self.loading_screen_layout = QtWidgets.QHBoxLayout(self.loading_screen)
+        self.loading_progress = QtWidgets.QProgressBar()
+        self.loading_progress.setRange(0, 100)
+        self.loading_progress.setTextVisible(False)
 
-        self.central_widget_layout.addWidget(self.line_numbers)
+        spacer1 = QtWidgets.QWidget()
+        spacer2 = QtWidgets.QWidget()
+
+        self.loading_screen_layout.addWidget(spacer1, stretch=1)
+        self.loading_screen_layout.addWidget(self.loading_progress, stretch=1)
+        self.loading_screen_layout.addWidget(spacer2, stretch=1)
+
+        self.central_widget_layout.addWidget(self.loading_screen)
         self.central_widget_layout.addWidget(self.script_editor)
+        self.central_widget_layout.setCurrentWidget(self.loading_screen)
+
+        self.script_editor.loadProgress.connect(lambda progress: self.loading_progress.setValue(progress))
+        self.script_editor.loadFinished.connect(lambda: self.central_widget_layout.setCurrentWidget(self.script_editor))
+        
         self.setCentralWidget(self.central_widget)
 
     def save(self):
         super().save()
         self.script_editor.save()
-
-    def cleanup(self):
-        super().cleanup()
-        self.script_editor.update_timer.stop()

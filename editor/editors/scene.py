@@ -4,6 +4,8 @@ from .editor import Editor
 from editor.utils.path import get_resource_path
 from PySide6 import QtWidgets, QtGui, QtCore
 from PySide6.QtCore import Qt
+from pathlib import Path
+import json
 
 
 class SceneEditor(Editor):
@@ -19,7 +21,7 @@ class SceneEditor(Editor):
         self.menu_bar_layout = QtWidgets.QHBoxLayout(self.menu_bar)
         self.run_button = QtWidgets.QPushButton()
         self.run_button.setFixedHeight(20)
-        self.run_button.setIcon(QtGui.QIcon(get_resource_path('editor/assets/ui_icons/play.png')))
+        self.run_button.setIcon(QtGui.QIcon(str(get_resource_path(Path('editor') / 'assets' / 'ui_icons' / 'play.png'))))
         self.run_button.setIconSize(QtCore.QSize(10, 10))
         self.run_button.clicked.connect(self.run)
         self.menu_bar_layout.addWidget(self.run_button)
@@ -50,16 +52,26 @@ class SceneEditor(Editor):
         self.load_node_tree()
 
     def load_node_tree(self):
-        with open(self.scene) as f:
-            content = f.read()
+        with open(self.path / self.scene) as f:
+            content = json.load(f)
 
-        self.node_tree.load_from_scene_data(eval(content))
+        scene_data = {}
+        for json_key, node_data in content.items():
+            path_list = json.loads(json_key)
+            scene_data[tuple(path_list)] = node_data
+
+        self.node_tree.load_from_scene_data(scene_data)
 
     def save(self):
         super().save()
         data = self.node_tree.save_to_scene_data()
-        with open(self.scene, 'w') as f:
-            f.write(str(data))
+        json_data = {}
+        for node_path, node_data in data.items():
+            json_key = json.dumps(list(node_path))
+            json_data[json_key] = node_data
+
+        with open(self.path / self.scene, 'w') as f:
+            json.dump(json_data, f, indent=2)
 
     def run(self):
         self.editor.task_manager.new_task('execute_scene', [self])

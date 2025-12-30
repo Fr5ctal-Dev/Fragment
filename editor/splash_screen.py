@@ -2,12 +2,13 @@ from editor.utils.path import get_resource_path
 from PySide6.QtWidgets import QWidget
 from PySide6.QtGui import QPainter, QPixmap
 from PySide6.QtCore import Qt
+from pathlib import Path
 
 
 class SplashScreen(QWidget):
     def __init__(self):
         super().__init__()
-        self.pixmap = QPixmap(get_resource_path('fragment/icon/splash_screens/logo.png'))
+        self.pixmap = QPixmap(str(get_resource_path(Path('fragment') / 'icon' / 'splash_screens' / 'logo.png')))
         self.setStyleSheet('background-color: #121212')
 
     def resizeEvent(self, event):
