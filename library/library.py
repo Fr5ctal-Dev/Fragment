@@ -1,6 +1,6 @@
-from editor.editor import launch_editor
-from editor.utils.path import get_resource_path
-from editor.splash_screen import SplashScreen
+from editor import launch_editor
+from editor.tools.utils.path import get_resource_path
+from library.splash_screen import SplashScreen
 from PySide6 import QtWidgets, QtCore, QtGui
 from PySide6.QtWidgets import QApplication, QWidget, QStackedLayout
 from PySide6.QtWebEngineWidgets import QWebEngineView
