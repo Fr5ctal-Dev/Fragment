@@ -31,10 +31,6 @@ class BaseNodeProperties(PropertiesModel):
     def unoverride_property(self, name):
         self.properties[name].scene_override = False
 
-    def setup_property_editors(self):
-        for prop in self.properties.values():
-            prop.setup_property_editor(self.scene_editor)
-
     def to_data(self):
         data = {'type': self.type, 'properties': {}}
 
