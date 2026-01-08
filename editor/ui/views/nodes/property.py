@@ -14,9 +14,7 @@ class PropertyNameWidget(QtWidgets.QWidget):
         self.node_properties = properties
         self.text = text
         self.display_text = text.split('/')[-1]
-        self.overridden = False
-        if overridden:
-            self.override()
+        self.overridden = overridden
         
         self.main_layout = QtWidgets.QHBoxLayout(self)
         self.main_layout.setContentsMargins(0, 0, 0, 0)
@@ -25,6 +23,9 @@ class PropertyNameWidget(QtWidgets.QWidget):
         self.stripe = QtWidgets.QWidget()
         self.stripe.setFixedWidth(5)
         self.main_layout.addWidget(self.stripe)
+
+        if self.overridden:
+            self.override()
 
         self.label = QtWidgets.QLabel(self.display_text)
         self.main_layout.addWidget(self.label)
