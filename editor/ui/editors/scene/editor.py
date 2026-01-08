@@ -1,5 +1,5 @@
-from editor.ui.widgets.node_tree import NodeTree
-from editor.ui.widgets.inspector import Inspector
+from editor.ui.views.nodes import NodeView
+from editor.core.models.nodes import NodeTreeModel
 from ..editor import Editor
 from editor.tools.utils.path import get_resource_path
 from PySide6 import QtWidgets, QtGui, QtCore
@@ -31,18 +31,12 @@ class SceneEditor(Editor):
         self.node_tree_dock.setWindowTitle('Node Tree')
         self.node_tree_dock.setAllowedAreas(Qt.DockWidgetArea.AllDockWidgetAreas)
         self.node_tree_dock.setFeatures(QtWidgets.QDockWidget.DockWidgetFeature.DockWidgetMovable | QtWidgets.QDockWidget.DockWidgetFeature.DockWidgetFloatable | QtWidgets.QDockWidget.DockWidgetFeature.DockWidgetClosable)
-        self.node_tree = NodeTree(self)
-        self.node_tree.setExpandsOnDoubleClick(False)
-        self.node_tree_dock.setWidget(self.node_tree)
+        self.node_model = NodeTreeModel(self)
+        self.node_tree = NodeView(self.editor, self)
+        self.node_tree.set_model(self.node_model)
+        assert self.node_tree.node_tree is not None # For type checker
+        self.node_tree_dock.setWidget(self.node_tree.node_tree)
         self.addDockWidget(Qt.DockWidgetArea.LeftDockWidgetArea, self.node_tree_dock)
-
-        self.inspector_dock = QtWidgets.QDockWidget()
-        self.inspector_dock.setWindowTitle('Inspector')
-        self.inspector_dock.setAllowedAreas(Qt.DockWidgetArea.AllDockWidgetAreas)
-        self.inspector_dock.setFeatures(QtWidgets.QDockWidget.DockWidgetFeature.DockWidgetMovable | QtWidgets.QDockWidget.DockWidgetFeature.DockWidgetFloatable | QtWidgets.QDockWidget.DockWidgetFeature.DockWidgetClosable)
-        self.inspector = Inspector(self)
-        self.inspector_dock.setWidget(self.inspector)
-        self.addDockWidget(Qt.DockWidgetArea.RightDockWidgetArea, self.inspector_dock)
 
         #self.viewport = Viewport(self)
         #self.central_widget_layout.addWidget(self.viewport)
@@ -60,11 +54,11 @@ class SceneEditor(Editor):
             path_list = json.loads(json_key)
             scene_data[tuple(path_list)] = node_data
 
-        self.node_tree.load_from_scene_data(scene_data)
+        self.node_model.load_from_scene_data(scene_data)
 
     def save(self):
         super().save()
-        data = self.node_tree.save_to_scene_data()
+        data = self.node_model.save_to_scene_data()
         json_data = {}
         for node_path, node_data in data.items():
             json_key = json.dumps(list(node_path))
@@ -79,3 +73,4 @@ class SceneEditor(Editor):
     def cleanup(self):
         super().cleanup()
         self.node_tree.cleanup()
+        self.node_model.cleanup()

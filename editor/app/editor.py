@@ -4,6 +4,7 @@ from editor.ui.editors.script import ScriptEditor
 from editor.ui.widgets.filesystem import FileSystem
 from editor.ui.widgets.task_manager import TaskManager
 from editor.ui.widgets.notifications import Notifications
+from editor.ui.views.inspector import InspectorView
 
 from editor.tools.utils.path import get_resource_path
 
@@ -98,6 +99,15 @@ class Editor(QtWidgets.QMainWindow):
         self.bottom_dock.setFeatures(QtWidgets.QDockWidget.DockWidgetFeature.DockWidgetMovable | QtWidgets.QDockWidget.DockWidgetFeature.DockWidgetFloatable | QtWidgets.QDockWidget.DockWidgetFeature.DockWidgetClosable)
         self.addDockWidget(Qt.DockWidgetArea.BottomDockWidgetArea, self.bottom_dock)
 
+        self.inspector_dock = QtWidgets.QDockWidget()
+        self.inspector_dock.setWindowTitle('Inspector')
+        self.inspector_dock.setAllowedAreas(Qt.DockWidgetArea.AllDockWidgetAreas)
+        self.inspector_dock.setFeatures(QtWidgets.QDockWidget.DockWidgetFeature.DockWidgetMovable | QtWidgets.QDockWidget.DockWidgetFeature.DockWidgetFloatable | QtWidgets.QDockWidget.DockWidgetFeature.DockWidgetClosable)
+        self.inspector = InspectorView(self)
+        self.inspector.set_model(None)
+        self.inspector_dock.setWidget(self.inspector.main_widget)
+        self.addDockWidget(Qt.DockWidgetArea.RightDockWidgetArea, self.inspector_dock)
+
         self.reopen_last()
 
     def save_settings(self):
@@ -151,6 +161,9 @@ class Editor(QtWidgets.QMainWindow):
 
         if filetype == 'script':
             self.new_tab(lambda _path: ScriptEditor(_path, self, path), path.name)
+
+    def set_inspector_model(self, property_model):
+        self.inspector.set_model(property_model)
 
     def cleanup(self):
         self.save_tabs()

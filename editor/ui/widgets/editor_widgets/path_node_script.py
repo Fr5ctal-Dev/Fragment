@@ -9,6 +9,7 @@ from pathlib import Path
 class PathNodeScript(PathScript):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
+        self.node_type = self.source_model.type
         self.create_script_button = QPushButton()
         self.main_layout.addWidget(self.create_script_button)
         self.create_script_button.setIcon(QIcon(str(get_resource_path(Path('editor') / 'assets' / 'icons' / 'ui' / 'add.png'))))
@@ -24,7 +25,7 @@ export class Node extends ParentNodeType { }'''
             return
 
         path = path.with_suffix('.js').as_posix()
-        with open(self.scene_editor.path / path, 'w') as f:
+        with open(self.path / path, 'w') as f:
             f.write(code)
 
         self.value = path

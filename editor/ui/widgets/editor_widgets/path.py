@@ -45,7 +45,7 @@ class Path(EditorWidget):
     def open_path(self):
         if not self.value:
             return
-        self.scene_editor.editor.open(PathLib(self.value))
+        self.editor.open(PathLib(self.value))
 
     def update_file_icon(self):
         if not self.FILE_FILTER:

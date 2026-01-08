@@ -4,11 +4,11 @@ from PySide6.QtCore import Signal
 
 class EditorWidget(QWidget):
     value_changed = Signal(object)
-    def __init__(self, scene_editor, node_type, value, type, name):
+    def __init__(self, editor, source_model, value, type, name):
         super().__init__()
-        self.scene_editor = scene_editor
-        self.node_type = node_type
-        self.path = self.scene_editor.path
+        self.editor = editor
+        self.path = editor.path
+        self.source_model = source_model
 
         self.type = type
         self.value = value
