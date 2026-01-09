@@ -17,14 +17,14 @@ class NewNodeSelectionDialog(SelectionDialog):
         self.node_tree.itemClicked.connect(self.enable_continue)
         self.central_layout.addWidget(self.node_tree)
 
-        with open(get_resource_path(Path('editor') / 'assets' / 'config' / 'nodes' / 'tree.vtree')) as f:
+        with open(get_resource_path(Path('editor') / 'config' / 'nodes' / 'tree.vtree')) as f:
             content = f.read()
 
         indentation = {}
 
         for line in content.split('\n'):
             widget = QtWidgets.QTreeWidgetItem([line.strip()])
-            widget.setIcon(0, QtGui.QIcon(str(get_resource_path(Path('editor') / 'assets' / 'icons' / 'node' / f'{line.strip()}.png'))))
+            widget.setIcon(0, QtGui.QIcon(str(get_resource_path(Path('editor') / 'assets' / 'icons' / 'node' / f'{line.strip()}.svg'))))
             indent = len(line.split(' ')) - 1
             indentation[indent] = widget
             if indent == 0:

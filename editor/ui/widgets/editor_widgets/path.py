@@ -23,11 +23,11 @@ class Path(EditorWidget):
         self.path_display.setReadOnly(True)
         self.path_selection_button = QPushButton()
         self.main_layout.addWidget(self.path_selection_button)
-        self.path_selection_button.setIcon(QIcon(str(get_resource_path(PathLib('editor') / 'assets' / 'icons' / 'file' / 'folder.png'))))
+        self.path_selection_button.setIcon(QIcon(str(get_resource_path(PathLib('editor') / 'assets' / 'icons' / 'file' / 'folder.svg'))))
         self.path_selection_button.clicked.connect(lambda: self.select_path()) # Do not remove 'lambda'
         self.open_path_button = QPushButton()
         self.main_layout.addWidget(self.open_path_button)
-        self.open_path_button.setIcon(QIcon(str(get_resource_path(PathLib('editor') / 'assets' / 'icons' / 'ui' / 'open.png'))))
+        self.open_path_button.setIcon(QIcon(str(get_resource_path(PathLib('editor') / 'assets' / 'icons' / 'ui' / 'open.svg'))))
         self.open_path_button.clicked.connect(self.open_path)
 
         self.update_file_icon()

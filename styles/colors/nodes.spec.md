@@ -1,0 +1,22 @@
+# Node Colors
+
+## Other
+` #a9a9a9 `
+
+## Graphics
+` #ce6605 `
+
+## Physics
+` #05abce `
+
+## Input
+` #ccbb23 `
+
+## Animation
+` #db2e2e `
+
+## UI
+` #546963 `
+
+## Audio
+` #77eb34 `

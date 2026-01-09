@@ -21,7 +21,7 @@ class SceneEditor(Editor):
         self.menu_bar_layout = QtWidgets.QHBoxLayout(self.menu_bar)
         self.run_button = QtWidgets.QPushButton()
         self.run_button.setFixedHeight(20)
-        self.run_button.setIcon(QtGui.QIcon(str(get_resource_path(Path('editor') / 'assets' / 'icons' / 'ui' / 'play.png'))))
+        self.run_button.setIcon(QtGui.QIcon(str(get_resource_path(Path('editor') / 'assets' / 'icons' / 'ui' / 'play.svg'))))
         self.run_button.setIconSize(QtCore.QSize(10, 10))
         self.run_button.clicked.connect(self.run)
         self.menu_bar_layout.addWidget(self.run_button)

@@ -21,7 +21,7 @@ class ImportAssetWorker(QtCore.QObject):
         self.path = path
         self.files = files
         self.is_terminating = False
-        with open(get_resource_path(Path('editor') / 'assets' / 'config' / 'importers' / 'filetypes.json')) as f:
+        with open(get_resource_path(Path('editor') / 'config' / 'importers' / 'filetypes.json')) as f:
             filetypes = json.loads(f.read())
         self.filetypes = inverse_dictionary(filetypes)
 

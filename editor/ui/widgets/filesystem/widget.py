@@ -11,12 +11,12 @@ import json
 import shutil
 
 
-with open(get_resource_path(Path('editor') / 'assets' / 'config' / 'filetypes' / 'filetypes.json')) as f:
+with open(get_resource_path(Path('editor') / 'config' / 'filetypes' / 'filetypes.json')) as f:
     filetypes = json.loads(f.read())
     for name, ext in filetypes.items():
         filetypes[name] = Path(ext)
 
-with open(get_resource_path(Path('editor') / 'assets' / 'config' / 'filetypes' / 'uncreatable.json')) as f:
+with open(get_resource_path(Path('editor') / 'config' / 'filetypes' / 'uncreatable.json')) as f:
     uncreatable_filetypes = json.loads(f.read())
     for name, ext in uncreatable_filetypes.items():
         uncreatable_filetypes[name] = Path(ext)
@@ -25,14 +25,14 @@ with open(get_resource_path(Path('editor') / 'assets' / 'config' / 'filetypes' /
 class FileIconProvider(QtWidgets.QFileIconProvider):
     def icon(self, file_info):
         if not hasattr(file_info, 'suffix'):
-            return QtGui.QIcon(str(get_resource_path(Path('editor') / 'assets' / 'icons' / 'file' / 'folder.png')))
+            return QtGui.QIcon(str(get_resource_path(Path('editor') / 'assets' / 'icons' / 'file' / 'folder.svg')))
         if file_info.suffix() == '':
-            return QtGui.QIcon(str(get_resource_path(Path('editor') / 'assets' / 'icons' / 'file' / 'folder.png')))
+            return QtGui.QIcon(str(get_resource_path(Path('editor') / 'assets' / 'icons' / 'file' / 'folder.svg')))
         else:
             for key, item in {**filetypes, **uncreatable_filetypes}.items():
-                if file_info.suffix() == item.suffix:
-                    return QtGui.QIcon(str(get_resource_path(Path('editor') / 'assets' / 'icons' / 'file' / (key + '.png'))))
-            return QtGui.QIcon(str(get_resource_path(Path('editor') / 'assets' / 'icons' / 'file' / 'file.png')))
+                if '.' + file_info.suffix() == item.suffix:
+                    return QtGui.QIcon(str(get_resource_path(Path('editor') / 'assets' / 'icons' / 'file' / (key + '.svg'))))
+            return QtGui.QIcon(str(get_resource_path(Path('editor') / 'assets' / 'icons' / 'file' / 'file.svg')))
 
 
 class FileSystem(QtWidgets.QTreeView):
@@ -119,7 +119,7 @@ class FileSystem(QtWidgets.QTreeView):
 
         path = path / (name + filepath.suffix)
         if not (self.path / path).exists():
-            shutil.copy(str(get_resource_path(Path('editor') / 'assets' / 'config' / 'filetypes' / 'files' / filepath)), self.path / path)
+            shutil.copy(str(get_resource_path(Path('editor') / 'config' / 'filetypes' / 'files' / filepath)), self.path / path)
 
     def create_folder(self):
         dialog = TextSelectionDialog(self, 'Name of Directory', 'Name')

@@ -14,10 +14,10 @@ from PySide6.QtCore import Qt
 from pathlib import Path
 import json
 
-with open(get_resource_path(Path('editor') / 'assets' / 'config' / 'filetypes' / 'filetypes.json')) as f:
+with open(get_resource_path(Path('editor') / 'config' / 'filetypes' / 'filetypes.json')) as f:
     FILETYPES = json.loads(f.read())
 
-with open(get_resource_path(Path('editor') / 'assets' / 'config' / 'filetypes' / 'uncreatable.json')) as f:
+with open(get_resource_path(Path('editor') / 'config' / 'filetypes' / 'uncreatable.json')) as f:
     FILETYPES = {**FILETYPES, **json.loads(f.read())}
 
 for name, ext in FILETYPES.items():
@@ -137,7 +137,7 @@ class Editor(QtWidgets.QMainWindow):
             self.tab_view.widget(i).save()
 
     def new_tab(self, editor, name):
-        self.tab_view.setCurrentIndex(self.tab_view.addTab(editor(self.path), QtGui.QIcon(str(get_resource_path(Path('editor') / 'assets' / 'icons' / 'file' / f'{get_filetype(Path(name)).lower()}.png'))), name))
+        self.tab_view.setCurrentIndex(self.tab_view.addTab(editor(self.path), QtGui.QIcon(str(get_resource_path(Path('editor') / 'assets' / 'icons' / 'file' / f'{get_filetype(Path(name)).lower()}.svg'))), name))
 
     def delete_tab(self, index):
         self.tab_view.widget(index).cleanup()

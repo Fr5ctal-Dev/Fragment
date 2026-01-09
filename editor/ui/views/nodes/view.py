@@ -166,7 +166,7 @@ class NodeTree(QtWidgets.QTreeWidget):
     def new_item(self, node: NodeItem):
         tree_item = QtWidgets.QTreeWidgetItem()
         tree_item.setText(0, self.tree_model.node_data[node].properties['Node/Name'].value)
-        tree_item.setIcon(0, QtGui.QIcon(str(get_resource_path(Path('editor') / 'assets' / 'icons' / 'node' / f'{self.tree_model.node_data[node].type.lower()}.png'))))
+        tree_item.setIcon(0, QtGui.QIcon(str(get_resource_path(Path('editor') / 'assets' / 'icons' / 'node' / f'{self.tree_model.node_data[node].type.lower()}.svg'))))
         tree_item.setFlags(tree_item.flags() | Qt.ItemFlag.ItemIsEditable)
         if node.parent:
             parent_item = self.tree_item_inverse_map[node.parent]
