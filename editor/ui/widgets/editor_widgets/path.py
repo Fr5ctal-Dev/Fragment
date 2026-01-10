@@ -27,7 +27,7 @@ class Path(EditorWidget):
         self.path_selection_button.clicked.connect(lambda: self.select_path()) # Do not remove 'lambda'
         self.open_path_button = QPushButton()
         self.main_layout.addWidget(self.open_path_button)
-        self.open_path_button.setIcon(QIcon(str(get_resource_path(PathLib('editor') / 'assets' / 'icons' / 'ui' / 'open.svg'))))
+        self.open_path_button.setIcon(QIcon(str(get_resource_path(PathLib('editor') / 'assets' / 'icons' / 'ui' / 'open_folder.svg'))))
         self.open_path_button.clicked.connect(self.open_path)
 
         self.update_file_icon()

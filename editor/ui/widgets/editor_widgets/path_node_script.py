@@ -12,7 +12,7 @@ class PathNodeScript(PathScript):
         self.node_type = self.source_model.type
         self.create_script_button = QPushButton()
         self.main_layout.addWidget(self.create_script_button)
-        self.create_script_button.setIcon(QIcon(str(get_resource_path(Path('editor') / 'assets' / 'icons' / 'ui' / 'add.svg'))))
+        self.create_script_button.setIcon(QIcon(str(get_resource_path(Path('editor') / 'assets' / 'icons' / 'ui' / 'plus.svg'))))
         self.create_script_button.clicked.connect(self.create_node_script)
 
     def create_node_script(self):
