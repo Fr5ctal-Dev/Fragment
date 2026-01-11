@@ -1,32 +1,13 @@
-from editor.ui.editors.scene import SceneEditor
-from editor.ui.editors.script import ScriptEditor
-
+from editor.ui.widgets.editor_view import EditorView
 from editor.ui.widgets.filesystem import FileSystem
 from editor.ui.widgets.task_manager import TaskManager
 from editor.ui.widgets.notifications import Notifications
 from editor.ui.views.inspector import InspectorView
 
-from editor.tools.utils.path import get_resource_path
-
-from PySide6 import QtWidgets, QtGui, QtCore, QtQuickWidgets
+from PySide6 import QtWidgets, QtCore, QtQuickWidgets
 from PySide6.QtCore import Qt
 
 from pathlib import Path
-import json
-
-with open(get_resource_path(Path('editor') / 'config' / 'filetypes' / 'filetypes.json')) as f:
-    FILETYPES = json.loads(f.read())
-
-with open(get_resource_path(Path('editor') / 'config' / 'filetypes' / 'uncreatable.json')) as f:
-    FILETYPES = {**FILETYPES, **json.loads(f.read())}
-
-for name, ext in FILETYPES.items():
-    FILETYPES[name] = Path(ext)
-
-def get_filetype(path: Path):
-    for name, ext in FILETYPES.items():
-        if path.suffix == ext.suffix:
-            return name
 
 
 def launch_editor(path: Path):
@@ -64,14 +45,8 @@ class Editor(QtWidgets.QMainWindow):
         super().__init__()
         self.path = path
 
-        self.tab_view = QtWidgets.QTabWidget()
-        self.setCentralWidget(self.tab_view)
-        self.tab_view.setMovable(True)
-        self.tab_view.setTabsClosable(True)
-        self.tab_view.setUsesScrollButtons(True)
-        self.tab_view.setDocumentMode(True)
-        self.tab_view.tabCloseRequested.connect(self.delete_tab)
-        self.tab_view.currentChanged.connect(self.save_tabs)
+        self.editor_view = EditorView(self)
+        self.setCentralWidget(self.editor_view)
 
         self.file_system_dock = QtWidgets.QDockWidget()
         self.file_system_dock.setWindowTitle('Files')
@@ -108,66 +83,12 @@ class Editor(QtWidgets.QMainWindow):
         self.inspector_dock.setWidget(self.inspector.main_widget)
         self.addDockWidget(Qt.DockWidgetArea.RightDockWidgetArea, self.inspector_dock)
 
-        self.reopen_last()
-
-    def save_settings(self):
-        with open(self.path / 'main.fragment') as f:
-            content = eval(f.read())
-
-        content['reopen']['tabs'] = list([self.tab_view.widget(e).file.as_posix() for e in range(self.tab_view.count())])
-        content['reopen']['last_tab'] = self.tab_view.currentIndex()
-
-        with open(self.path / 'main.fragment', 'w') as f:
-            f.write(str(content))
-
-    def reopen_last(self):
-        with open(self.path / 'main.fragment') as f:
-            content = eval(f.read())
-
-        tabs = content['reopen']['tabs']
-        last_tab = content['reopen']['last_tab']
-
-        for tab in tabs:
-            self.open(Path(tab))
-        if last_tab is not None:
-            self.tab_view.setCurrentIndex(last_tab)
-
-    def save_tabs(self):
-        for i in range(self.tab_view.count()):
-            self.tab_view.widget(i).save()
-
-    def new_tab(self, editor, name):
-        self.tab_view.setCurrentIndex(self.tab_view.addTab(editor(self.path), QtGui.QIcon(str(get_resource_path(Path('editor') / 'assets' / 'icons' / 'file' / f'{get_filetype(Path(name)).lower()}.svg'))), name))
-
-    def delete_tab(self, index):
-        self.tab_view.widget(index).cleanup()
-        self.tab_view.removeTab(index)
-
-    def open(self, path):
-        if not (self.path / path).exists():
-            return
-
-        for i in range(self.tab_view.count()):
-            if self.tab_view.tabText(i) == path.name:
-                self.tab_view.setCurrentIndex(i)
-                return
-
-        filetype = get_filetype(path)
-        if filetype is None: # Unsupported file format
-            return
-        filetype = filetype.lower()
-        if filetype == 'scene':
-            self.new_tab(lambda _path: SceneEditor(_path, self, path), path.name)
-
-        if filetype == 'script':
-            self.new_tab(lambda _path: ScriptEditor(_path, self, path), path.name)
+    def open(self, path: Path):
+        self.editor_view.select_new_file(path)
 
     def set_inspector_model(self, property_model):
         self.inspector.set_model(property_model)
 
     def cleanup(self):
-        self.save_tabs()
-        self.save_settings()
-        for i in range(self.tab_view.count()):
-            self.delete_tab(0)
+        self.editor_view.cleanup()
         self.task_manager.cleanup()

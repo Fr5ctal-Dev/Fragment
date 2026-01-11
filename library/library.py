@@ -44,7 +44,7 @@ class Backend(QtCore.QObject):
             return
         try:
             with open(path / 'main.fragment', 'w') as f:
-                f.write('{\'reopen\': {\'tabs\': [], \'last_tab\': None}}')
+                f.write('')
             shutil.copytree(str(get_resource_path(Path('fragment'))), str(path / 'fragment'))
             (path / 'scenes').mkdir()
             (path / 'scripts').mkdir()
