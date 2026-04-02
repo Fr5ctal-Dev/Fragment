@@ -2,22 +2,11 @@ from PySide6 import QtWidgets, QtCore, QtGui
 from editor.ui.editors import EDITORS
 from editor.ui.editors.editor import Editor
 from editor.tools.utils.path import get_resource_path
+from editor.config.filetypes import suffix_to_filetype
 from pathlib import Path
-import json
-
-with open(get_resource_path(Path('editor') / 'config' / 'filetypes' / 'filetypes.json')) as f:
-    FILETYPES = json.loads(f.read())
-
-with open(get_resource_path(Path('editor') / 'config' / 'filetypes' / 'uncreatable.json')) as f:
-    FILETYPES = {**FILETYPES, **json.loads(f.read())}
-
-for name, ext in FILETYPES.items():
-    FILETYPES[name] = Path(ext)
 
 def get_filetype(path: Path):
-    for name, ext in FILETYPES.items():
-        if path.suffix == ext.suffix:
-            return name
+    return suffix_to_filetype(path.suffix)
 
 
 class EditorView(QtWidgets.QWidget): # TODO: Implement recent files feature
@@ -99,6 +88,8 @@ class EditorView(QtWidgets.QWidget): # TODO: Implement recent files feature
         
         filetype = get_filetype(path)
         if filetype is None: # Unsupported file format
+            return
+        if EDITORS.get(filetype) is None: # No editor for this filetype
             return
         if self.current_editor is not None:
             self.back_history.append(self.current_editor.file)

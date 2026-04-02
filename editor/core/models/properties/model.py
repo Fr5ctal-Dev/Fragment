@@ -12,6 +12,9 @@ class PropertiesModel(BaseModel):
     def default_properties(self):
         return {}
     
+    def set_property(self, name, value):
+        self.properties[name].value = value
+    
     def cleanup(self):
         for prop in self.properties.values():
             prop.cleanup()

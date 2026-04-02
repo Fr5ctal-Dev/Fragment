@@ -21,9 +21,6 @@ class BaseNodeProperties(PropertiesModel):
     def default_properties(self):
         properties = {} # name: property
         return properties
-    
-    def set_property(self, name, value):
-        self.properties[name].value = value
 
     def override_property(self, name):
         self.properties[name].scene_override = True

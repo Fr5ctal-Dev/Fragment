@@ -6,4 +6,3 @@ class BaseModel(QtCore.QObject):
     
     def cleanup(self):
         self.deleted.emit()
-        self.deleteLater()

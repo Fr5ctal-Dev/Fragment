@@ -1,10 +1,9 @@
 from .editor_widget import EditorWidget
-from editor.tools.utils.path import extract_extensions_from_filter, get_resource_path
-from editor.ui.widgets.filesystem import FileIconProvider
+from editor.tools.utils.path import get_resource_path
+#from editor.ui.widgets.filesystem import FileIconProvider
 from editor.ui.dialogs.file_selection import get_open_relative_file_name
 from PySide6.QtWidgets import QPushButton, QLineEdit, QLabel, QSpacerItem
 from PySide6.QtGui import QIcon
-from PySide6.QtCore import QFileInfo
 from pathlib import Path as PathLib
 import os
 
@@ -13,7 +12,7 @@ class Path(EditorWidget):
     FILE_FILTER = 'All Files (*.*)'
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.file_icon_provider = FileIconProvider()
+        #self.file_icon_provider = FileIconProvider()
         self.path_icon_display = QLabel()
         self.main_layout.addWidget(self.path_icon_display)
         self.main_layout.addSpacerItem(QSpacerItem(5, 5))
@@ -50,7 +49,7 @@ class Path(EditorWidget):
     def update_file_icon(self):
         if not self.FILE_FILTER:
             return
-        self.path_icon_display.setPixmap(self.file_icon_provider.icon(QFileInfo('file' + extract_extensions_from_filter(self.FILE_FILTER)[0])).pixmap(15, 15))
+        #self.path_icon_display.setPixmap(self.file_icon_provider.icon(QFileInfo('file' + extract_extensions_from_filter(self.FILE_FILTER)[0])).pixmap(15, 15))
 
     def update_editor(self):
         self.path_display.setReadOnly(False)

@@ -1,7 +1,7 @@
 from editor.core.models.base_model import BaseModel
 from editor.core.models.nodes.loader import node_properties as NODE_PROPERTIES
 from editor.core.models.nodes.nodes.base_node import BaseNodeProperties
-from editor.core.models.nodes.node_item import NodeItem
+from editor.tools.utils.node import NodeItem
 from PySide6.QtCore import Signal, QTimer
 from uuid import uuid4
 import json
@@ -57,6 +57,7 @@ class NodeTreeModel(BaseModel):
         
         self.node_data.pop(item)
         for decendent in self.dfs_children(item):
+            self.node_data[decendent].cleanup()
             self.node_data.pop(decendent)
         
         parent = item.parent

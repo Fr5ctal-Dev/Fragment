@@ -1,8 +1,9 @@
 from editor.ui.widgets.editor_view import EditorView
-from editor.ui.widgets.filesystem import FileSystem
 from editor.ui.widgets.task_manager import TaskManager
 from editor.ui.widgets.notifications import Notifications
 from editor.ui.views.inspector import InspectorView
+from editor.ui.views.filesystem import FileSystemView
+from editor.core.models.filesystem import FileSystemModel
 
 from PySide6 import QtWidgets, QtCore, QtQuickWidgets
 from PySide6.QtCore import Qt
@@ -51,9 +52,11 @@ class Editor(QtWidgets.QMainWindow):
         self.file_system_dock = QtWidgets.QDockWidget()
         self.file_system_dock.setWindowTitle('Files')
         self.file_system_dock.setAllowedAreas(Qt.DockWidgetArea.AllDockWidgetAreas)
-        self.file_system = FileSystem(self, self.path)
-        self.file_system.doubleClicked.connect(lambda index: self.open(Path(self.file_system.directory_model.filePath(index)).relative_to(self.path)))
-        self.file_system_dock.setWidget(self.file_system)
+        self.file_system_model = FileSystemModel(self, self.path)
+        self.file_system_view = FileSystemView(self)
+        self.file_system_view.set_model(self.file_system_model)
+        assert self.file_system_view.filesystem_tree is not None # For type checker
+        self.file_system_dock.setWidget(self.file_system_view.filesystem_tree)
         self.file_system_dock.setFeatures(QtWidgets.QDockWidget.DockWidgetFeature.DockWidgetMovable | QtWidgets.QDockWidget.DockWidgetFeature.DockWidgetFloatable | QtWidgets.QDockWidget.DockWidgetFeature.DockWidgetClosable)
         self.addDockWidget(Qt.DockWidgetArea.LeftDockWidgetArea, self.file_system_dock)
 
@@ -92,3 +95,5 @@ class Editor(QtWidgets.QMainWindow):
     def cleanup(self):
         self.editor_view.cleanup()
         self.task_manager.cleanup()
+        self.file_system_model.cleanup()
+        self.file_system_view.cleanup()

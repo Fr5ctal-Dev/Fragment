@@ -46,8 +46,6 @@ class Backend(QtCore.QObject):
             with open(path / 'main.fragment', 'w') as f:
                 f.write('')
             shutil.copytree(str(get_resource_path(Path('fragment'))), str(path / 'fragment'))
-            (path / 'scenes').mkdir()
-            (path / 'scripts').mkdir()
             (path / 'assets').mkdir()
             self._add_to_project_list(path)
             self.openInEditor(path)

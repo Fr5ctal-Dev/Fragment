@@ -1,4 +1,5 @@
 {
-  "scene": "file.fscene",
-  "script": "file.js"
+  "scene": [".fscene"],
+  "script": [".js"],
+  "fragment": [".fragment"]
 }

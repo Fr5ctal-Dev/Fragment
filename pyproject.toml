@@ -5,12 +5,8 @@ description = "An open-source, powerful, 2D Python game engine."
 readme = "README.md"
 requires-python = ">=3.10"
 dependencies = [
-    "jedi>=0.19.2",
-    "pyflakes>=3.4.0",
-    "pygame-ce>=2.5.5",
-    "pygame-render>=1.4.2",
-    "pygments>=2.19.2",
-    "pyperclip>=1.9.0",
+    "pyperclip>=1.11.0",
     "pyside6>=6.9.1",
     "ruff>=0.13.3",
+    "watchdog>=6.0.0",
 ]

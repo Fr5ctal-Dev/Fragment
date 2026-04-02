@@ -27,3 +27,15 @@ def get_save_relative_file_name(parent, relative_to: Path, caption='Save File', 
     else:
         QtWidgets.QMessageBox.warning(parent, 'Invalid path', f'Saved file is not relative to {relative_to}')
         return None
+    
+def get_open_relative_folder_name(parent, relative_to: Path, caption='Open Folder') -> Path | None:
+    path = QtWidgets.QFileDialog.getExistingDirectory(parent, caption, str(relative_to))
+    if not path:
+        return None
+    
+    path = Path(path)
+    if path.is_relative_to(relative_to):
+        return path.relative_to(relative_to)
+    else:
+        QtWidgets.QMessageBox.warning(parent, 'Invalid path', f'Selected folder is not relative to {relative_to}')
+        return None

@@ -1,7 +1,7 @@
 from editor.ui.dialogs.new_node_selection import NewNodeSelectionDialog
 from editor.ui.dialogs.file_selection import get_open_relative_file_name
 from editor.core.models.nodes import NodeTreeModel
-from editor.core.models.nodes.node_item import NodeItem
+from editor.tools.utils.node import NodeItem
 from editor.tools.utils.path import get_resource_path
 from ..base_view import BaseView
 from PySide6 import QtWidgets, QtGui
@@ -37,8 +37,6 @@ class NodeTree(QtWidgets.QTreeWidget):
 
         self.setHeaderLabel('Node Tree')
         self.setEditTriggers(QtWidgets.QAbstractItemView.EditTrigger.DoubleClicked)
-        self.setDragDropMode(QtWidgets.QAbstractItemView.DragDropMode.InternalMove)
-        self.setDefaultDropAction(Qt.DropAction.MoveAction)
         self.setDragEnabled(True)
         self.setAcceptDrops(True)
         self.setDropIndicatorShown(True)
@@ -119,7 +117,7 @@ class NodeTree(QtWidgets.QTreeWidget):
         elif drop_indicator == QtWidgets.QAbstractItemView.DropIndicatorPosition.OnItem:
             target_parent = target_item
         elif drop_indicator == QtWidgets.QAbstractItemView.DropIndicatorPosition.AboveItem or \
-             drop_indicator == QtWidgets.QAbstractItemView.DropIndicatorPosition.BelowItem:
+            drop_indicator == QtWidgets.QAbstractItemView.DropIndicatorPosition.BelowItem:
             target_parent = target_item.parent()
         else:
             target_parent = None
